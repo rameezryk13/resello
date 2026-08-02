@@ -1,0 +1,19 @@
+.pdp-star-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.pdp-star-icons svg {
+  color: var(--color-text-faint);
+  /* flagged — reseller slate-300 close to vendor text-faint, used
+     for the unfilled-star icon state */
+  fill: none;
+}
+
+.pdp-star-icons svg.filled {
+  color: var(--color-primary);
+  fill: currentColor;
+}

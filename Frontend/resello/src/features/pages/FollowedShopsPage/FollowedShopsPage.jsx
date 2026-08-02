@@ -1,0 +1,107 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { get, post } from "../../../api/client";
+import endpoints from "../../../api/endpoints";
+import Header from "../../../components/Header/Header.jsx";
+import AccountHero from "../../../components/PageSections/AccountHero";
+import "./FollowedShopsPage.css";
+
+const formatDate = (value) =>
+  new Date(value).toLocaleDateString("en-US", {
+    dateStyle: "medium",
+  });
+
+const FollowedShopsPage = () => {
+  const navigate = useNavigate();
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pendingShopId, setPendingShopId] = useState(null);
+
+  const loadFollowedShops = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await get(endpoints.followedShops);
+      setShops(data.followedShops || []);
+    } catch (err) {
+      setError(err?.message || "Unable to load followed shops");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFollowedShops();
+  }, []);
+
+  const toggleFollow = async (shopId) => {
+    setPendingShopId(shopId);
+    setError(null);
+
+    try {
+      const data = await post(endpoints.followedShops, { shopId });
+      setShops(data.followedShops || []);
+    } catch (err) {
+      setError(err?.message || "Unable to update followed shops");
+    } finally {
+      setPendingShopId(null);
+    }
+  };
+
+  return (
+    <div className="account-page animate-fade-in">
+      <Header />
+      <div className="container account-content">
+        <AccountHero title="Followed Shop" description="Every shop you follow is saved by the backend and listed here so you can return to it anytime." />
+
+        <section className="account-section">
+          {loading ? <p className="account-empty">Loading followed shops...</p> : null}
+          {error ? <p className="account-empty">{error}</p> : null}
+          {!loading && !error && shops.length === 0 ? (
+            <p className="account-empty">No followed shops yet. Use the Follow Shop button on a product or shop page.</p>
+          ) : null}
+
+          {!loading && !error && shops.length > 0 ? (
+            <div className="account-list">
+              {shops.map((shop) => (
+                <article key={shop.shopId} className="account-card">
+                  <div className="account-card-main">
+                    <div className="account-card-title">{shop.shopName}</div>
+                    <div className="account-card-subtitle">{shop.location}</div>
+                    <div className="account-meta-row">
+                      <span>{shop.followers} followers</span>
+                      <span>{shop.rating} star rating</span>
+                      <span>{shop.products} products</span>
+                      <span>Followed {formatDate(shop.followedAt)}</span>
+                    </div>
+                  </div>
+                  <div className="followed-shop-actions">
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => navigate(`/shop/${shop.shopId}`)}
+                    >
+                      Open Shop
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline"
+                      disabled={pendingShopId === shop.shopId}
+                      onClick={() => toggleFollow(shop.shopId)}
+                    >
+                      {pendingShopId === shop.shopId ? "Updating..." : "Unfollow"}
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default FollowedShopsPage;

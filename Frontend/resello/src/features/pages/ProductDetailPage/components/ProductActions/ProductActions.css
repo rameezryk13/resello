@@ -1,0 +1,156 @@
+.pdp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.pdp-actions-with-utilities {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 12px;
+  margin-bottom: 32px;
+}
+
+.pdp-actions-with-utilities .pdp-actions {
+  margin: 0;
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  max-width: 292px;
+}
+
+.pdp-small-action-btn {
+  min-width: 124px;
+  min-height: 50px;
+  padding: 0 18px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 14px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Keep both purchase actions visually consistent and prominent. */
+.pdp-actions .pdp-small-action-btn,
+.pdp-actions .pdp-small-action-btn.btn-outline {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.pdp-actions .pdp-small-action-btn:hover:not(:disabled) {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  color: var(--color-white);
+}
+
+.pdp-actions .pdp-small-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pdp-cart-feedback-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-basis: 100%;
+  width: 100%;
+  animation: pdpSlideDown 0.24s ease-out;
+}
+
+.pdp-cart-feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm-md);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pdp-cart-feedback.success {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  /* flagged, same as .pdp-stock-line.in-stock */
+  border: 1px solid var(--status-success-border);
+}
+
+.pdp-cart-feedback.error {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+  /* flagged, same as .pdp-stock-line.out-of-stock */
+  border: 1px solid var(--status-danger-border);
+}
+
+@media (max-width: 650px) {
+  .pdp-actions-with-utilities {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .pdp-actions-with-utilities .pdp-actions {
+    justify-content: stretch;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdp-actions-with-utilities .pdp-actions {
+    flex-direction: column;
+  }
+
+  .pdp-small-action-btn {
+    width: 100%;
+    min-height: 46px;
+    border-radius: var(--radius-md) !important;
+    font-size: 14px !important;
+    justify-content: center;
+  }
+
+  .pdp-cart-feedback-row {
+    width: 100%;
+  }
+
+  .pdp-cart-feedback {
+    width: 100%;
+  }
+}
+
+/* Appended last so it wins the cascade: pin Add to Cart / Buy Now to the
+   bottom of the viewport so they stay reachable while the page scrolls. */
+@media (max-width: 650px) {
+  .pdp-actions-with-utilities .pdp-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    gap: 10px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--color-white);
+    border-top: 1px solid var(--color-border-light);
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+  }
+
+  .pdp-actions-with-utilities .pdp-actions .pdp-small-action-btn {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
+  .pdp-actions-with-utilities .pdp-actions .pdp-cart-feedback-row {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 100%;
+    margin-bottom: 8px;
+  }
+}

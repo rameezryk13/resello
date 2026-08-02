@@ -1,0 +1,457 @@
+
+:root {
+
+  /* Orange (brand) */
+  --orange-50:   #fffbf5;   /* lightest orange tint — hover rows, unread items */
+  --orange-100:  #fff7ed;
+  --orange-150:  #fff2cc;   /* was hardcoded as --color-tint-strong in v1; now a real primitive */
+  --orange-200:  #ffeece;
+  --orange-300:  #fde8c8;
+  --orange-400:  #fcd9a0;
+  --orange-450:  #ff9e26;   /* off-scale accent — cs-btn--next gradient highlight ONLY.
+                                Note: this is visually LIGHTER than orange-500, not darker —
+                                it isn't meant to read as "between 400 and 500" on the lightness
+                                scale, it's a separate accent shade that happens to sit there
+                                numerically. Left as-is to avoid changing the cs-btn--next gradient. */
+  --orange-500:  #ff8c00;
+  --orange-600:  #e07b00;
+  --orange-glow: rgba(255, 140, 0, 0.18);
+
+  /* Green */
+  --green-100: #f0fdf4;
+  --green-200: #dcfce7;
+  --green-300: #bbf7d0;
+  --green-500: #16a34a;
+  --green-600: #15803d;
+
+  /* Red */
+  --red-100:      #fef2f2;
+  --red-200:      #fee2e2;
+  --red-300:      #fecaca;
+  --red-400:      #fca5a5;   /* input error border */
+  --red-500:      #dc2626;
+  --red-600:      #991b1b;
+  --red-700:      #be123c;
+  --red-bg-light: #fff5f5;   /* input error background — slightly warmer than red-100 */
+
+  /* Amber */
+  --amber-100: #fefce8;
+  --amber-200: #fef9c3;
+  --amber-300: #fde68a;
+  --amber-500: #ca8a04;
+  --amber-600: #a16207;
+  --amber-700: #92400e;
+  --amber-800: #8a5d00;   /* was hardcoded as --color-table-head-text in v1; now a real primitive */
+
+  /* Blue */
+  --blue-100: #eff6ff;
+  --blue-200: #dbeafe;
+  --blue-300: #bfdbfe;
+  --blue-500: #2563eb;
+  --blue-600: #1d4ed8;
+  --blue-700: #1e40af;
+
+  /* Sky (lighter blue — in-transit, process, courier) */
+  --sky-100: #f0f9ff;
+  --sky-300: #bae6fd;
+  --sky-600: #0369a1;
+
+  /* Indigo (video upload — distinct from orange image upload) */
+  --indigo-100: #f5f3ff;
+  --indigo-300: #c7d2fe;
+  --indigo-500: #6366f1;
+  --indigo-glow: rgba(99, 102, 241, 0.20);
+
+  /* Purple */
+  --purple-100: #fdf4ff;
+  --purple-200: #f5f3ff;
+  --purple-300: #e9d5ff;
+  --purple-400: #c4b5fd;
+  --purple-500: #7c3aed;
+  --purple-600: #7e22ce;
+  --purple-700: #6d28d9;
+
+  /* Pink */
+  --pink-100: #fdf2f8;
+  --pink-300: #fbcfe8;
+  --pink-500: #db2777;
+
+  /* Gray */
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Neutral */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Skeleton loader — exact values already in use in .skel__bone (DashboardHome.css
+     and HistoryPage.css), promoted from raw hex into real primitives. Note these
+     don't match any existing gray step exactly (closest is gray-100/200) — kept
+     as their own pair rather than snapping to gray-100/200, which WOULD have
+     changed the skeleton's current appearance slightly. */
+  --skeleton-base:  #f0f0f0;
+  --skeleton-shine: #e8e8e8;
+}
+
+
+/* ============================================================
+   LAYER 2 — SEMANTIC TOKENS
+   These are the ONLY values component CSS files reference.
+   ============================================================ */
+:root {
+
+  /* ── Brand ──────────────────────────────────────────────── */
+  --color-primary:            var(--orange-500);
+  --color-primary-dark:       var(--orange-600);
+  --color-primary-light:      var(--orange-400);   /* borders, dividers, gradient end */
+  --color-primary-highlight:  var(--orange-450);   /* cs-btn--next gradient only */
+  --color-primary-glow:       var(--orange-glow);  /* focus rings, shadows */
+
+  /* ── Surfaces ───────────────────────────────────────────── */
+  /* NOTE: --color-surface and --color-white share a value today, but they're
+     kept separate intentionally — --color-surface means "card/panel background",
+     --color-white means "white text/icon on a colored background". They only
+     happen to be the same hex because your surface color is white. Don't merge
+     these — if you ever introduce a dark surface, --color-white must stay #fff
+     while --color-surface changes. */
+  --color-bg:      var(--gray-50);   /* page background */
+  --color-surface: var(--white);     /* cards, panels, modals */
+  --color-white:   var(--white);     /* text/icons on colored backgrounds */
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --color-text-primary:   var(--gray-900);
+  --color-text-secondary: var(--gray-700);
+  --color-text-muted:     var(--gray-500);
+  --color-text-faint:     var(--gray-400);
+  --color-text-inverse:   var(--color-white);   /* NEW — names the existing pattern of
+                                                    using --color-white for text on
+                                                    primary/colored buttons */
+
+  /* ── Table header text ──────────────────────────────────── */
+  --color-table-head-text: var(--amber-800);   /* was raw hex in v1; same color */
+
+  /* ── Button fills without a status/brand role ────────────── NEW */
+  /* For dark secondary CTAs that aren't part of the primary/brand
+     family and aren't a status color either (e.g. CheckoutPage's
+     "add address" button). Previously these components referenced
+     --gray-900/--gray-800 directly, which breaks the "component
+     files only reference semantic tokens" rule. Same exact colors,
+     just given a proper semantic name. */
+  --color-button-dark:       var(--gray-900);   /* e.g. secondary dark CTAs like "add address" */
+  --color-button-dark-hover: var(--gray-800);
+
+  /* ── Borders ────────────────────────────────────────────── */
+  /* --color-border (generic black-alpha overlay) and --color-border-light/-medium
+     (solid grays) are two different mechanisms for a similar visual effect.
+     --color-border renders differently depending on what's behind it; the solid
+     ones don't. This is unchanged from v1 — flagging it here as a known nuance
+     rather than silently picking one for you. */
+  --color-border:        rgba(0, 0, 0, 0.07);
+  --color-border-light:  var(--gray-200);
+  --color-border-medium: var(--gray-300);
+
+  /* ── Border width ───────────────────────────────────────── NEW */
+  /* Names the de facto scale already in use across the app. */
+  --border-width-thin:  1px;    /* card/container borders */
+  --border-width-input: 1.5px;  /* form inputs, search bars */
+  --border-width-thick: 2px;    /* interactive emphasis — buttons, toggles, counters */
+
+  /* ── Brand tints (canonical) ────────────────────────────── */
+  --color-tint-hover:  var(--orange-50);    /* lightest — unread rows, item hover */
+  --color-tint-light:  var(--orange-100);   /* light — banners, icon bg, step active */
+  --color-tint-medium: var(--orange-200);   /* medium — badge bg, reseller icon */
+  --color-tint-strong: var(--orange-150);   /* strong — checkbox hover */
+
+  /* ── Brand tint aliases — @deprecated, same values as above ──
+     Migrate component files from these to the canonical names above,
+     then delete this block. Kept only so nothing breaks today. */
+  --color-back-primary-hover: var(--color-tint-hover);
+  --color-back-primary-1:     var(--color-tint-light);
+  --color-back-primary-2:     var(--color-tint-medium);
+
+  /* ── Shadows ────────────────────────────────────────────── */
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-brand:  0 6px 24px rgba(255, 140, 0, 0.28);
+  --shadow-orange: var(--shadow-brand);   /* @deprecated alias — ReadyShip, Stepper */
+  --shadow-success: 0 4px 12px rgba(22, 163, 74, 0.25);
+  --shadow-danger:  0 4px 12px rgba(220, 38, 38, 0.25);
+  --shadow-warning: 0 4px 12px rgba(202, 138, 4, 0.25);   /* NEW — parity with success/danger */
+  --shadow-info:    0 4px 12px rgba(37, 99, 235, 0.25);   /* NEW — parity with success/danger */
+  --shadow-focus:   0 0 0 3px var(--color-primary-glow);  /* NEW — names a literal that already
+                                                              appears verbatim 5+ times across
+                                                              component files */
+
+  /* These two name the recurring hand-typed neutral shadows already found across
+     the app (Orders/Products tab--active, dashboard-card:hover). Same exact
+     values as what's already rendering — purely a naming pass. */
+  --shadow-tab-active: 0 2px 6px rgba(0, 0, 0, 0.08);    /* NEW */
+  --shadow-card-hover: 0 10px 28px rgba(0, 0, 0, 0.10);  /* NEW */
+
+  /* ── Glow / focus rings ─────────────────────────────────── */
+  --color-danger-glow:  rgba(220, 38, 38, 0.08);    /* NEW — names the existing literal used
+                                                         in .input-error's box-shadow */
+  --color-neutral-glow: rgba(156, 163, 175, 0.2);   /* NEW — names the existing literal used
+                                                         in .store-dot.closed */
+
+  /* ── Radius ─────────────────────────────────────────────── */
+  --radius-2xs:   4px;    /* NEW — code labels, small chips */
+  --radius-xs:    6px;    /* NEW — tracking ID pills, color chips */
+  --radius-sm:    8px;
+  --radius-sm-md: 10px;   /* NEW — the single most common un-tokenized radius found
+                              across the codebase (tables, cards, tab labels, buttons) */
+  --radius-md:    14px;
+  --radius-lg:    20px;
+  --radius-pill:  20px;   /* NEW — same value as radius-lg, separate semantic name for
+                              pill-shaped badges/buttons so the two can diverge later
+                              without renaming every consumer */
+  --radius-full:  999px;  /* NEW — guaranteed full round regardless of element size */
+  --radius-xl:    26px;
+
+
+  /* ── Z-index ────────────────────────────────────────────── */
+  /* One ordered scale for the whole app. Every layer that overlaps another
+     reads from here — no raw z-index values in component files.
+
+     Read top to bottom: furniture that scrolls with the page sits lowest,
+     the header sits above it, and anything that interrupts the user
+     (scrim → modal → toast) sits above the header. Toast is last on purpose:
+     a confirmation must never be hidden behind the thing it confirms. */
+  --z-raised:   1;     /* in-flow siblings that must paint over a neighbour */
+  --z-sticky:   100;   /* sticky page furniture — rails, sticky buy bars */
+  --z-dropdown: 200;   /* select dropdowns, popups */
+  --z-popover:  300;   /* dots menus, small popovers */
+  --z-tooltip:  500;   /* hover tooltips */
+  --z-header:   900;   /* site header — over the page, under every overlay */
+  --z-overlay:  1000;  /* modal/panel backdrop scrims */
+  --z-modal:    1100;  /* modal panels, slide-out panels */
+  --z-toast:    1200;  /* toast notifications — always on top */
+
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  /* Names the durations already hand-typed across the app (0.2s almost
+     everywhere, 0.3s in a few places) and resolves the gap flagged in
+     OrdersPage.css, which had to drop --transition-speed for a literal
+     because no duration token existed. Every transition should name the
+     properties it animates — `transition: all` also animates layout
+     properties, which forces needless reflow on hover. */
+  --duration-fast: 120ms;   /* colour/opacity swaps */
+  --duration-base: 200ms;   /* the default — hover, focus, small transforms */
+  --duration-slow: 320ms;   /* panels, dropdowns, anything that travels */
+  --ease-out:      cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+
+
+  /* ══════════════════════════════════════════════════════════
+     STATUS COLORS
+     One canonical set for orders, products, history, badges,
+     buttons across every page.
+     Pattern per state: bg / border / text / icon / solid
+     ══════════════════════════════════════════════════════════ */
+
+  /* success — delivered, active, approved, accepted, done */
+  --status-success-bg:      var(--green-100);
+  --status-success-border:  var(--green-300);
+  --status-success-text:    var(--green-600);
+  --status-success-icon:    var(--green-500);
+  --status-success-solid:   var(--status-success-icon);  /* NEW — names the existing pattern of
+                                                              using -icon as a solid button/badge
+                                                              fill (.btn-approve, .product-status-
+                                                              badge--active, etc.) */
+
+  /* danger — cancelled, rejected, error, delete, failed */
+  --status-danger-bg:       var(--red-100);
+  --status-danger-border:   var(--red-300);
+  --status-danger-text:     var(--red-500);
+  --status-danger-icon:     var(--red-500);
+  --status-danger-solid:    var(--status-danger-text);   /* NEW */
+
+  /* danger input — error state on form inputs */
+  --status-danger-input-bg:     var(--red-bg-light);
+  --status-danger-input-border: var(--red-400);
+
+  /* warning — pending, ready-to-ship, ready-to-dispatch, low stock */
+  --status-warning-bg:          var(--amber-100);
+  --status-warning-border:      var(--amber-300);
+  --status-warning-text:        var(--amber-600);
+  --status-warning-text-dark:   var(--amber-700);  /* review hint / variants-locked notice —
+                                                        reused for 2 different contexts already,
+                                                        consider a more general name later */
+  --status-warning-icon:        var(--amber-500);  /* NEW — matches the value already used by
+                                                        --toast-warning-icon, given its own name
+                                                        for parity with the other status families */
+  --status-warning-solid:       var(--status-warning-icon);  /* NEW */
+
+  /* info — draft, in-transit, under-review, new information */
+  --status-info-bg:         var(--blue-100);
+  --status-info-border:     var(--blue-300);
+  --status-info-text:       var(--blue-600);
+  --status-info-icon:       var(--blue-500);
+  --status-info-solid:      var(--status-info-icon);  /* NEW */
+
+  /* new — new-order, COD badge, brand-accent items */
+  --status-new-bg:          var(--orange-100);
+  --status-new-border:      var(--orange-300);
+  --status-new-text:        var(--orange-500);
+  --status-new-icon:        var(--orange-500);   /* NEW — parity addition */
+
+  /* process — under-process, courier queue */
+  --status-process-bg:      var(--sky-100);
+  --status-process-border:  var(--sky-300);
+  --status-process-text:    var(--sky-600);
+  --status-process-icon:    var(--sky-600);      /* NEW — parity addition */
+
+  /* transit — in-transit, shipped */
+  --status-transit-bg:      var(--blue-100);
+  --status-transit-border:  var(--blue-300);
+  --status-transit-text:    var(--blue-600);
+  --status-transit-icon:    var(--blue-600);     /* NEW — parity addition */
+
+  /* return — returned orders (purple, no collision with any other status) */
+  --status-return-bg:       var(--purple-100);
+  --status-return-border:   var(--purple-300);
+  --status-return-text:     var(--purple-600);
+  --status-return-icon:     var(--purple-600);   /* NEW — parity addition */
+
+  /* inactive — inactive products, disabled variants */
+  --status-inactive-bg:     var(--gray-50);
+  --status-inactive-border: var(--gray-200);
+  --status-inactive-text:   var(--gray-500);
+  --status-inactive-icon:   var(--gray-500);     /* NEW — parity addition */
+
+  /* draft — saved drafts */
+  --status-draft-bg:        var(--purple-200);
+  --status-draft-border:    var(--purple-400);
+  --status-draft-text:      var(--purple-700);
+  --status-draft-icon:      var(--purple-500);
+
+
+  /* ══════════════════════════════════════════════════════════
+     TOAST
+     Single implementation in Toast.css.
+     Delete all TOAST_STYLES objects from JSX files.
+
+     --toast-success-* and --toast-draft-* are fully identical to
+     their --status-* equivalents, so they're now aliases (zero
+     visual change). --toast-error-* and --toast-info-* are NOT
+     aliased — they use different shades already (see header note)
+     — decide if that divergence was intentional before touching it.
+     ══════════════════════════════════════════════════════════ */
+
+  --toast-success-bg:     var(--status-success-bg);
+  --toast-success-border: var(--status-success-border);
+  --toast-success-text:   var(--status-success-text);
+  --toast-success-icon:   var(--status-success-icon);
+
+  --toast-error-bg:       var(--red-100);
+  --toast-error-border:   var(--red-300);
+  --toast-error-text:     var(--red-600);   /* deliberately different from --status-danger-text
+                                                (red-500) — already this way in v1, not merged */
+  --toast-error-icon:     var(--red-500);
+
+  --toast-warning-bg:     var(--status-warning-bg);
+  --toast-warning-border: var(--status-warning-border);
+  --toast-warning-text:   var(--status-warning-text);
+  --toast-warning-icon:   var(--status-warning-icon);
+
+  --toast-info-bg:        var(--blue-100);
+  --toast-info-border:    var(--blue-300);
+  --toast-info-text:      var(--blue-700);  /* deliberately different from --status-info-text
+                                                (blue-600) — already this way in v1, not merged */
+  --toast-info-icon:      var(--blue-500);
+
+  --toast-draft-bg:       var(--status-draft-bg);
+  --toast-draft-border:   var(--status-draft-border);
+  --toast-draft-text:     var(--status-draft-text);
+  --toast-draft-icon:     var(--status-draft-icon);
+
+  /* delete reuses danger — no separate token needed */
+
+
+  /* ══════════════════════════════════════════════════════════
+     FILTER CHIPS
+     Shared across orders, products, reviews pages.
+
+     chip-category / chip-time / chip-price are fully identical to
+     their --status-* equivalents, now aliased (zero visual change).
+     chip-sort is NOT fully aliased — its border (orange-400) differs
+     from --status-new-border (orange-300) already in v1.
+     ══════════════════════════════════════════════════════════ */
+
+  --chip-sort-bg:         var(--status-new-bg);
+  --chip-sort-border:     var(--orange-400);   /* intentionally not --status-new-border — see note above */
+  --chip-sort-text:       var(--status-new-text);
+
+  --chip-category-bg:     var(--status-info-bg);
+  --chip-category-border: var(--status-info-border);
+  --chip-category-text:   var(--status-info-text);
+
+  --chip-time-bg:         var(--status-warning-bg);
+  --chip-time-border:     var(--status-warning-border);
+  --chip-time-text:       var(--status-warning-text);
+
+  --chip-price-bg:        var(--status-success-bg);
+  --chip-price-border:    var(--status-success-border);
+  --chip-price-text:      var(--status-success-text);
+
+  /* star rating chip reuses --chip-time-* (amber) per design intent —
+     ReviewsPage.css currently uses --chip-sort-* (orange) instead;
+     that's a component-level fix to make when you update that file,
+     not something this tokens file can resolve on its own. */
+
+
+  /* ══════════════════════════════════════════════════════════
+     SPECIALTY
+     Unique UI elements not covered by status tokens. Unchanged.
+     ══════════════════════════════════════════════════════════ */
+
+  /* product color label pills (pink — not a status) */
+  --color-chip-pill-bg:     var(--pink-100);
+  --color-chip-pill-border: var(--pink-300);
+  --color-chip-pill-text:   var(--pink-500);
+
+  /* monospace code labels — Item ID, Product Code, Tracking ID */
+  --code-label-bg:   var(--gray-100);
+  --code-label-text: var(--gray-600);
+
+  /* courier badge — logistic carrier, distinct from order status */
+  --courier-bg:     var(--sky-100);
+  --courier-border: var(--sky-300);
+  --courier-text:   var(--sky-600);
+
+  /* video upload box — indigo, distinct from image upload (orange) */
+  --video-box-bg:     var(--indigo-100);
+  --video-box-border: var(--indigo-300);
+  --video-box-accent: var(--indigo-500);
+
+
+  /* ══════════════════════════════════════════════════════════
+     PAYMENT BADGES — reuse status tokens, no new variables
+     COD           → --status-new-*      (orange)
+     Online        → --status-info-*     (blue)
+     Bank Transfer → --status-success-*  (green)
+
+     NOTIFICATIONS — reuse status tokens, no new variables
+     order type    → --status-process-*  (sky blue)
+     payment type  → --status-success-*  (green)
+     review type   → --status-warning-*  (amber)
+     alert type    → --status-new-*      (orange)
+
+     REVIEW RATINGS — reuse status tokens, no new variables
+     Excellent ≥4.5 → --status-success-*
+     Good      ≥4.0 → --status-process-*
+     Average   ≥3.0 → --status-warning-*
+     Poor      ≥2.0 → --status-danger-*
+     Bad       <2.0 → --status-danger-*
+     ══════════════════════════════════════════════════════════ */
+}
+

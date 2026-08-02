@@ -1,0 +1,308 @@
+/* PaymentStep — the advance-payment form styled after PayFast.
+
+   The summary card embedded on the left is OrderSummaryCard in its
+   "payment" variant and styles itself; what lives here is the shell
+   around it (.payment-summary-shell, .payfast-mark, .payment-back-btn)
+   and the whole right-hand form. */
+
+.payment-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 1.08fr);
+  min-height: 720px;
+  overflow: hidden;
+  border-radius: var(--radius-sm-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+  /* flagged, see stepper note in CheckoutPage.css */
+}
+
+.payment-summary-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 5.5rem 1.8rem 3rem;
+  background: var(--color-bg);
+}
+
+.payment-back-btn {
+  position: absolute;
+  top: 5.8rem;
+  left: 1.8rem;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.payfast-mark {
+  display: grid;
+  gap: 0;
+  align-self: center;
+  margin-bottom: 6rem;
+  color: var(--status-info-text);
+  /* flagged, see file header note in CheckoutPage.css — this IS the
+     PayFast wordmark, but its color role still maps closest to info-text */
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.payfast-mark span {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  font-weight: 800;
+}
+
+.payfast-mark strong {
+  font-size: 1.85rem;
+  letter-spacing: 0.03em;
+}
+
+.payment-form-card {
+  position: relative;
+  padding: 4.5rem clamp(2rem, 6vw, 7rem);
+  background: var(--color-white);
+}
+
+.secure-server {
+  position: absolute;
+  top: 1rem;
+  right: clamp(1.5rem, 4vw, 4rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #69c59a;
+  /* INTENTIONALLY UNTOUCHED — third-party PayFast brand color,
+     see file header note in CheckoutPage.css */
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.secure-server svg:first-child {
+  color: var(--color-text-secondary);
+  /* flagged — reseller slate-700 close to vendor text-secondary */
+}
+
+.payment-form-card h2 {
+  margin: 0 0 1.35rem;
+  color: var(--color-text-primary);
+  /* flagged, see .section-title note in CheckoutPage.css */
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.payment-method-card {
+  width: 104px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  /* flagged, see .section-title note in CheckoutPage.css */
+  cursor: pointer;
+}
+
+.payment-method-card svg {
+  color: var(--status-info-text);
+  /* flagged, see file header note in CheckoutPage.css */
+}
+
+.payment-method-card span {
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.payment-method-card.active {
+  border-color: #93c5fd;
+  /* INTENTIONALLY UNTOUCHED — same PayFast-provider color pattern,
+     a solid-value selection ring rather than vendor's alpha-glow
+     mechanism; see file header note in CheckoutPage.css */
+  box-shadow: 0 0 0 3px #93c5fd;
+}
+
+.payment-fields {
+  display: grid;
+  gap: 2rem;
+  max-width: 590px;
+}
+
+.payment-fields label {
+  display: grid;
+  gap: 0.75rem;
+  color: var(--color-text-primary);
+  /* flagged, see .section-title note in CheckoutPage.css */
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.payment-fields input,
+.payment-fields select {
+  width: 100%;
+  min-height: 66px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-xs);
+  padding: 0 1.25rem;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  /* flagged, see .section-title note in CheckoutPage.css */
+  font-size: 1.25rem;
+}
+
+.payment-fields input::placeholder,
+.payment-fields select:invalid {
+  color: var(--color-text-faint);
+}
+
+.payment-fields small {
+  margin-top: -0.5rem;
+  color: var(--color-text-faint);
+  font-size: 0.85rem;
+}
+
+.payment-pay-btn {
+  min-height: 60px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #69c59a;
+  /* INTENTIONALLY UNTOUCHED — see file header note in CheckoutPage.css */
+  color: var(--color-white);
+  font-size: 1.35rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.payment-pay-btn:disabled {
+  background: var(--color-border-medium);
+  cursor: not-allowed;
+}
+
+.qr-pay-btn {
+  width: 88%;
+  min-height: 60px;
+  align-self: center;
+  margin: 4.5rem auto 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: #69c59a;
+  /* INTENTIONALLY UNTOUCHED — third-party PayFast brand color,
+     see file header note in CheckoutPage.css */
+  color: var(--color-white);
+  font-size: 1.35rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .payment-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-summary-shell {
+    padding: 4.75rem 1.25rem 2rem;
+  }
+
+  .payment-back-btn {
+    top: 1.25rem;
+    left: 1.25rem;
+  }
+
+  .payfast-mark {
+    margin-bottom: 2rem;
+  }
+
+  .payment-form-card {
+    padding: 4.5rem 1.25rem 2rem;
+  }
+
+  .secure-server {
+    right: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-layout {
+    min-height: 0;
+  }
+
+  .payment-method-card {
+    width: 96px;
+    height: 104px;
+  }
+
+  .payment-fields {
+    gap: 1.35rem;
+  }
+
+  .payment-fields input,
+  .payment-fields select {
+    min-height: 56px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-summary-shell {
+    padding: 4rem 1rem 1.5rem;
+  }
+
+  .qr-pay-btn {
+    width: 100%;
+    margin-top: 2rem;
+    min-height: 52px;
+    font-size: 1rem;
+  }
+
+  .payment-form-card {
+    padding: 4rem 1rem 1.5rem;
+  }
+
+  .secure-server {
+    font-size: 0.95rem;
+  }
+
+  .payment-form-card h2 {
+    font-size: 1.35rem;
+  }
+
+  .payment-methods {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .payment-method-card {
+    width: 100%;
+    height: 94px;
+    padding: 0.55rem;
+  }
+
+  .payment-method-card span {
+    font-size: 0.72rem;
+  }
+
+  .payment-fields label {
+    font-size: 0.95rem;
+  }
+
+  .payment-pay-btn {
+    min-height: 52px;
+    font-size: 1rem;
+  }
+}

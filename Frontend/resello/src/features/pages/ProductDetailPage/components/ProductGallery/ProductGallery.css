@@ -1,0 +1,102 @@
+.pdp-gallery {
+  display: grid;
+  grid-template-columns: 1fr minmax(72px, 96px);
+  gap: 16px;
+  width: 100%;
+  max-width: 640px;
+}
+
+@media (max-width: 600px) {
+  .pdp-gallery {
+    grid-template-columns: 1fr;
+  }
+  .pdp-thumbs {
+    flex-direction: row !important;
+    overflow-x: auto;
+    max-height: none;
+  }
+}
+
+.pdp-main-image {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--radius-sm-md);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+  /* flagged — no exact geometry match, closest subtle-shadow role */
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.pdp-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdp-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: min(100%, 520px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.pdp-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: var(--border-width-thick) solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--color-white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.pdp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdp-thumb:hover {
+  border-color: var(--color-border-medium);
+  box-shadow: var(--shadow-sm);
+  /* flagged, see .pdp-main-image note */
+}
+
+.pdp-thumb.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+  /* kept as its own thin solid-color ring pattern — different
+     geometry from --shadow-focus, so not substituted */
+}
+
+@media (max-width: 480px) {
+  .pdp-gallery {
+    gap: 12px;
+  }
+
+  .pdp-main-image {
+    border-radius: var(--radius-lg);
+    /* flagged — 18px, closest step is lg (20px) */
+    border-color: var(--color-border-light);
+    box-shadow: var(--shadow-md);
+    /* flagged, no exact geometry match */
+    background: linear-gradient(180deg, var(--color-white) 0%, var(--color-bg) 100%);
+  }
+
+  .pdp-thumbs {
+    gap: 8px;
+    padding-bottom: 4px;
+  }
+
+  .pdp-thumb {
+    width: 68px;
+    min-width: 68px;
+    border-radius: var(--radius-sm-md);
+  }
+}

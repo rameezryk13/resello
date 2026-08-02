@@ -1,0 +1,169 @@
+/* ============================================================
+   ProductDetailPage.css (PDP) — page-level layout only
+
+   Everything that belongs to a single component now lives in that
+   component's own stylesheet under components/<Name>/<Name>.css,
+   imported by the component itself. What's left here is the page
+   shell (grid, loading/error states) plus the handful of rules
+   genuinely shared by more than one component.
+
+   KEY DECISIONS (carried over from the design-token conversion):
+   - var(--primary-color, var(--primary-color)) — this odd
+     self-referential fallback syntax appeared throughout the
+     original file. It's meaningless (fallback = itself), so
+     simplified to plain var(--color-primary) everywhere.
+   - var(--color-blue-800) used repeatedly for review-section
+     headings/text — flagged same as CheckoutPage.css (no close
+     vendor match, mapped to --status-info-text as closest role).
+   - .pdp-return-policy's darkest text color (--color-orange-900,
+     #431407) has no close vendor equivalent at all — mapped to
+     --color-primary-dark as the closest available "dark brand text"
+     role, but flagged as a real hex gap, same category as vendor's
+     own flagged #B85C00 case in CreateSellerWizard.css.
+   ============================================================ */
+
+.pdp-page {
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+.pdp-loading,
+.pdp-error {
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.pdp-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 40px 48px;
+  align-items: start;
+  margin-bottom: 40px;
+}
+
+.pdp-info {
+  max-width: 520px;
+}
+
+.pdp-option-group {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.option-heading {
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: block;
+  color: var(--color-text-primary);
+}
+
+.pdp-action-error {
+  margin-top: 12px;
+  color: var(--status-danger-text);
+  /* flagged — reseller --color-danger (#ef4444) close to vendor
+     danger-text (red-500, #dc2626) */
+  font-size: 14px;
+}
+
+/* Mobile-only "Show all / Show less" toggle, shared by the return-policy
+   card and the Product details block. Hidden on larger screens where the
+   full text is always shown. */
+.pdp-mobile-show-all-btn {
+  display: none;
+}
+
+/* Used by .pdp-cart-feedback-row in ProductActions.css. Kept here because
+   @keyframes is document-global — the page stylesheet is the one file
+   guaranteed to load, so it stays the single place to define it. */
+@keyframes pdpSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .pdp-main-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdp-mobile-show-all-btn {
+    display: inline-block;
+    margin-top: 10px;
+    border: none;
+    background: transparent;
+    color: var(--color-primary);
+    font: inherit;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 4px 0;
+    cursor: pointer;
+  }
+
+  .pdp-mobile-show-all-btn:hover {
+    color: var(--color-primary-dark);
+  }
+}
+
+/* Leaves room for the Add to Cart / Buy Now bar that ProductActions.css
+   pins to the bottom of the viewport at this width. */
+@media (max-width: 650px) {
+  .pdp-page {
+    padding-bottom: 104px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdp-page {
+    padding-bottom: 40px;
+    background: linear-gradient(180deg, var(--color-white) 0%, var(--color-bg) 100%);
+  }
+
+  .pdp-loading,
+  .pdp-error {
+    padding: 56px 16px;
+    font-size: 14px;
+  }
+
+  .pdp-main-grid {
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .pdp-info {
+    max-width: none;
+    padding: 18px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    /* flagged — original used near-opaque white (0.96 alpha), which
+       is visually negligible; simplified to solid --color-surface */
+    box-shadow: var(--shadow-sm);
+    /* flagged, no exact geometry match */
+  }
+
+  .pdp-option-group {
+    margin-bottom: 16px;
+  }
+
+  .option-heading {
+    margin-bottom: 10px;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .pdp-action-error {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+}

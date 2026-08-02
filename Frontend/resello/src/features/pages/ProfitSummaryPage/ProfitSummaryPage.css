@@ -1,0 +1,384 @@
+/* ============================================================
+   ProfitSummaryPage.css
+   Mobile-card "wallet" style summary — self-contained, uses the
+   vendor token system where a token already fits, plus a small
+   set of local gradient values for the hero/payout cards since
+   no vendor token models this exact navy → teal / teal → green
+   diagonal treatment yet.
+   ============================================================ */
+
+.ps-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.ps-wrap {
+  padding: 28px 0 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.ps-shell {
+  width: 100%;
+  max-width: 460px;
+}
+
+/* ── Top bar ─────────────────────────────────────────────── */
+.ps-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.ps-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ps-back:hover {
+  background: var(--color-tint-hover);
+}
+
+.ps-topbar h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Hero gradient card ─────────────────────────────────── */
+.ps-hero {
+  border-radius: var(--radius-xl);
+  padding: 24px 22px 26px;
+  background: linear-gradient(135deg, var(--orange-600) 0%, var(--orange-500) 100%);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-white);
+  margin-bottom: 16px;
+}
+
+.ps-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.ps-hero-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ps-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  flex-shrink: 0;
+}
+
+.ps-hero-label strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ps-hero-label span {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  margin-top: 2px;
+}
+
+.ps-range-toggle {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  flex-shrink: 0;
+}
+
+.ps-range-toggle button {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.ps-range-toggle button.active {
+  background: var(--color-white);
+  color: #0a1240;
+}
+
+.ps-hero-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ps-currency {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ps-amount {
+  font-size: clamp(34px, 6vw, 44px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ps-hero-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+/* ── Stat row ────────────────────────────────────────────── */
+.ps-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 20px 8px;
+  margin-bottom: 18px;
+}
+
+.ps-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 0 8px;
+  position: relative;
+}
+
+.ps-stat + .ps-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--color-border-light);
+}
+
+.ps-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.ps-stat-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.ps-stat strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+/* ── Pending / Paid tabs ─────────────────────────────────── */
+.ps-tabs {
+  display: inline-flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ps-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--color-border-medium);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ps-tab.active {
+  background: #0a1240;
+  border-color: #0a1240;
+  color: var(--color-white);
+}
+
+.ps-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.24);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ── Upcoming payout card ───────────────────────────────── */
+.ps-payout-card {
+  border-radius: var(--radius-xl);
+  padding: 22px 22px 24px;
+  background: linear-gradient(135deg, var(--orange-600) 0%, var(--orange-500) 100%);
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 18px;
+}
+
+.ps-payout-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+}
+
+.ps-payout-amount {
+  font-size: clamp(28px, 5vw, 34px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.ps-payout-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0;
+}
+
+/* ── Transaction list ───────────────────────────────────── */
+.ps-list {
+  display: grid;
+  gap: 12px;
+}
+
+.ps-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+}
+
+.ps-list-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--status-warning-bg);
+  color: var(--status-warning-icon);
+  flex-shrink: 0;
+}
+
+.ps-list-item:has(.ps-list-amount.positive) .ps-list-icon {
+  background: var(--orange-100);
+  color: var(--orange-500);
+}
+
+.ps-list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.ps-list-main strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.ps-list-main span {
+  display: block;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.ps-list-amount {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--status-danger-text);
+  white-space: nowrap;
+}
+
+.ps-list-amount.positive {
+  color: var(--orange-600);
+}
+
+.ps-empty {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  padding: 18px 4px;
+  text-align: center;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .ps-wrap {
+    padding: 18px 0 40px;
+  }
+
+  .ps-shell {
+    max-width: 100%;
+  }
+
+  .ps-hero {
+    padding: 20px 18px 22px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ps-payout-card {
+    padding: 18px 18px 20px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ps-stat-row {
+    padding: 16px 4px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ps-topbar h1 {
+    font-size: 20px;
+  }
+}

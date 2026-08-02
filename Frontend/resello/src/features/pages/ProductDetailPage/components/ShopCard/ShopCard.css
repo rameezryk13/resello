@@ -1,0 +1,159 @@
+.pdp-shop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 22px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  margin-bottom: 24px;
+}
+
+.pdp-shop-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pdp-shop-avatar {
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-primary-light);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.pdp-shop-basic {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pdp-shop-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdp-shop-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.pdp-shop-location svg {
+  flex-shrink: 0;
+  color: var(--color-text-faint);
+}
+
+.pdp-shop-visit-btn {
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  padding: 0.65rem 1.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.pdp-shop-visit-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pdp-shop-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: 16px;
+}
+
+.pdp-shop-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  border-right: 1px solid var(--color-border-light);
+}
+
+.pdp-shop-stat:last-child {
+  border-right: none;
+}
+
+.pdp-shop-stat-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.pdp-shop-stat-value svg {
+  color: var(--color-primary);
+  fill: currentColor;
+}
+
+.pdp-shop-stat-label {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 480px) {
+  .pdp-shop-card {
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 0;
+  }
+
+  .pdp-shop-card-top {
+    gap: 10px;
+  }
+
+  .pdp-shop-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 0.9rem;
+  }
+
+  .pdp-shop-name {
+    font-size: 14px;
+  }
+
+  .pdp-shop-location {
+    font-size: 12px;
+  }
+
+  .pdp-shop-visit-btn {
+    padding: 0.55rem 1rem;
+    font-size: 0.82rem;
+  }
+
+  .pdp-shop-stats-grid {
+    padding-top: 12px;
+  }
+
+  .pdp-shop-stat-value {
+    font-size: 1rem;
+  }
+
+  .pdp-shop-stat-label {
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,125 @@
+.event-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.event-page-loading,
+.event-page-error {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.event-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.event-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(220px, 32vw, 340px);
+  background-position: center;
+  background-size: cover;
+  color: var(--color-white);
+}
+
+.event-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25));
+}
+
+.event-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.event-hero__content h2,
+.event-hero__content h1 {
+  margin: 0 0 16px;
+  font-size: clamp(24px, 4vw, 40px);
+  line-height: 1.2;
+}
+
+.event-hero__content p {
+  margin: 0;
+  font-size: clamp(14px, 2vw, 18px);
+  opacity: 0.92;
+}
+
+.event-page-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.event-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.event-page-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
+}
+
+.event-page-count {
+  margin: 0;
+  color: var(--color-text-muted, #6b7280);
+  font-size: 0.9rem;
+}
+
+.event-page-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.event-page-grid .product-card {
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * This page used to reuse the generic .empty-state class, which it never
+ * defined — it only rendered styled because Checkout, RowProducts and ShopPage
+ * each declare their own .empty-state and every page's CSS shipped in one
+ * bundle. Once routes are code-split that stylesheet may not be loaded here.
+ * These values are the union those three cascaded to, so this is the same
+ * appearance the page has always had, now owned by the page that uses it.
+ */
+.event-page-empty {
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+  line-height: 1.75;
+}
+
+@media (max-width: 1080px) {
+  .event-page-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .event-page-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
+}
+
+@media (max-width: 640px) {
+  .event-page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+}
+
+@media (max-width: 360px) {
+  .event-page-grid { grid-template-columns: 1fr; }
+}

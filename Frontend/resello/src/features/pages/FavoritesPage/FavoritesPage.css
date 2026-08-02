@@ -1,0 +1,337 @@
+/* ============================================================
+   FavoritesPage.css — converted to vendor design-token system
+   Straightforward — same slate→gray, orange-scale→primary,
+   and radius "closest step" patterns established in earlier files.
+   ============================================================ */
+
+.favorites-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-white) 0%, var(--color-bg) 100%);
+}
+
+.favorites-page-content {
+  min-height: 60vh;
+  padding: 40px 20px 56px;
+}
+
+.favorites-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.favorites-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+  /* flagged — reseller slate-900, closest role */
+}
+
+.favorites-grid {
+  gap: 16px;
+}
+
+.favorites-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.favorites-select-btn,
+.favorites-action-btn,
+.favorites-remove-btn {
+  min-height: 38px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.favorites-select-btn,
+.favorites-action-btn {
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  /* flagged — reseller slate-700, closest role */
+}
+
+.favorites-select-btn:hover,
+.favorites-action-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.favorites-remove-btn {
+  background: var(--status-danger-solid);
+  border-color: var(--status-danger-solid);
+  color: var(--color-white);
+}
+
+.favorites-remove-btn:hover {
+  background: var(--status-danger-border);
+  /* flagged — reseller danger-dark; vendor has no separate "darker
+     danger" token, closest is danger-border which is a mid-tone red,
+     not exactly a hover-darken; visually close but flagged */
+  border-color: var(--status-danger-border);
+}
+
+.favorites-select-btn:disabled,
+.favorites-action-btn:disabled,
+.favorites-remove-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.favorites-message {
+  margin-bottom: 16px;
+  border: 1px solid var(--color-primary-light);
+  /* flagged, see earlier orange-200 note */
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--color-tint-light);
+  color: var(--color-primary-dark);
+  /* flagged — reseller orange-800, closest role */
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.favorite-select-card {
+  position: relative;
+  border-radius: var(--radius-sm-md);
+}
+
+.favorite-select-card.selected .product-card {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow), var(--shadow-md);
+  /* flagged — original alpha 0.18 is an exact match to
+     --color-primary-glow, clean swap */
+}
+
+.favorite-select-control {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  /* intentionally raw — local stacking context above a card, same
+     precedent as other per-component z-index values left alone */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  background: var(--color-surface);
+  /* flagged — original near-opaque white (0.96 alpha) simplified to
+     solid surface, same treatment as PDP's .pdp-info */
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(31, 41, 55, 0.12);
+  /* flagged — approximated slate-900-alpha shadow using vendor
+     gray-800 hex, same pattern as earlier files */
+  cursor: pointer;
+}
+
+.favorite-select-control input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.favorites-empty-state {
+  margin-top: 20px;
+  padding: 72px 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  /* flagged, same near-opaque-white simplification as above */
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  /* flagged — 24px, closest step is xl (26px) */
+  box-shadow: var(--shadow-lg);
+  /* flagged, no exact geometry match, closest elevated role */
+}
+
+.favorites-empty-icon {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 16px;
+  color: var(--color-border-medium);
+  /* flagged — reseller slate-300, closest role */
+}
+
+.favorites-empty-title {
+  margin: 0 0 14px;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+}
+
+.favorites-empty-copy {
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+
+.favorites-empty-btn {
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 768px) {
+  .favorites-page-content {
+    padding: 28px 0 40px;
+  }
+
+  .favorites-header {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 18px;
+  }
+
+  .favorites-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .favorites-title {
+    font-size: 24px;
+  }
+
+  .favorites-grid {
+    gap: 14px;
+  }
+
+  .favorites-empty-state {
+    padding: 48px 20px;
+    border-radius: var(--radius-lg);
+    /* exact — 20px */
+  }
+
+  .favorites-empty-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-page-content {
+    padding: 22px 0 32px;
+  }
+
+  .favorites-title {
+    font-size: 22px;
+  }
+
+  .favorites-actions {
+    gap: 8px;
+  }
+
+  .favorites-select-btn,
+  .favorites-action-btn,
+  .favorites-remove-btn {
+    flex: 1 1 auto;
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .favorites-empty-state {
+    margin-top: 12px;
+    padding: 36px 16px;
+    border-radius: var(--radius-lg);
+    /* flagged — 18px, closest step is lg (20px) */
+  }
+
+  .favorites-empty-icon {
+    font-size: 38px;
+    margin-bottom: 12px;
+  }
+
+  .favorites-empty-title {
+    font-size: 19px;
+    margin-bottom: 10px;
+  }
+
+  .favorites-empty-copy {
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .favorites-empty-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+}
+
+/* ============================================================
+   .related-products-grid
+   Moved here from ProductDetailPage.css during the PDP component
+   split. The favorites grid opts into it (see FavoritesPage.jsx:
+   className="favorites-grid related-products-grid"), and the PDP's
+   own related-product rows go through RowSection instead — so this
+   page is now its only in-page owner.
+
+   Note: components/Product/Product.css also has a min-width:769px
+   block covering .related-products-grid .product-card alongside
+   .more-products-grid and .search-results-grid. That one is shared
+   by three separate grids and deliberately stays where it is.
+   ============================================================ */
+.related-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.related-products-grid .product-card {
+  width: 100%;
+  min-width: unset;
+}
+
+@media (max-width: 1600px) {
+  .related-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 1400px) {
+  .related-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .related-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .related-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .related-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}

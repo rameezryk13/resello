@@ -1,0 +1,222 @@
+.row-section {
+  margin-bottom: 0px;
+}
+
+.event-banner {
+  border-radius: var(--radius-sm-md);
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  min-height: 350px;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease;
+}
+
+.event-banner:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.event-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 100%);
+  /* flagged — overlay-dark gap */
+}
+
+.event-content {
+  position: relative;
+  z-index: 1;
+  max-width: 550px;
+}
+
+.event-content h3 {
+  color: var(--color-primary);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.event-content h2 {
+  font-size: 42px;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  font-family: 'Raleway', sans-serif;
+}
+
+.event-content p {
+  font-size: 16px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--color-primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.view-all-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: var(--color-primary-dark);
+}
+
+.slider-controls {
+  display: flex;
+  gap: 20px;
+}
+
+.slider-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  border: 1px solid var(--color-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+  color: var(--color-text-primary);
+}
+
+.slider-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 2px 0 4px;
+}
+
+.product-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding-bottom: 10px;
+  padding-top: 2px;
+  scroll-snap-type: x mandatory;
+  /* On very wide viewports (e.g. Chrome zoomed out to 50%) the whole
+     row of cards can fit at once — center it instead of leaving a
+     dead gap on the right. `safe center` falls back to left-aligned
+     scrolling the moment the cards no longer fit, so nothing is ever
+     clipped or made unreachable. */
+  justify-content: center;
+  justify-content: safe center;
+}
+
+.product-track::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .event-banner {
+      padding: 40px 20px;
+    }
+  .event-content h2 {
+      font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+  .section-header {
+      gap: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+  .section-header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      margin-bottom: 2px;
+    }
+  .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+  .slider-controls {
+      gap: 8px;
+    }
+  .slider-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      border-radius: var(--radius-xs);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-light);
+    }
+  .slider-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-white);
+    }
+  .product-track {
+      gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+  .slider-btn {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
+    }
+}

@@ -1,0 +1,757 @@
+/* ============================================================
+   AccountPage.css — converted to vendor design-token system
+
+   CHANGES APPLIED:
+   - var(--color-orange-50) → var(--color-tint-light)
+     (reseller's #fff7ed is an exact hex match for vendor's
+     orange-100/--color-tint-light, not vendor's own orange-50)
+   - var(--white) → var(--color-white)  (semantic layer, not the
+     raw primitive, per vendor's two-layer rule)
+   - var(--text-light) → var(--color-text-muted)
+   - var(--text-dark) → var(--color-text-primary)
+   - var(--primary-color) → var(--color-primary)
+   - var(--border-color) (#eaeaea) → var(--color-border-light)
+     (#e5e7eb) — flagged, 1-digit hex difference, closest role match
+   - var(--color-form-border) (#d8dbe2) → var(--color-border-medium)
+     (#d1d5db) — flagged, closest role match
+   - var(--color-form-placeholder) (#b0b5bf) → var(--color-text-faint)
+     (#9ca3af) — flagged, closest role match
+   - var(--color-form-helper) (#8b93a7) → var(--color-text-muted)
+     (#6b7280) — flagged, closest role match
+   - var(--color-warm-50) (#fffaf5) → var(--color-tint-hover)
+     (#fffbf5) — flagged, near-identical hex, same role (lightest tint)
+   - border-radius: 999px → var(--radius-full)
+   - border-radius: 20px → var(--radius-lg)  (exact match)
+   - border-radius: 14px → var(--radius-md)  (exact match)
+   - border-radius: 12px → var(--radius-sm-md)  (exact cheatsheet mapping)
+   - border-radius: 16px → var(--radius-md)  (closest existing step,
+     2px off — same "closest step" precedent already used throughout
+     vendor's own files for ambiguous radii)
+   - border-radius: 18px → var(--radius-lg)  (closest existing step,
+     2px off, same precedent)
+   - rgb(var(--rgb-primary) / 0.18) → var(--color-primary-glow)
+     (exact alpha match — this IS the token that value was invented for)
+   - --transition-speed (0.3s) has no equivalent in vendor's token
+     system at all (vendor has no duration/timing tokens). Replaced
+     with a literal 0.2s to match vendor's typical component transition
+     speed. Flagging as a possible future addition
+     (e.g. --transition-fast / --transition-base) rather than inventing
+     one unrequested.
+
+   STATUS BADGES — REMAPPED BY SEMANTIC ROLE, NOT BY ORIGINAL HUE:
+   The original file reused var(--color-orange-800) / warm-family
+   oranges across several unrelated status meanings (in-progress,
+   shipper's-advice, cancelled, returned, payment-pending) rather than
+   using vendor's proper distinct status families. Remapped each to
+   its correct vendor status per the cheatsheet's own documented
+   mapping ("cancelled/rejected → danger", "returned → return",
+   "pending → warning", etc):
+   - .status-in-progress      → var(--status-warning-bg/text)
+   - .status-shipper-s-advice → var(--status-info-bg/text)
+     (closest vendor category to a "pending on shipper" info message —
+     vendor has no dedicated token for this exact custom status)
+   - .status-delivered        → var(--status-success-bg/text)
+     REAL BUG FIXED: original paired a green background with
+     var(--color-warning-dark) (orange) text — a "delivered" badge
+     showing orange text on green is very likely an unintentional
+     leftover, not a deliberate design choice. Corrected to full
+     success green, consistent with vendor's own status-success family.
+   - .status-returned         → var(--status-return-bg/text)
+     Vendor has a dedicated purple "return" status family built
+     exactly for this case — original was using an orange variant,
+     which visually collided with the "new/cancelled" oranges below.
+     This is a genuine hue change (orange → purple); flagging clearly
+     since it's the most visually significant remap in this file.
+   - .status-cancelled        → var(--status-danger-bg/text)
+     Vendor's cheatsheet explicitly maps "cancelled/rejected → danger"
+     (red). Original used the same orange as several unrelated
+     statuses. Corrected to red — also a real hue change, flagged.
+   - .payment-badge-pending   → var(--status-warning-bg/text)
+   - .payment-badge-paid      → var(--status-success-bg/text)
+     (already conceptually correct — green-175/green-700 in the
+     original are close to vendor's success family; snapped to the
+     canonical values)
+
+   FLAGGED, NOT CHANGED — NEW TOKENS NEEDED IN MASTER variables.css:
+   - Several borders/backgrounds used rgb(var(--rgb-primary) / X) at
+     alpha values vendor doesn't have a named token for (0.12, 0.14,
+     0.16), plus a focus-ring shadow at 4px/0.08 (vendor's
+     --shadow-focus is 3px/0.18 — different geometry AND alpha, so
+     it can't be reused as-is). Converted all of these to raw
+     rgba(255, 140, 0, <alpha>) using vendor's orange-500 as the base
+     color, so they at least resolve to the correct brand hue — but
+     none of these have a proper semantic token yet. Candidates for
+     the master variables.css: --color-primary-glow-soft (0.12–0.14),
+     --shadow-focus-soft (0 0 0 4px / 0.08). Not adding them
+     unrequested — flagging for your confirmation first, since
+     they'd need to be added to vendor's master file, then copied to
+     reseller and user portal files per our agreed process.
+   ============================================================ */
+
+.account-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--color-tint-light) 0%, var(--color-white) 24%);
+}
+
+.account-content {
+  padding: 32px 0 56px;
+}
+
+.account-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.account-hero h1 {
+  font-size: clamp(28px, 3vw, 40px);
+  margin-bottom: 8px;
+}
+
+.account-hero p {
+  color: var(--color-text-muted);
+  max-width: 640px;
+  line-height: 1.6;
+}
+
+.payment-time-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.payment-time-filter {
+  border: 1px solid var(--color-primary-glow);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  /* was var(--color-warm-700) — flagged, no vendor token matches this
+     brown-orange text tone; mapped to closest semantic role */
+  border-radius: var(--radius-full);
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-time-filter:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.payment-time-filter.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 10px 20px var(--color-primary-glow);
+}
+
+.account-section {
+  background: var(--color-white);
+  border: 1px solid rgba(255, 140, 0, 0.12);
+  /* no vendor token at this alpha — see file header note */
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 22px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.account-payment-section {
+  margin-bottom: 24px;
+}
+
+.account-payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.account-selected-method {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-tint-light);
+  border: 1px solid rgba(255, 140, 0, 0.16);
+  /* no vendor token at this alpha — see file header note */
+  color: var(--color-text-primary);
+}
+
+.account-payment-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.account-payment-option {
+  border: 1px solid rgba(255, 140, 0, 0.16);
+  /* no vendor token at this alpha — see file header note */
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.account-payment-option:hover,
+.account-payment-option.active {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.account-stat-card {
+  background: linear-gradient(180deg, var(--color-tint-hover) 0%, var(--color-white) 100%);
+  border: 1px solid rgba(255, 140, 0, 0.12);
+  /* no vendor token at this alpha — see file header note */
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.account-stat-card span {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.account-stat-card strong {
+  display: block;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.account-list {
+  display: grid;
+  gap: 16px;
+}
+
+.orders-toolbar {
+  margin-bottom: 22px;
+}
+
+.orders-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.orders-status-tab {
+  border: 1px solid var(--color-primary-glow);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.orders-status-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.orders-status-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 10px 20px var(--color-primary-glow);
+}
+
+.orders-search {
+  position: relative;
+}
+
+.orders-search input {
+  width: 100%;
+  min-height: 56px;
+  border-radius: var(--radius-sm-md);
+  border: 1px solid var(--color-border-medium);
+  padding: 0 64px 0 16px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.orders-search input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(255, 140, 0, 0.08);
+  /* no vendor token matches this geometry/alpha — see file header note */
+}
+
+.orders-search input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.orders-search-icon {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 20px;
+}
+
+.account-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: var(--color-white);
+}
+
+.account-card-main {
+  flex: 1;
+}
+
+.account-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.account-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.account-card-subtitle,
+.account-meta-row,
+.account-empty {
+  color: var(--color-text-muted);
+}
+
+.account-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.account-side {
+  min-width: 160px;
+  text-align: right;
+}
+
+.account-side strong {
+  display: block;
+  font-size: 22px;
+  color: var(--color-primary);
+}
+
+.account-side span {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.account-products {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.account-product-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-in-progress {
+  background: var(--status-warning-bg);
+  color: var(--status-warning-text);
+}
+
+.status-shipper-s-advice {
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+  /* remapped from orange to vendor's info family — see file header note */
+}
+
+.status-delivered {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  /* BUG FIXED — original paired green bg with orange text; see file
+     header note */
+}
+
+.status-returned {
+  background: var(--status-return-bg);
+  color: var(--status-return-text);
+  /* remapped from orange to vendor's dedicated purple return family
+     — see file header note, real hue change */
+}
+
+.status-cancelled {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+  /* remapped from orange to vendor's danger family per the
+     cheatsheet's explicit "cancelled → danger" mapping — see file
+     header note, real hue change */
+}
+
+.account-dual-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+.account-mini-list {
+  display: grid;
+  gap: 12px;
+}
+
+.account-mini-card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-tint-light);
+  border: 1px solid rgba(255, 140, 0, 0.14);
+  /* no vendor token at this alpha — see file header note */
+}
+
+.account-mini-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.payment-summary-grid {
+  margin-bottom: 24px;
+}
+
+.payment-status-section {
+  margin-top: 0;
+}
+
+.payment-status-switcher {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-tint-light);
+  border: 1px solid rgba(255, 140, 0, 0.14);
+  /* no vendor token at this alpha — see file header note */
+}
+
+.payment-status-button {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-status-button.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 10px 20px var(--color-primary-glow);
+}
+
+.payment-order-list {
+  margin-top: 20px;
+}
+
+.payment-badge-pending {
+  background: var(--status-warning-bg);
+  color: var(--status-warning-text);
+}
+
+.payment-badge-paid {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+}
+
+.followed-shop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.followed-shop-actions button {
+  min-width: 140px;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.followed-shop-actions .btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: transparent;
+}
+
+.followed-shop-actions .btn-outline {
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-medium);
+}
+
+.followed-shop-actions .btn-outline:hover:not(:disabled) {
+  background: var(--color-tint-light);
+}
+
+.followed-shop-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 992px) {
+  .account-grid,
+  .account-dual-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .account-payment-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .account-content {
+    padding: 20px 0 34px;
+  }
+
+  .account-hero,
+  .account-card,
+  .account-payment-header {
+    flex-direction: column;
+  }
+
+  .account-hero {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .account-hero h1 {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  .account-hero p {
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .payment-time-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px;
+    margin: 0 -4px 18px;
+    padding: 2px 4px 8px;
+    scrollbar-width: none;
+  }
+
+  .payment-time-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .payment-time-filter {
+    flex: 0 0 auto;
+    padding: 9px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .account-section {
+    padding: 18px;
+    border-radius: var(--radius-lg);
+  }
+
+  .account-grid,
+  .account-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .account-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .account-stat-card {
+    padding: 16px 18px;
+    border-radius: var(--radius-md);
+  }
+
+  .account-stat-card span {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  .account-stat-card strong {
+    font-size: 1.95rem;
+  }
+
+  .account-card {
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .account-card-title {
+    font-size: 16px;
+  }
+
+  .account-card-subtitle,
+  .account-meta-row,
+  .account-side span {
+    font-size: 13px;
+  }
+
+  .account-side strong {
+    font-size: 20px;
+  }
+
+  .account-mini-list,
+  .account-list {
+    gap: 10px;
+  }
+
+  .account-mini-card {
+    padding: 14px;
+    border-radius: var(--radius-md);
+  }
+
+  .account-side,
+  .followed-shop-actions {
+    min-width: 0;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .orders-status-tab {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .orders-search input {
+    min-height: 52px;
+    font-size: 15px;
+  }
+
+  .payment-status-switcher {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .payment-status-button {
+    flex: 1;
+    text-align: center;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-content {
+    padding: 16px 0 28px;
+  }
+
+  .account-hero {
+    margin-bottom: 14px;
+  }
+
+  .account-hero h1 {
+    font-size: 1.7rem;
+  }
+
+  .account-hero p {
+    font-size: 0.92rem;
+  }
+
+  .payment-time-filters {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .payment-time-filter {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .account-section {
+    padding: 15px;
+    border-radius: var(--radius-md);
+  }
+
+  .account-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .account-stat-card {
+    padding: 14px 15px;
+  }
+
+  .account-stat-card strong {
+    font-size: 1.75rem;
+  }
+
+  .account-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .account-card-title {
+    font-size: 15px;
+  }
+
+  .account-side strong {
+    font-size: 18px;
+  }
+
+  .account-mini-card {
+    padding: 12px;
+  }
+
+  .payment-status-button {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+}

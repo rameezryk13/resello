@@ -1,0 +1,233 @@
+/* Source order matters here: the base .size-btn / .color-btn rules below are
+   later redefined by a second set of declarations that were merged in from
+   the old index.css. Those duplicates currently win the cascade, so the
+   original top-to-bottom order is kept intact. */
+
+@media (max-width: 650px) {
+  .size-selector,
+  .color-selector {
+    gap: 8px;
+  }
+
+  .size-btn,
+  .color-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .size-btn,
+  .color-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    border-width: var(--border-width-thin);
+    border-radius: var(--radius-sm-md);
+  }
+
+  .size-selector,
+  .color-selector {
+    gap: 8px;
+  }
+
+  .size-btn {
+    min-width: 44px;
+  }
+}
+
+.pdp-stock-line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 20px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm-md);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pdp-stock-line.in-stock {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  /* flagged — reseller success-dark darker than vendor's success-text */
+  border: 1px solid var(--status-success-border);
+  /* flagged — reseller green-200 vs vendor green-300, close role */
+}
+
+.pdp-stock-line.out-of-stock {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+  /* flagged — reseller danger-deep darker than vendor's danger-text */
+  border: 1px solid var(--status-danger-border);
+}
+
+.pdp-stock-label {
+  color: inherit;
+}
+
+.pdp-stock-context {
+  font-weight: 600;
+  opacity: 0.82;
+}
+
+.size-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.size-btn {
+  padding: 10px 16px;
+  border: var(--border-width-thick) solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.size-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+  /* flagged — reseller orange-75 close to vendor tint-light */
+}
+
+.size-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.color-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.color-btn {
+  padding: 5px 10px;
+  border: var(--border-width-thick) solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+  width: auto;
+}
+
+.color-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.color-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+  .size-selector,
+  .color-selector {
+    gap: 8px;
+  }
+
+  .size-btn,
+  .color-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    border-width: var(--border-width-thin);
+    border-radius: var(--radius-sm-md);
+  }
+
+  .size-btn {
+    min-width: 44px;
+  }
+}
+
+/* ---- merged shared product-detail rules from index.css ----
+   These repeat the selectors above and, being last, are the ones that
+   actually take effect. */
+
+.size-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.size-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-white);
+  border-radius: var(--radius-2xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.size-btn:hover, .size-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.color-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-btn {
+  display: inline-flex;
+  width: auto;
+  height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: var(--border-width-thick) solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-btn-swatch {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-full);
+}
+
+.color-btn:hover {
+  margin: 0;
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+  transform: none;
+}
+
+.color-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+  color: var(--color-text-primary);
+  transform: none;
+}

@@ -1,0 +1,106 @@
+.pdp-return-policy {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 32px;
+  padding: 24px 22px;
+  border: 1px solid var(--color-primary-light);
+  /* flagged — reseller orange-200 vs vendor primary-light, closest role */
+  background: var(--color-tint-light);
+  color: var(--color-primary-dark);
+  /* flagged — reseller orange-900 has no close vendor match at all,
+     see ProductDetailPage.css header note */
+}
+
+/* Desktop/window (default): keep the return policy in its original spot
+   after the main grid; the mobile duplicate (placed before the
+   description) stays hidden. On mobile this flips — see the 650px
+   media query below. */
+.pdp-return-policy--mobile {
+  display: none;
+}
+
+@media (max-width: 650px) {
+  .pdp-return-policy--mobile {
+    display: grid;
+    margin-bottom: 24px;
+  }
+
+  .pdp-return-policy--desktop {
+    display: none;
+  }
+}
+
+.pdp-return-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  border: 1px solid var(--color-primary-light);
+  /* flagged, see .pdp-return-policy note */
+  color: var(--color-primary);
+  /* flagged — reseller orange-500 hex differs from vendor primary,
+     resolves to brand color per unification */
+  line-height: 1;
+}
+
+.pdp-return-icon svg {
+  display: block;
+}
+
+.pdp-return-policy h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.pdp-return-policy p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.pdp-return-policy p + p {
+  margin-top: 16px;
+}
+
+.pdp-return-body {
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .pdp-return-policy {
+    width: 100%;
+    padding: 18px 16px;
+    gap: 12px;
+  }
+
+  .pdp-return-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pdp-return-policy h3 {
+    font-size: 16px;
+  }
+
+  .pdp-return-policy p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdp-return-body {
+    max-height: 0;
+    transition: max-height 0.25s ease;
+  }
+
+  .pdp-return-body.expanded {
+    max-height: 400px;
+  }
+}

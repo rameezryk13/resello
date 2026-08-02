@@ -1,0 +1,246 @@
+/* ============================================================
+   CheckoutPage.css — page shell only
+
+   The step-specific rules moved out to the component that owns
+   them: AddressStep.css, OrderSummaryCard.css, PaymentStep.css,
+   ConfirmStep.css. What stays here is what the page itself
+   renders, plus the three things every step shares:
+   .section-title, the card surface, and .empty-state.
+
+   KEY DECISIONS (apply to every file in this folder):
+   - #69c59a (mint-green "PayFast" pay button/secure-badge) and
+     #93c5fd (light-blue payment-method active ring) are almost
+     certainly a THIRD-PARTY PAYMENT PROVIDER's own brand colors
+     (PayFast), not part of this app's palette. Left as raw hex,
+     untouched — same treatment vendor gave the grayscale AWB
+     shipping label ("matches courier convention, not app branding").
+     They now live in PaymentStep.css; flagged there too so they
+     aren't mistaken for missed conversions.
+   - var(--color-blue-800) (#0f3d91, a distinct navy) has no close
+     vendor match (vendor's blue scale tops out at blue-700,
+     #1e40af) — mapped to --status-info-text throughout as the
+     closest role, but every instance is flagged since the hue is
+     visibly darker/more navy than vendor's info blue.
+   - The dark "add address" button (var(--color-gray-900) as a
+     button background) has NO vendor semantic token — vendor's
+     gray-900 is only ever used for --color-text-primary, never as
+     a button fill. Flagged as a genuine new-token candidate
+     (e.g. --color-button-dark) rather than silently reusing a
+     text-role primitive as a background. See AddressStep.css.
+   - Radius/shadow gaps handled the same way as CartPage.css —
+     closest existing step, flagged where not exact.
+   ============================================================ */
+
+.checkout-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.checkout-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.checkout-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  padding: 0.8rem 1.25rem;
+  border: 1px solid var(--color-border-light);
+  /* flagged — reseller neutral-250 (#e6e6e6) lighter than vendor's
+     actual border-light value */
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+  /* flagged — no exact geometry match, closest role */
+}
+
+.checkout-step {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-text-muted);
+  font-weight: 800;
+  min-width: 0;
+}
+
+.checkout-step:not(:last-child)::after {
+  content: "";
+  width: 70px;
+  height: 1px;
+  margin: 0 0.75rem;
+  background: var(--color-border-medium);
+}
+
+.checkout-step span {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-full);
+  background: var(--color-border-light);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.checkout-step.complete,
+.checkout-step.active {
+  color: var(--status-info-text);
+  /* flagged — reseller blue-800 (#0f3d91) is notably darker/navier
+     than vendor's info-text (blue-600, #1d4ed8) — see file header */
+}
+
+.checkout-step.complete span {
+  background: var(--status-success-solid);
+  color: var(--color-white);
+}
+
+.checkout-step.active span {
+  background: var(--status-info-solid);
+  /* flagged — same blue-800 vs blue-500 hue gap as above */
+  color: var(--color-white);
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Shared by every step component. Kept here rather than duplicated
+   into four files — they are one visual language, not per-step
+   styling, and splitting them would let the cards drift apart. */
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  /* flagged — reseller neutral-700 (#333) vs vendor gray-900 */
+}
+
+.checkout-address-card,
+.checkout-summary-card,
+.checkout-delivery-card,
+.checkout-payment-option-card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-md);
+  /* flagged, see stepper note */
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+
+.checkout-message,
+.checkout-error {
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+}
+
+.checkout-message.success {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  /* flagged — reseller green-150/green-900 darker/lighter than
+     vendor's exact success tokens, closest role */
+}
+
+.checkout-message.info {
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+  /* flagged, see file header note re: blue-800 */
+}
+
+.checkout-error {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+  /* flagged — reseller red-75/red-850 differ from vendor's exact
+     danger tokens, closest role */
+}
+
+@media (max-width: 960px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-stepper {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-content {
+    padding: 1.5rem 0 2.25rem;
+  }
+
+  .checkout-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .checkout-address-card,
+  .checkout-summary-card {
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .checkout-step:not(:last-child)::after {
+    width: 38px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-content {
+    padding: 1.1rem 0 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .checkout-grid {
+    gap: 1rem;
+  }
+
+  .checkout-address-card,
+  .checkout-summary-card {
+    padding: 0.9rem;
+    border-radius: var(--radius-md);
+  }
+
+  .checkout-stepper {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .checkout-step {
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .checkout-step span {
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+  }
+
+  .checkout-step:not(:last-child)::after {
+    width: 24px;
+    margin: 0 0.45rem;
+  }
+}

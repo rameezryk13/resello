@@ -1,0 +1,322 @@
+.pdp-reviews-reveal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin: 8px 0 32px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm-md);
+  background: var(--color-white);
+}
+
+.pdp-reviews-reveal-label {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text-primary);
+}
+
+.pdp-reviews-reveal-btn {
+  min-width: 96px;
+  flex-shrink: 0;
+}
+
+.pdp-review-section {
+  margin-bottom: 48px;
+  padding: 34px 50px 40px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  /* flagged — 28px, closest step is xl (26px) */
+  background: var(--color-white);
+}
+
+/* Paired with .pdp-star-icons svg.filled in RatingStars.css — the review
+   section renders its own inline star icons rather than that component. */
+.pdp-review-section svg.filled {
+  color: var(--color-primary);
+  fill: currentColor;
+}
+
+.pdp-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.pdp-review-header h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.pdp-see-all-reviews {
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.pdp-see-all-reviews:hover {
+  color: var(--color-primary-dark);
+}
+
+.pdp-review-content {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  gap: 40px;
+  padding-top: 34px;
+}
+
+.pdp-review-summary {
+  padding-right: 40px;
+  border-right: 1px solid var(--color-border-light);
+}
+
+.pdp-review-score {
+  color: var(--color-text-secondary);
+  /* flagged — reseller slate-700, closest role */
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.pdp-review-large-stars svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pdp-review-summary > p {
+  margin: 14px 0 26px;
+  color: var(--color-text-primary);
+  /* flagged, see .section-title style note */
+  font-size: 16px;
+}
+
+.pdp-review-mentions {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.pdp-review-mentions > span {
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pdp-review-mentions div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdp-review-mentions div span {
+  padding: 7px 12px;
+  border: 1px solid var(--color-primary-light);
+  /* flagged, see .pdp-return-policy note */
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--color-white);
+}
+
+.pdp-rating-bars {
+  display: grid;
+  gap: 16px;
+}
+
+.pdp-rating-bar-row {
+  display: grid;
+  grid-template-columns: 22px 20px minmax(100px, 1fr) 52px;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pdp-rating-bar-row strong {
+  justify-self: end;
+  font-weight: 600;
+}
+
+.pdp-rating-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-border-light);
+}
+
+.pdp-rating-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+}
+
+.pdp-review-list {
+  display: grid;
+  gap: 16px;
+}
+
+.pdp-review-card {
+  padding: 24px 26px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.pdp-review-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.pdp-review-card h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.pdp-review-card time {
+  color: var(--color-text-faint);
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.pdp-review-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 16px;
+}
+
+.pdp-review-card-stars svg {
+  width: 22px;
+  height: 22px;
+}
+
+.pdp-review-card p {
+  margin: 0;
+  color: var(--color-text-primary);
+  /* flagged, see ProductDetailPage.css header note re: blue-800 */
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.pdp-review-empty {
+  padding: 26px;
+  border: 1px dashed var(--color-border-medium);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .pdp-review-section {
+    padding: 28px 24px 32px;
+    border-radius: var(--radius-lg);
+  }
+
+  .pdp-review-content {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pdp-review-summary {
+    padding-right: 0;
+    padding-bottom: 28px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+}
+
+@media (max-width: 480px) {
+  .pdp-review-section {
+    padding: 18px 16px 22px;
+    margin-bottom: 28px;
+    border-radius: var(--radius-lg);
+  }
+
+  .pdp-review-header {
+    padding-bottom: 18px;
+  }
+
+  .pdp-review-header h2 {
+    font-size: 18px;
+  }
+
+  .pdp-see-all-reviews {
+    font-size: 13px;
+  }
+
+  .pdp-review-content {
+    padding-top: 20px;
+  }
+
+  .pdp-review-score {
+    font-size: 44px;
+  }
+
+  .pdp-review-large-stars svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pdp-review-summary > p,
+  .pdp-review-card p {
+    font-size: 14px;
+  }
+
+  .pdp-rating-bar-row {
+    grid-template-columns: 18px 18px minmax(80px, 1fr) 42px;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .pdp-rating-track {
+    height: 12px;
+  }
+
+  .pdp-review-card {
+    padding: 18px 16px;
+    border-radius: var(--radius-sm-md);
+  }
+
+  .pdp-review-card-header {
+    align-items: flex-start;
+  }
+
+  .pdp-review-card h3,
+  .pdp-review-card time {
+    font-size: 14px;
+  }
+
+  .pdp-review-card-stars svg {
+    width: 18px;
+    height: 18px;
+  }
+}

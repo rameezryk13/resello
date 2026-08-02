@@ -1,0 +1,215 @@
+/* ============================================================
+   ShopPage.css — converted to vendor design-token system
+   Straightforward file — no new-token gaps, no hue-flagged
+   remaps beyond the standard slate→gray role mapping.
+   ============================================================ */
+
+.shop-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.shop-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.shop-summary-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.75rem 2.25rem;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  /* flagged — 22px, closest step is lg (20px) */
+  padding: 1.6rem 1.75rem;
+  box-shadow: var(--shadow-lg);
+  /* flagged, no exact geometry match, closest elevated-card role */
+  margin-bottom: 2rem;
+}
+
+.shop-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.shop-avatar {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.shop-summary-left h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.shop-summary-left p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.shop-summary-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 1.75rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.shop-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-left: auto;
+}
+
+.shop-action-active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 10px 20px var(--color-primary-glow);
+}
+
+.shop-action-active:hover {
+  color: var(--color-white);
+}
+
+.shop-products-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.shop-products-grid .product-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.empty-state {
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  /* flagged — 16px, closest step is md (14px) */
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.shop-loading,
+.shop-error {
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  /* flagged, same as .empty-state */
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  /* flagged — reseller slate-700 vs vendor text-primary, closest role */
+}
+
+@media (max-width: 1200px) {
+  .shop-products-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .shop-content {
+    padding: 1.5rem 0 2.25rem;
+  }
+
+  .shop-summary-card {
+    padding: 1.25rem 1.1rem;
+    border-radius: var(--radius-md);
+    /* exact — 14px */
+  }
+
+  .shop-summary-left {
+    width: 100%;
+  }
+
+  .shop-summary-stats {
+    width: 100%;
+  }
+
+  .shop-summary-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .shop-products-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .shop-summary-card {
+    gap: 1rem;
+  }
+
+  .shop-summary-left h2 {
+    font-size: 1.2rem;
+  }
+
+  .shop-summary-left p,
+  .shop-summary-stats {
+    font-size: 0.9rem;
+  }
+
+  .shop-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-content {
+    padding: 1.1rem 0 1.8rem;
+  }
+
+  .shop-summary-card {
+    padding: 1rem 0.9rem;
+    border-radius: var(--radius-md);
+    /* exact — 14px was original desktop value; this 480px override
+       uses 14px too, so sm-md wasn't right — corrected note: original
+       480px value is 14px, mapping to --radius-md (exact) */
+  }
+
+  .shop-summary-left {
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .shop-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 1rem;
+  }
+
+  .shop-summary-left h2 {
+    font-size: 1.05rem;
+  }
+
+  .shop-summary-stats {
+    gap: 0.5rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .shop-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .shop-products-grid {
+    grid-template-columns: 1fr;
+  }
+}

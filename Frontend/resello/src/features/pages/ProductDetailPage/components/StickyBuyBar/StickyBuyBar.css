@@ -1,0 +1,136 @@
+/* ============================================================
+   Desktop floating buy bar
+   Appears once the person scrolls past the in-page Add to Cart /
+   Buy Now buttons, and floats above the bottom edge of the
+   viewport (rather than sitting flush against it like the mobile
+   pinned bar in ProductActions.css). Hidden on mobile — the
+   max-width:650px bar already covers that case.
+   ============================================================ */
+.pdp-sticky-buybar {
+  display: none;
+}
+
+@media (min-width: 651px) {
+  .pdp-sticky-buybar {
+    display: block;
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translate(-50%, 18px);
+    z-index: 60;
+    width: min(94%, 980px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .pdp-sticky-buybar.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+
+  .pdp-sticky-buybar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg), 0 2px 10px rgba(15, 23, 42, 0.06);
+    padding: 12px 20px 12px 12px;
+  }
+
+  .pdp-sticky-buybar-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .pdp-sticky-buybar-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-sm-md);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--color-tint-hover);
+  }
+
+  .pdp-sticky-buybar-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .pdp-sticky-buybar-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #16234d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 46vw;
+  }
+
+  .pdp-sticky-buybar-price {
+    font-size: 15px;
+    font-weight: 800;
+    color: #16234d;
+  }
+
+  .pdp-sticky-buybar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .pdp-sticky-buybar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--radius-full);
+    padding: 11px 20px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  }
+
+  .pdp-sticky-buybar-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .pdp-sticky-buybar-btn-outline {
+    background: var(--color-white);
+    border: 1.5px solid #16234d;
+    color: #16234d;
+  }
+
+  .pdp-sticky-buybar-btn-outline:not(:disabled):hover {
+    background: var(--color-tint-hover);
+  }
+
+  .pdp-sticky-buybar-btn-solid {
+    background: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-brand);
+  }
+
+  .pdp-sticky-buybar-btn-solid:not(:disabled):hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+  }
+}
+
+@media (min-width: 651px) and (max-width: 860px) {
+  .pdp-sticky-buybar-name {
+    max-width: 34vw;
+  }
+}

@@ -1,0 +1,13 @@
+.pdp-rows {
+  margin-top: 20px;
+}
+
+.pdp-rows .row-section:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 480px) {
+  .pdp-rows {
+    margin-top: 14px;
+  }
+}

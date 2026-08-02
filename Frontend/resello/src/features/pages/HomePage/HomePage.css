@@ -1,0 +1,25 @@
+.home-showcase {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 30px;
+  margin: 20px 0 50px;
+}
+
+@media (max-width: 992px) {
+  .home-showcase {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-showcase {
+    gap: 16px;
+    margin: 12px 0 32px;
+  }
+}
+
+/* @media (min-width: 1920px) {
+    .container {
+        width: min(100% - 0px, 2200px);
+    }
+} */

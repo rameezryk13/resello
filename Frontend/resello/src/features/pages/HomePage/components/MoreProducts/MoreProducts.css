@@ -1,0 +1,461 @@
+/* ============================================================
+   MoreProducts.css — converted to vendor design-token system
+
+   KEY DECISIONS:
+   - The select-dropdown's inline SVG arrow icons use hardcoded hex
+     fill colors (%23475569 = slate-600, %23334155 = slate-700,
+     %230ea5e9 = sky-500) baked directly into data-URIs. These can't
+     be swapped for CSS variables (SVG data-URIs don't resolve CSS
+     custom properties) — left as-is, flagged as a structural
+     limitation rather than a missed conversion. If exact-token colors
+     matter here, the fix is regenerating these SVGs with vendor's
+     actual hex values, not a CSS-level change.
+   - --rgb-sky (0ea5e9-based) appears in the select's hover/focus glow
+     — this is a genuinely different hue (blue) from anything else in
+     this file, not orange. No vendor token uses blue for form-focus
+     states (vendor's --shadow-focus is orange). Mapped to
+     --status-info-border-based rgba as the closest role match, but
+     flagged clearly — this may be an intentional distinct blue accent
+     for filter dropdowns specifically, worth confirming.
+   ============================================================ */
+
+.more-products-section {
+  padding: 40px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--color-border-light);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.more-products-header {
+  margin-bottom: 20px;
+}
+
+.more-products-header h2 {
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+}
+
+.more-products-header p {
+  font-size: clamp(12px, 1.5vw, 14px);
+  color: var(--color-text-faint);
+  margin-bottom: 30px;
+}
+
+.more-products-meta {
+  font-size: clamp(12px, 1.5vw, 14px);
+  color: var(--color-text-muted);
+  margin: 0 0 24px;
+  min-height: 1.35em;
+}
+
+.filter-status {
+  color: var(--color-text-muted);
+}
+
+.filter-error {
+  color: var(--status-danger-text);
+  /* flagged — reseller danger-deep darker than vendor's danger-text */
+  font-weight: 500;
+}
+
+.no-products-hint {
+  margin: 0 0 12px;
+  font-size: clamp(13px, 1.5vw, 15px);
+  color: var(--color-text-muted);
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.filter-label {
+  font-size: clamp(11px, 1.2vw, 12px);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.filter-label-context {
+  font-weight: 500;
+  color: var(--color-text-faint);
+}
+
+.filter-bar select {
+  appearance: none;
+  background: linear-gradient(135deg, var(--color-white) 0%, var(--color-bg) 100%);
+  border: var(--border-width-input) solid var(--color-border-light);
+  border-radius: var(--radius-sm-md);
+  padding: 10px 40px 10px 16px;
+  font-size: clamp(12px, 1.5vw, 14px);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+  height: 40px;
+  background-image:
+    linear-gradient(135deg, var(--color-white) 0%, var(--color-bg) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  /* SVG fill left as raw hex — data-URIs can't reference CSS
+     variables, see file header note */
+  background-repeat: no-repeat;
+  background-position: right 14px center, right 14px center;
+  background-size: 12px 12px, auto;
+  padding-right: 40px;
+  box-shadow: var(--shadow-sm);
+  /* flagged, closest subtle-shadow role */
+  position: relative;
+}
+
+.filter-field,
+.filter-bar > select,
+.filter-actions {
+  flex: 1 1 180px;
+}
+
+.filter-bar select:hover {
+  border-color: var(--color-border-medium);
+  background-image:
+    linear-gradient(135deg, var(--color-bg) 0%, var(--color-white) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23334155' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center, right 14px center;
+  background-size: 12px 12px, auto;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+  /* flagged — distinct blue accent (--rgb-sky), see file header note */
+  transform: translateY(-1px);
+}
+
+.filter-bar select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1), 0 4px 12px rgba(2, 132, 199, 0.12);
+  /* flagged — same distinct blue accent, see file header note */
+  background-image:
+    linear-gradient(135deg, var(--color-white) 0%, var(--status-info-bg) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230ea5e9' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center, right 14px center;
+  background-size: 12px 12px, auto;
+  transform: translateY(-2px);
+}
+
+/* Dropdown Options Styling */
+.filter-bar select option {
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+  border: none;
+}
+
+.filter-bar select option:checked {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--status-info-icon) 100%);
+  /* flagged — original blended into blue-500, a two-tone
+     orange→blue gradient; kept the blue endpoint per original design
+     rather than flattening to solid orange */
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.filter-bar select option:hover {
+  background-color: var(--status-info-bg);
+  color: var(--color-primary);
+}
+
+/* Filter Actions */
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-apply-filter,
+.btn-clear-filter {
+  border-radius: var(--radius-full);
+  font-size: clamp(12px, 1.5vw, 14px);
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-apply-filter {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 0 20px;
+  font-weight: 600;
+}
+
+.btn-apply-filter:hover {
+  background-color: var(--status-info-icon);
+  /* flagged — original hover targets blue-500, same intentional
+     blue-accent pattern as the select above */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
+  /* flagged, same blue accent */
+}
+
+.btn-clear-filter {
+  background-color: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-medium);
+  padding: 0 16px;
+  font-weight: 500;
+}
+
+.btn-clear-filter:hover {
+  background-color: var(--color-border-light);
+  color: var(--color-text-secondary);
+  border-color: var(--color-text-faint);
+}
+
+/* Product Grid */
+.more-products-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin: 0;
+}
+
+@media (min-width: 1920px) {
+  .more-products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+}
+
+.more-products-show-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.btn-show-more-products {
+  min-width: 180px;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 0 26px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px var(--color-primary-glow);
+  /* flagged — original alpha 0.22, close enough to reuse */
+  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-show-more-products:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px var(--color-primary-glow);
+  /* flagged — original alpha 0.28, using vendor's fixed 0.18 */
+}
+
+/* No Products Block */
+.no-products {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  margin-top: 20px;
+}
+
+.no-products h3 {
+  font-size: clamp(16px, 2vw, 20px);
+  margin-bottom: 10px;
+  color: var(--color-text-secondary);
+}
+
+.no-products button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-xs);
+  font-size: clamp(12px, 1.5vw, 14px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.no-products button:hover { background-color: var(--status-info-icon); }
+/* flagged — same intentional blue-accent hover pattern as above */
+
+@media (max-width: 1600px) {
+  .more-products-grid { grid-template-columns: repeat(6, 1fr); }
+}
+@media (max-width: 1200px) {
+  .more-products-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 992px) {
+  .more-products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .more-products-section {
+    padding: 28px 0;
+  }
+
+  .more-products-header {
+    margin-bottom: 16px;
+  }
+
+  .more-products-header h2 {
+    margin-bottom: 14px;
+  }
+
+  .more-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(248, 250, 252, 0.95) 0%, rgba(255, 255, 255, 1) 100%);
+    /* flagged — no vendor token for this translucent scrim, see
+       file header note */
+    box-shadow: var(--shadow-sm);
+    /* flagged, closest subtle-shadow role */
+  }
+
+  .filter-field,
+  .filter-bar > select,
+  .filter-actions {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .filter-field {
+    gap: 5px;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    letter-spacing: 0.01em;
+  }
+
+  .filter-bar select {
+    min-width: 0;
+    width: 100%;
+    height: 42px;
+    padding: 10px 40px 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-bg) 100%);
+    background-image:
+      linear-gradient(135deg, var(--color-white) 0%, var(--color-bg) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center, right 12px center;
+    background-size: 12px 12px, auto;
+  }
+
+  .filter-actions {
+    justify-content: stretch;
+    align-items: stretch;
+    background: none;
+    padding-left: 0;
+    position: static;
+  }
+
+  .btn-clear-filter {
+    width: 100%;
+    height: 42px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+  }
+
+  .more-products-meta {
+    margin: 0 0 18px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .more-products-section {
+    padding: 24px 0;
+  }
+
+  .more-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    overflow: visible;
+  }
+
+  .filter-field,
+  .filter-bar > select,
+  .filter-actions {
+    flex: initial;
+    width: 100%;
+  }
+
+  .more-products-header h2 {
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .filter-label {
+    font-size: 10px;
+  }
+
+  .filter-bar select,
+  .btn-clear-filter {
+    height: 40px;
+    font-size: 12px;
+    border-radius: var(--radius-sm-md);
+    background-image:
+      linear-gradient(135deg, var(--color-white) 0%, var(--color-bg) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center, right 11px center;
+    background-size: 11px 11px, auto;
+    padding-right: 36px;
+  }
+
+  .filter-actions {
+    grid-column: 1 / -1;
+  }
+}
