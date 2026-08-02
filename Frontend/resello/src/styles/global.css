@@ -1,8 +1,7 @@
 /* Fonts are preconnected and loaded from index.html, not @import-ed here.
    A CSS @import is discovered only after this stylesheet has downloaded and
    parsed, so it serialises two round trips before any text can paint. */
-@import './colors.css';
-@import './account-shell.css';
+@import './variables.css';
 
 * {
   margin: 0;

@@ -1,18 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.css'
-import App from './App.jsx'
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx'
-import { ToastProvider } from './components/Toast/ToastContainer.jsx'
+import App from './app/App.jsx'
+import AppProviders from './app/providers/AppProviders.jsx'
 
-// ErrorBoundary sits outside ToastProvider so a crash inside the provider
-// itself still renders the fallback instead of a blank page.
+// main.jsx is a mount point only: providers live in AppProviders, the layout
+// and route table in app/App.jsx.
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ErrorBoundary>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </ErrorBoundary>
+    <AppProviders>
+      <App />
+    </AppProviders>
   </StrictMode>,
 )
