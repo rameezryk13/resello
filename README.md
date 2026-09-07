@@ -1,5 +1,9 @@
 # ReSello
 
+> 🌐 **Live Website**: [https://rameezryk13.github.io/resello/](https://rameezryk13.github.io/resello/)
+> 
+> Open the link above to test the live application directly in your browser.
+
 A reseller storefront: shoppers browse products, add them to a cart, and check out;
 resellers see the profit earned on each order in a dashboard, wallet, and profit
 summary.
