@@ -1,37 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  TrendingUp,
-  ShoppingBag,
-  Wallet,
-  Gift,
-  Clock,
-  CheckCircle2,
-} from "lucide-react";
+import { ArrowLeft, Wallet } from "lucide-react";
 import Header from "@/components/layout/Header/Header.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import AccountAlert from "@/components/sections/AccountAlert";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import { CLEARED_STATUS, DEAD_STATUSES } from "@/constants/orderStatus";
+import useWallet from "@/features/wallet/useWallet";
+import ProfitHeadlineCard from "./components/ProfitHeadlineCard";
+import ProfitTrendChart from "./components/ProfitTrendChart";
+import ProfitStatsGrid from "./components/ProfitStatsGrid";
+import ProfitPenaltiesSection from "./components/ProfitPenaltiesSection";
+import ProfitPayoutsSection from "./components/ProfitPayoutsSection";
 import "./ProfitSummaryPage.css";
 
 const SALES_RANGES = ["All time", "This month"];
 const PAYOUT_TABS = ["Pending", "Paid"];
-
-const formatPKR = (value) => {
-  const number = Number(value);
-  const safe = Number.isFinite(number) ? number : 0;
-  return Math.round(safe).toLocaleString("en-PK");
-};
+const TREND_MONTHS = 6;
 
 const getPaymentStatus = (order) => {
-  const source = String(order?.orderId || "");
-  let total = 0;
-
-  for (let index = 0; index < source.length; index += 1) {
-    total += source.charCodeAt(index);
-  }
-
-  return PAYOUT_TABS[total % PAYOUT_TABS.length];
+  if (order?.status === CLEARED_STATUS) return "Paid";
+  if (DEAD_STATUSES.includes(order?.status)) return null;
+  return "Pending";
 };
 
 const isThisMonth = (value) => {
@@ -46,18 +37,51 @@ const isThisMonth = (value) => {
   );
 };
 
+const buildTrend = (orders) => {
+  const now = new Date();
+  const months = [];
+
+  for (let back = TREND_MONTHS - 1; back >= 0; back -= 1) {
+    const cursor = new Date(now.getFullYear(), now.getMonth() - back, 1);
+    months.push({
+      key: `${cursor.getFullYear()}-${cursor.getMonth()}`,
+      label: cursor.toLocaleDateString("en-US", { month: "short" }),
+      year: cursor.getFullYear(),
+      month: cursor.getMonth(),
+      profit: 0,
+    });
+  }
+
+  orders.forEach((order) => {
+    const created = new Date(order.createdAt);
+    if (Number.isNaN(created.getTime())) return;
+
+    const slot = months.find(
+      (entry) =>
+        entry.year === created.getFullYear() && entry.month === created.getMonth()
+    );
+
+    if (slot) slot.profit += Number(order.profit) || 0;
+  });
+
+  return months;
+};
+
 const ProfitSummaryPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [salesRange, setSalesRange] = useState("All time");
   const [payoutTab, setPayoutTab] = useState("Pending");
+  const { wallet, loading: walletLoading } = useWallet();
 
   useEffect(() => {
     let ignore = false;
 
     const loadOrders = async () => {
       setLoading(true);
+      setError(null);
 
       try {
         const data = await get(endpoints.orders);
@@ -70,8 +94,11 @@ const ProfitSummaryPage = () => {
             }))
           );
         }
-      } catch {
-        if (!ignore) setOrders([]);
+      } catch (err) {
+        if (!ignore) {
+          setOrders([]);
+          setError(err?.message || "Unable to load your earnings");
+        }
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -99,12 +126,28 @@ const ProfitSummaryPage = () => {
           totalSales: accumulator.totalSales + (Number(order.totalAmount) || 0),
           completedOrders: accumulator.completedOrders + 1,
           totalProfit: accumulator.totalProfit + (Number(order.profit) || 0),
-          totalBonus: accumulator.totalBonus + (Number(order.bonus) || 0),
+          itemsSold: accumulator.itemsSold + (Number(order.itemCount) || 0),
+          shipping: accumulator.shipping + (Number(order.shippingCharge) || 0),
         }),
-        { totalSales: 0, completedOrders: 0, totalProfit: 0, totalBonus: 0 }
+        {
+          totalSales: 0,
+          completedOrders: 0,
+          totalProfit: 0,
+          itemsSold: 0,
+          shipping: 0,
+        }
       ),
     [rangedOrders]
   );
+
+  const margin =
+    totals.totalSales > 0 ? (totals.totalProfit / totals.totalSales) * 100 : 0;
+
+  const avgProfitPerOrder =
+    totals.completedOrders > 0 ? totals.totalProfit / totals.completedOrders : 0;
+
+  const trend = useMemo(() => buildTrend(orders), [orders]);
+  const trendPeak = Math.max(...trend.map((entry) => entry.profit), 0);
 
   const pendingOrders = useMemo(
     () => orders.filter((order) => order.paymentStatus === "Pending"),
@@ -116,151 +159,95 @@ const ProfitSummaryPage = () => {
     [orders, payoutTab]
   );
 
-  const upcomingPayout = pendingOrders.reduce(
-    (sum, order) => sum + (Number(order.profit) || 0),
-    0
-  );
+  const upcomingPayout = wallet.pendingCommission;
+  const hasOrders = orders.length > 0;
 
   return (
     <div className="ps-page animate-fade-in">
       <Header />
       <div className="container ps-wrap">
-        <div className="ps-shell">
-          <div className="ps-topbar">
-            <button
-              type="button"
-              className="ps-back"
-              onClick={() => navigate(-1)}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={22} />
-            </button>
-            <h1>Payment Summary</h1>
+        <div className="ps-topbar">
+          <button
+            type="button"
+            className="ps-back"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
+          </button>
+          <div className="ps-topbar-text">
+            <h1>Earnings</h1>
+            <p>What you&apos;ve made, and what&apos;s still on its way.</p>
           </div>
 
-          <div className="ps-hero">
-            <div className="ps-hero-top">
-              <div className="ps-hero-label">
-                <span className="ps-hero-icon">
-                  <TrendingUp size={18} />
-                </span>
-                <div>
-                  <strong>TOTAL SALES</strong>
-                  <span>{salesRange}</span>
-                </div>
-              </div>
-
-              <div className="ps-range-toggle">
-                {SALES_RANGES.map((range) => (
-                  <button
-                    key={range}
-                    type="button"
-                    className={salesRange === range ? "active" : ""}
-                    onClick={() => setSalesRange(range)}
-                  >
-                    {range}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="ps-hero-amount">
-              <span className="ps-currency">PKR</span>
-              <span className="ps-amount">
-                {loading ? "--" : formatPKR(totals.totalSales)}
-              </span>
-            </div>
-            <p className="ps-hero-desc">
-              Sales you&apos;ve booked across all your customers.
-            </p>
-          </div>
-
-          <div className="ps-stat-row">
-            <div className="ps-stat">
-              <span className="ps-stat-icon">
-                <ShoppingBag size={18} />
-              </span>
-              <span className="ps-stat-label">COMPLETED ORDERS</span>
-              <strong>{loading ? "--" : totals.completedOrders}</strong>
-            </div>
-            <div className="ps-stat">
-              <span className="ps-stat-icon">
-                <Wallet size={18} />
-              </span>
-              <span className="ps-stat-label">TOTAL PROFIT</span>
-              <strong>PKR {loading ? "--" : formatPKR(totals.totalProfit)}</strong>
-            </div>
-            <div className="ps-stat">
-              <span className="ps-stat-icon">
-                <Gift size={18} />
-              </span>
-              <span className="ps-stat-label">TOTAL BONUS</span>
-              <strong>PKR {loading ? "--" : formatPKR(totals.totalBonus)}</strong>
-            </div>
-          </div>
-
-          <div className="ps-tabs">
-            {PAYOUT_TABS.map((tab) => (
+          <div className="ps-range-toggle" role="group" aria-label="Date range">
+            {SALES_RANGES.map((range) => (
               <button
-                key={tab}
+                key={range}
                 type="button"
-                className={`ps-tab ${payoutTab === tab ? "active" : ""}`}
-                onClick={() => setPayoutTab(tab)}
+                className={salesRange === range ? "active" : ""}
+                aria-pressed={salesRange === range}
+                onClick={() => setSalesRange(range)}
               >
-                {tab === "Pending" ? <Clock size={16} /> : <CheckCircle2 size={16} />}
-                {tab}
-                {tab === "Pending" && pendingOrders.length > 0 ? (
-                  <span className="ps-tab-badge">{pendingOrders.length}</span>
-                ) : null}
+                {range}
               </button>
             ))}
           </div>
-
-          <div className="ps-payout-card">
-            <span className="ps-payout-label">TOTAL UPCOMING PAYOUT</span>
-            <div className="ps-payout-amount">
-              PKR {loading ? "--" : formatPKR(upcomingPayout)}
-            </div>
-            <p className="ps-payout-desc">
-              Lands in your account once delivery is confirmed.
-            </p>
-          </div>
-
-          <div className="ps-list">
-            {loading ? (
-              <p className="ps-empty">Loading transactions...</p>
-            ) : payoutOrders.length ? (
-              payoutOrders.map((order) => (
-                <div className="ps-list-item" key={order.orderId}>
-                  <span className="ps-list-icon">
-                    {payoutTab === "Pending" ? (
-                      <Clock size={18} />
-                    ) : (
-                      <CheckCircle2 size={18} />
-                    )}
-                  </span>
-                  <div className="ps-list-main">
-                    <strong>
-                      {payoutTab === "Pending" ? "Payout Pending" : "Payout Complete"}
-                    </strong>
-                    <span>Order #{order.orderId}</span>
-                  </div>
-                  <span
-                    className={`ps-list-amount ${
-                      payoutTab === "Paid" ? "positive" : ""
-                    }`}
-                  >
-                    PKR {formatPKR(order.profit)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="ps-empty">
-                No {payoutTab.toLowerCase()} payouts to show yet.
-              </p>
-            )}
-          </div>
         </div>
+
+        <AccountAlert wallet={wallet} />
+
+        {error ? (
+          <EmptyState
+            variant="error"
+            title="Could not load your earnings"
+            description={error}
+          />
+        ) : null}
+
+        {loading ? <EmptyState variant="loading" title="Loading earnings..." /> : null}
+
+        {!loading && !error && !hasOrders ? (
+          <EmptyState
+            icon={Wallet}
+            title="No earnings yet"
+            description="Once an order is placed from your reseller account, your profit and payouts will show up here."
+          />
+        ) : null}
+
+        {!loading && !error && hasOrders ? (
+          <div className="ps-grid">
+            <ProfitHeadlineCard
+              salesRange={salesRange}
+              totals={totals}
+              margin={margin}
+              avgProfitPerOrder={avgProfitPerOrder}
+            />
+
+            <ProfitTrendChart
+              trend={trend}
+              trendPeak={trendPeak}
+              trendMonths={TREND_MONTHS}
+            />
+
+            <ProfitStatsGrid
+              totals={totals}
+              wallet={wallet}
+              walletLoading={walletLoading}
+            />
+
+            <ProfitPenaltiesSection wallet={wallet} />
+
+            <ProfitPayoutsSection
+              payoutTab={payoutTab}
+              setPayoutTab={setPayoutTab}
+              payoutTabs={PAYOUT_TABS}
+              pendingOrders={pendingOrders}
+              payoutOrders={payoutOrders}
+              upcomingPayout={upcomingPayout}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

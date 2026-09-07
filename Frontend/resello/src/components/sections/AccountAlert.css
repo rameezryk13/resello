@@ -1,0 +1,61 @@
+/* AccountAlert.css — the deactivation notice shown across the account pages.
+   Danger colours come from the shared status palette so it reads the same as
+   every other blocking state in the app. */
+
+.account-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm);
+  border: 1px solid var(--status-danger-border);
+  border-radius: var(--radius-sm-md);
+  background: var(--status-danger-bg);
+}
+
+.account-alert-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--status-danger-icon);
+}
+
+.account-alert-body { min-width: 0; }
+
+.account-alert-body strong {
+  display: block;
+  margin-bottom: var(--space-3xs);
+  color: var(--status-danger-text);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.account-alert-body p {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.account-alert-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  margin-top: var(--space-2xs);
+}
+
+.account-alert-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  color: var(--status-danger-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.account-alert-contact:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .account-alert { flex-direction: column; gap: var(--space-2xs); }
+}

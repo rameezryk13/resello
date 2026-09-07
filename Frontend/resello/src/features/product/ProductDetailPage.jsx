@@ -8,13 +8,13 @@ import VariantSelector from "./components/VariantSelector/VariantSelector";
 import QuantitySelector from "./components/QuantitySelector/QuantitySelector";
 import ProfitInputRow from "./components/ProfitInputRow/ProfitInputRow";
 import ProductActions from "./components/ProductActions/ProductActions";
-import ProductUtilityRow from "./components/ProductUtilityRow/ProductUtilityRow";
 import ShopCard from "./components/ShopCard/ShopCard";
 import ReturnPolicy from "./components/ReturnPolicy/ReturnPolicy";
 import ProductDetailsSection from "./components/ProductDetailsSection/ProductDetailsSection";
 import RelatedProductRows from "./components/RelatedProductRows/RelatedProductRows";
 import ReviewSection from "./components/ReviewSection/ReviewSection";
 import StickyBuyBar from "./components/StickyBuyBar/StickyBuyBar";
+import ShareModal from "./components/ShareModal/ShareModal";
 import useProductData from "./hooks/useProductData";
 import useProductVariants from "./hooks/useProductVariants";
 import useProductActions from "./hooks/useProductActions";
@@ -33,8 +33,20 @@ const ProductDetailPage = () => {
   const [productDetailsExpanded, setProductDetailsExpanded] = useState(false);
   const [reviewsSectionShown, setReviewsSectionShown] = useState(false);
   const [showStickyBuyBar, setShowStickyBuyBar] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [viewKey, setViewKey] = useState(null);
   const primaryActionsRef = useRef(null);
+
+  // Reset scroll to top whenever opening a product or switching products
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [id]);
 
   // Every expand/reveal control starts closed again on a different product.
   if (product && product !== viewKey) {
@@ -44,6 +56,7 @@ const ProductDetailPage = () => {
     setReturnPolicyExpanded(false);
     setProductDetailsExpanded(false);
     setReviewsSectionShown(false);
+    setShowShareModal(false);
   }
 
   const images =
@@ -163,12 +176,18 @@ const ProductDetailPage = () => {
               onChangeProfit={variants.setProfitValue}
               isFav={actions.isFav}
               favLoading={actions.favLoading}
+              favoriteCount={favoriteCount}
+              favoriteMessage={actions.favoriteMessage}
               downloadLoading={actions.downloadLoading}
-              onShare={actions.copyProductLink}
+              onShare={() => setShowShareModal(true)}
               onToggleFavorite={actions.toggleFavorite}
               onDownload={actions.downloadAllMedia}
             />
 
+            {/* Share, favourite and download live as icons on the profit row
+                above. They used to repeat here as labelled buttons, which put
+                three supporting actions directly under — and at the same
+                weight as — Add to Cart. */}
             <ProductActions
               containerRef={primaryActionsRef}
               addingToCart={actions.addingToCart}
@@ -177,32 +196,46 @@ const ProductDetailPage = () => {
               actionError={actions.actionError}
               onAddToCart={actions.addToCart}
               onBuyNow={actions.handleBuyNow}
-            >
-              <ProductUtilityRow
-                isFav={actions.isFav}
-                favLoading={actions.favLoading}
-                favoriteCount={favoriteCount}
-                favoriteMessage={actions.favoriteMessage}
-                downloadLoading={actions.downloadLoading}
-                onShare={actions.copyProductLink}
-                onToggleFavorite={actions.toggleFavorite}
-                onDownload={actions.downloadAllMedia}
-              />
-            </ProductActions>
+            />
 
             {actions.actionError ? (
-              <div className="pdp-action-error">{actions.actionError}</div>
+              <div className="pdp-action-error">
+                {actions.actionError.includes("support@resello.pk") ? (
+                  <>
+                    {actions.actionError.split("support@resello.pk")[0]}
+                    <a
+                      href="mailto:support@resello.pk"
+                      style={{ color: "#e11d48", textDecoration: "underline", fontWeight: 700 }}
+                    >
+                      support@resello.pk
+                    </a>
+                    {actions.actionError.split("support@resello.pk")[1]}
+                  </>
+                ) : (
+                  actions.actionError
+                )}
+              </div>
             ) : null}
-
-            <ShopCard shop={shop} fallbackShopName={product.shopName} />
           </div>
+
+          {/* Supporting cards. On a wide screen these take a third column, so
+              the page's surplus width holds content instead of inflating the
+              product image or stretching the buy form. Narrower than that the
+              grid folds them back under the buy column — see
+              ProductDetailPage.css. */}
+          <aside className="pdp-aside">
+            <ShopCard shop={shop} fallbackShopName={product.shopName} />
+
+            <ReturnPolicy
+              variant="desktop"
+              expanded={returnPolicyExpanded}
+              onToggle={() => setReturnPolicyExpanded((current) => !current)}
+            />
+          </aside>
         </div>
 
-        <ReturnPolicy
-          variant="desktop"
-          expanded={returnPolicyExpanded}
-          onToggle={() => setReturnPolicyExpanded((current) => !current)}
-        />
+        {/* The desktop copy lives inside the grid's left column above. This
+            one covers every width where that grid is a single column. */}
         <ReturnPolicy
           variant="mobile"
           expanded={returnPolicyExpanded}
@@ -242,6 +275,13 @@ const ProductDetailPage = () => {
         isOutOfStock={isOutOfStock}
         onAddToCart={actions.addToCart}
         onBuyNow={actions.handleBuyNow}
+      />
+
+      <ShareModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        product={product}
+        initialProfit={variants.profitValue}
       />
     </div>
   );

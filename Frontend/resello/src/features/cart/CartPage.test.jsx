@@ -4,9 +4,11 @@ import { BrowserRouter } from "react-router-dom";
 import CartPage from "./CartPage";
 import * as client from "@/api/client";
 
-// CartPage renders Header, which pulls in SearchBar and its own API calls.
-// None of that is under test here, so the whole Header is stubbed out.
-vi.mock("../../../components/Header/Header.jsx", () => ({
+// CartPage renders Header, which pulls in SearchBar, its own API calls and now
+// useAuth. None of that is under test here, so the whole Header is stubbed out.
+// The specifier has to match the one CartPage imports — it used to point at a
+// path that no longer exists, so the mock silently did nothing.
+vi.mock("@/components/layout/Header/Header.jsx", () => ({
   default: () => <div data-testid="mock-header">Header</div>,
 }));
 

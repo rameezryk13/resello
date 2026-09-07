@@ -1,0 +1,13 @@
+/* ResellerPage.css — Reseller Program page styling */
+
+.reseller-page-wrap {
+  position: relative;
+}
+
+.reseller-highlight-box {
+  padding: 16px 20px;
+  background: var(--color-tint-light, #fff8f0);
+  border-left: 4px solid var(--color-primary, #ff8c00);
+  border-radius: var(--radius-sm, 6px);
+  margin: 16px 0;
+}

@@ -4,6 +4,7 @@ import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import Product from "@/components/catalog/Product/Product.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import "./RowProductsPage.css";
 
 const RowProductsPage = () => {
@@ -82,11 +83,14 @@ const RowProductsPage = () => {
         </div>
 
         {loading ? (
-          <div className="row-products-loading">Loading products...</div>
+          <EmptyState variant="loading" title="Loading products..." />
         ) : error ? (
-          <div className="row-products-error">{error}</div>
+          <EmptyState variant="error" title="Could not load this section" description={error} />
         ) : products.length === 0 ? (
-          <div className="empty-state">No products available in this section.</div>
+          <EmptyState
+            title="No products here yet"
+            description="No products available in this section."
+          />
         ) : (
           <div className="row-products-grid">
             {products.map((product) => (

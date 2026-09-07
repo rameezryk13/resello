@@ -8,7 +8,7 @@ import Row from "@/components/catalog/Row/Row";
 import MoreProducts from "./components/MoreProducts/MoreProducts";
 import Events from "./components/Events/Events";
 import ShopByCategory from "./components/ShopByCategory/ShopByCategory";
-import TopRatedWholesalers from "./components/TopRatedWholesalers/TopRatedWholesalers";
+import TopRecommendedWholesalers from "./components/TopRecommendedWholesalers/TopRecommendedWholesalers";
 import "./HomePage.css";
 
 const Home = () => {
@@ -97,7 +97,7 @@ const Home = () => {
         <ShopByCategory categories={visualCategories} onCategoryClick={handleCategoryClick} />
 
         <section className="home-showcase animate-fade-in-up delay-100">
-          <TopRatedWholesalers shops={shops} />
+          <TopRecommendedWholesalers shops={shops} />
           <Events posters={heroPosters} />
         </section>
 

@@ -1,0 +1,293 @@
+/* NotificationPanel — right-side slide-in for the header bell.
+   Uses the vendor design-token system, same as Header.css. */
+
+.notif-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120000;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  justify-content: flex-end;
+  animation: notif-fade-in 0.2s ease;
+}
+
+.notif-panel {
+  width: min(400px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  animation: notif-slide-in 0.25s ease;
+}
+
+@keyframes notif-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes notif-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Respect users who ask the OS to reduce motion — the panel still appears,
+   it just does not travel across the screen. */
+@media (prefers-reduced-motion: reduce) {
+  .notif-overlay,
+  .notif-panel {
+    animation: none;
+  }
+}
+
+.notif-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.notif-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notif-panel-title h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.notif-panel-count {
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
+
+.notif-close-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notif-close-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.notif-mark-all {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  margin: 12px 20px 0;
+  padding: 7px 13px;
+  border: 1px solid var(--color-primary-glow);
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notif-mark-all:hover {
+  background: var(--color-tint-light);
+  border-color: var(--color-primary);
+}
+
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: 12px 20px 24px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
+  background: var(--color-white, #ffffff);
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Unread reads as "still needs you": warm tint plus a left accent bar, so it
+   is distinguishable without relying on the dot alone. */
+.notif-item.unread {
+  background: var(--color-tint-hover);
+  border-color: var(--color-primary-glow);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.notif-item-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+}
+
+.notif-item-icon.type-promo {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.notif-item-icon.type-order {
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+}
+
+.notif-item-icon.type-shipping {
+  background: var(--status-warning-bg);
+  color: var(--status-warning-text);
+}
+
+.notif-item-icon.type-wallet {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+}
+
+.notif-item-icon.type-review {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.notif-item.review-actionable {
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.notif-item.review-actionable:hover {
+  border-color: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.notif-review-cta {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #d97706;
+}
+
+.notif-item-body {
+  min-width: 0;
+}
+
+.notif-item-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.notif-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+.notif-item-message {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.notif-item-time {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-faint);
+  font-size: var(--text-xs);
+}
+
+/* Bell badge lives in the header next to the other nav icons. */
+.notif-bell-wrap {
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--status-danger-solid, #dc2626);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Mobile menu row counter — the drawer items are text rows, so the count sits
+   inline at the end rather than floating over an icon like .notif-badge. */
+.mobile-notif-count {
+  margin-left: auto;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--status-danger-solid, #dc2626);
+  color: var(--color-white);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Mobile drawer row: the count sits at the end of the row rather than floating
+   over the icon, since the drawer item is a full-width label, not an icon. */
+.mobile-notif-count {
+  margin-left: auto;
+  min-width: 20px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: var(--status-danger-solid, #dc2626);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .notif-panel {
+    width: 100%;
+  }
+
+  .notif-list {
+    padding: 12px 15px 20px;
+  }
+}

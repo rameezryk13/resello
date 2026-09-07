@@ -1,4 +1,5 @@
 import StaticPageLayout from "@/components/sections/StaticPageLayout";
+import "./DropshippingPage.css";
 
 const DropshippingPage = () => {
   return (

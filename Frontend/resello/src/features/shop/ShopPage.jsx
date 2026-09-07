@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Store } from "lucide-react";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import Product from "@/components/catalog/Product/Product.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import "./ShopPage.css";
 
 const ShopPage = () => {
@@ -122,7 +124,11 @@ const ShopPage = () => {
 
             <div className="shop-products-grid">
               {products.length === 0 ? (
-                <div className="empty-state">No products available for this shop.</div>
+                <EmptyState
+                  icon={Store}
+                  title="No products yet"
+                  description="No products available for this shop."
+                />
               ) : (
                 products.map((product) => (
                   <Product key={product.productId} product={product} showCategory />

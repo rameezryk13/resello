@@ -2,9 +2,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px 20px;
-  margin: 8px 0 32px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-sm);
+  margin: var(--space-2xs) 0 var(--space-lg);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm-md);
   background: var(--color-white);
@@ -12,7 +12,7 @@
 
 .pdp-reviews-reveal-label {
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 
@@ -22,8 +22,8 @@
 }
 
 .pdp-review-section {
-  margin-bottom: 48px;
-  padding: 34px 50px 40px;
+  margin-bottom: var(--space-xl);
+  padding: 34px var(--space-xl) var(--space-lg);
   border: 1px solid var(--color-border-light);
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
   /* flagged — 28px, closest step is xl (26px) */
@@ -41,8 +41,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 32px;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-lg);
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -50,7 +50,7 @@
   margin: 0;
   color: var(--color-text-primary);
   /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 24px;
+  font-size: var(--text-2xl);
   line-height: 1.25;
   font-weight: 800;
 }
@@ -62,7 +62,7 @@
   font: inherit;
   font-weight: 800;
   cursor: pointer;
-  padding: 6px 0;
+  padding: var(--space-3xs) 0;
 }
 
 .pdp-see-all-reviews:hover {
@@ -72,22 +72,25 @@
 .pdp-review-content {
   display: grid;
   grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
-  gap: 40px;
+  gap: var(--space-lg);
   padding-top: 34px;
 }
 
 .pdp-review-summary {
-  padding-right: 40px;
+  padding-right: var(--space-lg);
   border-right: 1px solid var(--color-border-light);
 }
 
 .pdp-review-score {
   color: var(--color-text-secondary);
   /* flagged — reseller slate-700, closest role */
-  font-size: 56px;
+  /* The big average-rating numeral. --text-hero is clamp(2.25rem, 5vw,
+     3.5rem) = 36→56px, which covers both the 56px desktop and 44px mobile
+     values this used to hard-code, so the mobile override below is gone. */
+  font-size: var(--text-hero);
   line-height: 1;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2xs);
 }
 
 .pdp-review-large-stars svg {
@@ -96,57 +99,156 @@
 }
 
 .pdp-review-summary > p {
-  margin: 14px 0 26px;
+  margin: var(--space-xs) 0 var(--space-md);
   color: var(--color-text-primary);
   /* flagged, see .section-title style note */
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
-.pdp-review-mentions {
-  display: grid;
+/* OFTEN MENTIONED TAGS (EXACT MATCH TO USER SCREENSHOT) */
+.pdp-often-mentioned-container {
+  margin: 16px 0 20px;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  margin-bottom: 28px;
 }
 
-.pdp-review-mentions > span {
-  color: var(--color-primary-dark);
+.pdp-often-mentioned-label {
+  color: var(--color-primary-dark, #ea580c);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.pdp-review-mentions div {
+.pdp-mention-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.pdp-review-mentions div span {
-  padding: 7px 12px;
-  border: 1px solid var(--color-primary-light);
-  /* flagged, see .pdp-return-policy note */
-  border-radius: var(--radius-full);
-  color: var(--color-text-primary);
-  /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 12px;
+.pdp-mention-chip {
+  padding: 6px 16px;
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdp-mention-chip:hover {
+  background: #fff8f0;
+  border-color: #f97316;
+  color: #ea580c;
+}
+
+.pdp-mention-chip.active {
+  background: var(--color-primary, #ff8c00);
+  color: #ffffff;
+  border-color: var(--color-primary, #ff8c00);
+  box-shadow: 0 4px 10px rgba(255, 140, 0, 0.25);
+}
+
+/* 3-CATEGORY RATINGS BREAKDOWN (Delivery, Quality, Price) */
+.pdp-category-breakdown-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.pdp-category-heading {
+  display: block;
+  font-size: 11px;
   font-weight: 800;
-  background: var(--color-white);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.pdp-category-meters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pdp-category-meter-row {
+  display: grid;
+  grid-template-columns: 105px minmax(100px, 1fr) 48px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.pdp-cat-name {
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdp-cat-track {
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.pdp-cat-track span {
+  display: block;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #ff8c00 0%, #f97316 100%);
+  transition: width 0.4s ease;
+}
+
+.pdp-cat-score {
+  font-weight: 800;
+  color: #0f172a;
+  text-align: right;
+  font-size: 13px;
+}
+
+/* Individual Review Card Category Pills */
+.pdp-review-card-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pdp-review-cat-chip {
+  font-size: 11px;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.pdp-review-cat-chip strong {
+  color: #ea580c;
 }
 
 .pdp-rating-bars {
   display: grid;
-  gap: 16px;
+  gap: var(--space-sm);
 }
 
 .pdp-rating-bar-row {
   display: grid;
   grid-template-columns: 22px 20px minmax(100px, 1fr) 52px;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2xs);
   color: var(--color-text-primary);
   /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 16px;
+  font-size: var(--text-base);
   font-weight: 600;
 }
 
@@ -171,11 +273,11 @@
 
 .pdp-review-list {
   display: grid;
-  gap: 16px;
+  gap: var(--space-sm);
 }
 
 .pdp-review-card {
-  padding: 24px 26px;
+  padding: var(--space-md) var(--space-md);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
   background: var(--color-white);
@@ -185,33 +287,33 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 10px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xs);
 }
 
 .pdp-review-card h3 {
   margin: 0;
   color: var(--color-text-primary);
   /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 18px;
+  font-size: var(--text-lg);
   line-height: 1.25;
   font-weight: 800;
 }
 
 .pdp-review-card time {
   color: var(--color-text-faint);
-  font-size: 16px;
+  font-size: var(--text-base);
   white-space: nowrap;
 }
 
 .pdp-review-card-rating {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-xs);
   color: var(--color-text-primary);
   /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
 .pdp-review-card-stars svg {
@@ -223,32 +325,32 @@
   margin: 0;
   color: var(--color-text-primary);
   /* flagged, see ProductDetailPage.css header note re: blue-800 */
-  font-size: 16px;
+  font-size: var(--text-base);
   line-height: 1.55;
 }
 
 .pdp-review-empty {
-  padding: 26px;
+  padding: var(--space-md);
   border: 1px dashed var(--color-border-medium);
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
   text-align: center;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 992px) {
   .pdp-review-section {
-    padding: 28px 24px 32px;
+    padding: var(--space-md) var(--space-md) var(--space-lg);
     border-radius: var(--radius-lg);
   }
 
   .pdp-review-content {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: var(--space-md);
   }
 
   .pdp-review-summary {
     padding-right: 0;
-    padding-bottom: 28px;
+    padding-bottom: var(--space-md);
     border-right: none;
     border-bottom: 1px solid var(--color-border-light);
   }
@@ -256,30 +358,29 @@
 
 @media (max-width: 480px) {
   .pdp-review-section {
-    padding: 18px 16px 22px;
-    margin-bottom: 28px;
+    padding: var(--space-sm) var(--space-sm) 22px;
+    margin-bottom: var(--space-md);
     border-radius: var(--radius-lg);
   }
 
   .pdp-review-header {
-    padding-bottom: 18px;
+    padding-bottom: var(--space-sm);
   }
 
   .pdp-review-header h2 {
-    font-size: 18px;
+    font-size: var(--text-lg);
   }
 
   .pdp-see-all-reviews {
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
 
   .pdp-review-content {
-    padding-top: 20px;
+    padding-top: var(--space-sm);
   }
 
-  .pdp-review-score {
-    font-size: 44px;
-  }
+  /* .pdp-review-score's 44px override used to live here — now covered by
+     the --text-hero clamp on the base rule. */
 
   .pdp-review-large-stars svg {
     width: 20px;
@@ -288,13 +389,13 @@
 
   .pdp-review-summary > p,
   .pdp-review-card p {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 
   .pdp-rating-bar-row {
     grid-template-columns: 18px 18px minmax(80px, 1fr) 42px;
-    gap: 8px;
-    font-size: 14px;
+    gap: var(--space-2xs);
+    font-size: var(--text-sm);
   }
 
   .pdp-rating-track {
@@ -302,7 +403,7 @@
   }
 
   .pdp-review-card {
-    padding: 18px 16px;
+    padding: var(--space-sm) var(--space-sm);
     border-radius: var(--radius-sm-md);
   }
 
@@ -312,7 +413,7 @@
 
   .pdp-review-card h3,
   .pdp-review-card time {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 
   .pdp-review-card-stars svg {

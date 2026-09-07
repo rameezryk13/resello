@@ -16,7 +16,7 @@ const ReturnPolicy = ({ variant, expanded, onToggle }) => (
           mein return ki darkhast saat (7) din k andar de ja sakti hai.
         </p>
         <p>
-          Return k liyay Markaz App ke Order screen pe apne order k sath
+          Return k liyay Resello App ke Order screen pe apne order k sath
           moujood Return button click karain.
         </p>
       </div>

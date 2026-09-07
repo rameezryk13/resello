@@ -1,46 +1,49 @@
 .pdp-product-code {
-  margin-bottom: 6px;
+  margin-bottom: var(--space-3xs);
   color: var(--color-text-faint);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
+/* Product name — the page's largest heading, deliberately fluid.
+   22→30px in rem; the vw middle term is unchanged so at the default 16px
+   root this still renders exactly 30px at desktop widths. */
 .pdp-title {
-  font-size: clamp(22px, 2.6vw, 30px);
+  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
   font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-xs);
   line-height: 1.25;
 }
 
 .pdp-rating-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-sm);
 }
 
 .pdp-reviews {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
 .pdp-price-row {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
 }
 
 .pdp-old-price {
   text-decoration: line-through;
   color: var(--color-text-faint);
-  font-size: 18px;
+  font-size: var(--text-lg);
 }
 
 .pdp-price {
-  font-size: 28px;
+  font-size: var(--text-2xl);
   font-weight: 800;
   color: var(--color-text-primary);
 }
@@ -48,44 +51,44 @@
 .pdp-desc {
   color: var(--color-text-muted);
   line-height: 1.65;
-  margin-bottom: 24px;
-  font-size: 15px;
+  margin-bottom: var(--space-md);
+  font-size: var(--text-base);
 }
 
 @media (max-width: 480px) {
   .pdp-title {
-    font-size: 22px;
+    font-size: var(--text-xl);
     line-height: 1.2;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2xs);
   }
 
   .pdp-rating-row {
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: var(--space-2xs);
+    margin-bottom: var(--space-xs);
   }
 
   .pdp-reviews {
-    font-size: 12px;
+    font-size: var(--text-xs);
   }
 
   .pdp-price-row {
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: var(--space-2xs);
+    margin-bottom: var(--space-xs);
     flex-wrap: wrap;
   }
 
   .pdp-old-price {
-    font-size: 15px;
+    font-size: var(--text-base);
   }
 
   .pdp-price {
-    font-size: 24px;
+    font-size: var(--text-2xl);
     letter-spacing: -0.02em;
   }
 
   .pdp-desc {
-    font-size: 14px;
+    font-size: var(--text-sm);
     line-height: 1.65;
-    margin-bottom: 18px;
+    margin-bottom: var(--space-sm);
   }
 }

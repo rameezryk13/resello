@@ -1,6 +1,7 @@
 import LegalSections from "@/components/sections/LegalSections";
 import StaticPageHero from "@/components/sections/StaticPageHero";
 import StaticPageLayout from "@/components/sections/StaticPageLayout";
+import "./TermsPage.css";
 
 const sections = [
   {

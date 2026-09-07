@@ -1,7 +1,11 @@
 .profit-row {
   display: grid;
-  grid-template-columns: minmax(140px, auto) 1fr;
-  gap: 6px;
+  /* The input takes what it needs and the icon group sits against the right
+     edge of the buy column. This used to be `minmax(140px, auto) 1fr` with the
+     icons hidden above 768px; now they show at every width, so the second track
+     is sized by its contents instead of soaking up the rest of the row. */
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xs);
   align-items: center;
 }
 
@@ -10,18 +14,24 @@
   max-width: 180px;
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm-md);
-  padding: 12px 14px;
-  font-size: 14px;
+  padding: var(--space-xs) var(--space-xs);
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
-/* Compact icon-only utility row shown next to the profit input on mobile;
-   hidden on larger screens where the labelled utility row is used. */
+/* Share / favourite / download. These are the page's secondary actions, so
+   they are icons at every width rather than the labelled full-width buttons
+   that used to stack below the buy controls — see ProfitInputRow.jsx. */
 .pdp-profit-icon-actions {
-  display: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  justify-self: end;
 }
 
 .pdp-icon-only-btn {
+  position: relative;
   width: 40px;
   height: 40px;
   flex-shrink: 0;
@@ -37,7 +47,7 @@
   transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
-.pdp-icon-only-btn:hover {
+.pdp-icon-only-btn:hover:not(:disabled) {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -53,34 +63,57 @@
   background: var(--color-tint-light);
 }
 
-@media (max-width: 480px) {
-  .profit-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
+/* Favourite count, tucked on the button's shoulder. Positioned rather than
+   inline so it cannot stretch the circular button out of shape. */
+.pdp-icon-btn-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
 
+/* Toggle confirmation. Right-anchored so it grows inwards over the buy column
+   instead of past the edge of the aside; the icons have no label to change, so
+   without this the favourite action gives no feedback at all. */
+.pdp-icon-actions-message {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2;
+  white-space: nowrap;
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--radius-sm-md);
+  background: var(--color-text-primary);
+  color: var(--color-white);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 480px) {
   .profit-input {
     max-width: none;
     min-height: 44px;
     border-radius: var(--radius-md);
-    font-size: 13px;
+    font-size: var(--text-sm);
     background: var(--color-bg);
-  }
-}
-
-/* Appended last so it wins the cascade: swap in the compact icon row
-   next to the profit input. */
-@media (max-width: 650px) {
-  .profit-row {
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 10px;
   }
 
   .pdp-profit-icon-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-self: end;
+    gap: var(--space-3xs);
+  }
+
+  /* Comfortable touch target while still fitting three circles plus the input
+     on a 320px screen. */
+  .pdp-icon-only-btn {
+    width: 44px;
+    height: 44px;
   }
 }

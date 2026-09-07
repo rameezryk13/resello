@@ -45,7 +45,7 @@
 
 .toast__message {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.5;
   margin: 0;
 }
@@ -124,6 +124,6 @@
   }
 
   .toast__message {
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
 }

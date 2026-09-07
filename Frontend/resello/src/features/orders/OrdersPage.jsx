@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
-import { get } from "@/api/client";
+import { PackageSearch, Star, Store, TriangleAlert } from "lucide-react";
+import { get, put } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import AccountHero from "@/components/sections/AccountHero";
-import { formatRupees, parsePrice } from "@/utils/currency";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import ReviewModal from "@/components/ui/ReviewModal/ReviewModal";
+import { ORDER_STATUSES, PENALTY_STATUS } from "@/constants/orderStatus";
+import { useToast } from "@/context/ToastContext";
+import { formatRupees, formatSignedRupees, parsePrice } from "@/utils/currency";
 import "./OrdersPage.css";
 
-const ORDER_STATUSES = ["In-progress", "Shipper's Advice", "Delivered", "Returned", "Cancelled"];
+// Orders split across suppliers each carry their own status, so they can land in
+// different tabs. "All" is the default so a checkout that became three orders is
+// visible in one place instead of scattered across the filters.
+const ALL_STATUSES = "All";
+const STATUS_TABS = [ALL_STATUSES, ...ORDER_STATUSES];
 
 const computeItemProfitTotal = (item) => {
   const rawProfit = item?.profit;
@@ -27,23 +36,16 @@ const formatDate = (value) =>
     timeStyle: "short",
   });
 
-const getOrderStatus = (order) => {
-  const source = String(order?.orderId || "");
-  let total = 0;
-
-  for (let index = 0; index < source.length; index += 1) {
-    total += source.charCodeAt(index);
-  }
-
-  return ORDER_STATUSES[total % ORDER_STATUSES.length];
-};
-
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeStatus, setActiveStatus] = useState("In-progress");
+  const [activeStatus, setActiveStatus] = useState(ALL_STATUSES);
   const [searchTerm, setSearchTerm] = useState("");
+  const [updating, setUpdating] = useState(null);
+  const [penalty, setPenalty] = useState(100);
+  const [reviewOrder, setReviewOrder] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -52,11 +54,7 @@ const OrdersPage = () => {
 
       try {
         const data = await get(endpoints.orders);
-        const enrichedOrders = (data.orders || []).map((order) => ({
-          ...order,
-          status: getOrderStatus(order),
-        }));
-        setOrders(enrichedOrders);
+        setOrders(data.orders || []);
       } catch (err) {
         setError(err?.message || "Unable to load orders");
       } finally {
@@ -67,9 +65,34 @@ const OrdersPage = () => {
     loadOrders();
   }, []);
 
+  // Flips an order's status and reports what it did to the wallet.
+  //
+  // A real deployment would get these transitions from a courier webhook. This
+  // switcher stands in for that so the commission and penalty rules can be
+  // walked through without waiting on a delivery.
+  const changeStatus = async (orderId, status) => {
+    setUpdating(orderId);
+    try {
+      const data = await put(endpoints.orderStatus(orderId), { status });
+      setOrders((current) =>
+        current.map((order) => (order.orderId === orderId ? data.order : order))
+      );
+      if (data.wallet) {
+        setPenalty(data.wallet.returnPenalty ?? penalty);
+        toast.success(
+          `${orderId} is now ${status}. Wallet balance ${formatSignedRupees(data.wallet.balance)}.`
+        );
+      }
+    } catch (err) {
+      toast.error(err?.message || "Could not update that order.");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
   const normalizedSearch = searchTerm.trim().toLowerCase();
   const filteredOrders = orders.filter((order) => {
-    if (order.status !== activeStatus) {
+    if (activeStatus !== ALL_STATUSES && order.status !== activeStatus) {
       return false;
     }
 
@@ -79,11 +102,11 @@ const OrdersPage = () => {
 
     const searchableText = [
       order.orderId,
+      order.shopName,
       order.address?.name,
       order.address?.line1,
       order.address?.line2,
       order.address?.city,
-      order.address?.country,
     ]
       .filter(Boolean)
       .join(" ")
@@ -96,12 +119,12 @@ const OrdersPage = () => {
     <div className="account-page animate-fade-in">
       <Header />
       <div className="container account-content">
-        <AccountHero title="My Orders" description="Track every order placed from your reseller account, including totals, profit, and shipping details." />
+        <AccountHero title="My Orders" description="Track every order placed from your reseller account. Items from different suppliers ship as separate orders, each with its own total, profit, and shipping." />
 
         <section className="account-section">
           <div className="orders-toolbar">
             <div className="orders-status-tabs" role="tablist" aria-label="Order status filters">
-              {ORDER_STATUSES.map((status) => (
+              {STATUS_TABS.map((status) => (
                 <button
                   key={status}
                   type="button"
@@ -120,7 +143,7 @@ const OrdersPage = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Order ID, Customer Name/Address..."
+                placeholder="Order ID, Supplier, Customer Name/Address..."
                 aria-label="Search orders"
               />
               <span className="orders-search-icon" aria-hidden="true">
@@ -129,13 +152,27 @@ const OrdersPage = () => {
             </div>
           </div>
 
-          {loading ? <p className="account-empty">Loading orders...</p> : null}
-          {error ? <p className="account-empty">{error}</p> : null}
+          {loading ? <EmptyState variant="loading" title="Loading orders..." /> : null}
+          {error ? (
+            <EmptyState
+              variant="error"
+              title="Could not load your orders"
+              description={error}
+            />
+          ) : null}
           {!loading && !error && orders.length === 0 ? (
-            <p className="account-empty">No orders yet. Place an order from checkout and it will appear here.</p>
+            <EmptyState
+              icon={PackageSearch}
+              title="No orders yet"
+              description="Place an order from checkout and it will appear here."
+            />
           ) : null}
           {!loading && !error && orders.length > 0 && filteredOrders.length === 0 ? (
-            <p className="account-empty">No orders found for this status or search.</p>
+            <EmptyState
+              icon={PackageSearch}
+              title="No matching orders"
+              description="No orders found for this status or search."
+            />
           ) : null}
 
           {!loading && !error && filteredOrders.length > 0 ? (
@@ -149,8 +186,21 @@ const OrdersPage = () => {
                         {order.status}
                       </span>
                     </div>
+                    {order.shopName ? (
+                      <div className="order-supplier-row">
+                        <span className="order-supplier-name">
+                          <Store size={15} aria-hidden="true" />
+                          {order.shopName}
+                        </span>
+                        {order.supplierCount > 1 ? (
+                          <span className="order-split-badge">
+                            Order {order.supplierIndex} of {order.supplierCount} from this checkout
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <div className="account-card-subtitle">
-                      {order.address?.name} • {order.address?.city}, {order.address?.country}
+                      {order.address?.name} • {order.address?.city}
                     </div>
                     <div className="account-meta-row">
                       <span>{formatDate(order.createdAt)}</span>
@@ -165,18 +215,59 @@ const OrdersPage = () => {
                         </div>
                       ))}
                     </div>
+
+                    {order.status === PENALTY_STATUS ? (
+                      <p className="order-penalty-note">
+                        <TriangleAlert size={15} aria-hidden="true" />
+                        {formatMoney(penalty)} return penalty charged to your wallet, and the
+                        commission on this order was reversed.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="account-side">
                     <strong>{formatMoney(order.totalAmount)}</strong>
                     <span>Total paid</span>
                     <span>Profit {formatMoney(order.profit)}</span>
+
+                    {order.status === "Delivered" && (
+                      <button
+                        type="button"
+                        className="order-review-btn"
+                        onClick={() => setReviewOrder(order)}
+                      >
+                        <Star size={14} /> ★ Leave Review & Photo
+                      </button>
+                    )}
+
+                    {/* Stands in for a courier webhook — see changeStatus. */}
+                    <label className="order-status-switcher">
+                      <span>Demo: set status</span>
+                      <select
+                        value={order.status}
+                        disabled={updating === order.orderId}
+                        onChange={(event) => changeStatus(order.orderId, event.target.value)}
+                        aria-label={`Set status for order ${order.orderId}`}
+                      >
+                        {ORDER_STATUSES.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                   </div>
                 </article>
               ))}
             </div>
           ) : null}
         </section>
+
+        <ReviewModal
+          open={Boolean(reviewOrder)}
+          order={reviewOrder}
+          onClose={() => setReviewOrder(null)}
+        />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatRupees, formatProductPrice } from "./currency";
+import { formatRupees, formatSignedRupees, formatProductPrice } from "./currency";
 
 // These functions run on every price the app renders, and they're written
 // defensively because the backend sends prices as strings, numbers, and
@@ -44,6 +44,27 @@ describe("formatRupees", () => {
     expect(formatRupees(null)).toBe("Rs. 0");
     expect(formatRupees("")).toBe("Rs. 0");
     expect(formatRupees("N/A")).toBe("Rs. 0");
+  });
+});
+
+describe("formatSignedRupees", () => {
+  it("puts the minus in front of the whole amount", () => {
+    // formatRupees would give "Rs. -500", which buries the sign inside the
+    // figure. A wallet in minus is the one place that reads badly.
+    expect(formatSignedRupees(-500)).toBe("− Rs. 500");
+  });
+
+  it("formats a positive balance exactly like formatRupees", () => {
+    expect(formatSignedRupees(1500)).toBe("Rs. 1,500");
+  });
+
+  it("treats zero as positive", () => {
+    expect(formatSignedRupees(0)).toBe("Rs. 0");
+  });
+
+  it("accepts the same loose input formatRupees does", () => {
+    expect(formatSignedRupees("-1,250.5")).toBe("− Rs. 1,250.5");
+    expect(formatSignedRupees(undefined)).toBe("Rs. 0");
   });
 });
 

@@ -1,3 +1,4 @@
+import { Mail } from "lucide-react";
 import { formatRupees, parsePrice } from "@/utils/currency";
 import { DELIVERY_PARTNER, SHIPPING_CHARGE } from "../../constants";
 import "./OrderSummaryCard.css";
@@ -18,6 +19,8 @@ const OrderSummaryCard = ({
   orderPaymentType,
   submitting,
   selectedAddressId,
+  deactivated = false,
+  wallet,
   onPrimaryAction,
 }) => {
   const isPayment = variant === "payment";
@@ -68,7 +71,7 @@ const OrderSummaryCard = ({
               </div>
               <div className="payment-summary-row">
                 <span>Store Name</span>
-                <strong>Markaz Technologies</strong>
+                <strong>Resello Technologies</strong>
               </div>
               <div className="payment-summary-row">
                 <span>Courier</span>
@@ -99,14 +102,55 @@ const OrderSummaryCard = ({
                 <span>Total</span>
                 <span>{formatRupees(total)}</span>
               </div>
-              <button
-                type="button"
-                className="buy-now-btn"
-                onClick={onPrimaryAction}
-                disabled={submitting || cartItems.length === 0 || !selectedAddressId}
+              {/* A deactivated account is refused by the backend anyway. Stopping
+                  the button here means the reason is visible before the click
+                  rather than after it. */}
+              <div
+                className="buy-now-btn-container"
+                onClick={() => {
+                  if (deactivated) {
+                    onPrimaryAction?.();
+                  }
+                }}
               >
-                {submitting ? "Processing..." : orderPaymentType === "cod" ? "Buy Now" : "Pay Now"}
-              </button>
+                <button
+                  type="button"
+                  className={`buy-now-btn ${deactivated ? "disabled-deactivated" : ""}`}
+                  onClick={onPrimaryAction}
+                  disabled={
+                    submitting || deactivated || cartItems.length === 0 || !selectedAddressId
+                  }
+                >
+                  {deactivated
+                    ? "Account deactivated"
+                    : submitting
+                      ? "Processing..."
+                      : orderPaymentType === "cod"
+                        ? "Buy Now"
+                        : "Pay Now"}
+                </button>
+              </div>
+              {deactivated ? (
+                <div className="account-disabled-badge-msg" role="status">
+                  <span className="account-disabled-badge-icon">⚠️</span>
+                  <div className="account-disabled-badge-body">
+                    <strong>Account Disabled (5 Return Penalties)</strong>
+                    <p className="account-disabled-badge-desc">
+                      Your account is disabled from placing orders due to 5 return penalties.
+                    </p>
+                    <div className="account-disabled-admin-contact">
+                      <span>Contact Admin:</span>{" "}
+                      <a
+                        href={`mailto:${wallet?.support?.email || "support@resello.pk"}`}
+                        className="account-disabled-email-link"
+                      >
+                        <Mail size={13} aria-hidden="true" />
+                        {wallet?.support?.email || "support@resello.pk"}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </>
           )}
         </>

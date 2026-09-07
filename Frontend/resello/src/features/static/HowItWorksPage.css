@@ -1,0 +1,46 @@
+/* HowItWorksPage.css — Step-by-step reseller journey */
+
+.static-page-container {
+  padding-top: 36px;
+  padding-bottom: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.static-hero-icon-card {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--color-tint-light, #fff8f0);
+  border: 1px solid rgba(255, 140, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(255, 140, 0, 0.15);
+}
+
+.text-primary {
+  color: var(--color-primary, #ff8c00);
+}
+
+.static-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  padding: 28px;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.04));
+  transition: all 0.25s ease;
+}
+
+.static-card:hover {
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(0, 0, 0, 0.06));
+  border-color: rgba(255, 140, 0, 0.3);
+}
+
+.static-card.align-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

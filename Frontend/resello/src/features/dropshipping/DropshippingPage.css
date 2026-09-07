@@ -1,0 +1,17 @@
+/* DropshippingPage.css — Dropshipping information styling */
+
+.dropshipping-page-wrap {
+  position: relative;
+}
+
+.dropshipping-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--color-tint-light, #fff8f0);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  color: var(--color-primary, #ff8c00);
+}

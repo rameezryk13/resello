@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import { get, put, del } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import AccountAlert from "@/components/sections/AccountAlert";
+import useWallet from "@/features/wallet/useWallet";
 import { formatRupees, parsePrice } from "@/utils/currency";
 import "./CartPage.css";
 
 const formatMoney = (value) => formatRupees(value);
 
 const CartPage = () => {
+  const { wallet } = useWallet();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +52,7 @@ const CartPage = () => {
       });
       setCartItems(data.cart || []);
       setMessage("Cart updated successfully.");
+      window.dispatchEvent(new CustomEvent("resello:cart-updated"));
     } catch (err) {
       setError(err?.message || "Unable to update quantity");
     } finally {
@@ -62,6 +68,7 @@ const CartPage = () => {
       const data = await del(endpoints.cart.item(itemId));
       setCartItems(data.cart || []);
       setMessage("Item removed from cart.");
+      window.dispatchEvent(new CustomEvent("resello:cart-updated"));
     } catch (err) {
       setError(err?.message || "Unable to remove item");
     } finally {
@@ -139,6 +146,7 @@ const CartPage = () => {
     <div className="cart-page animate-fade-in">
       <Header />
       <div className="container cart-page-content">
+        <AccountAlert wallet={wallet} />
         <div className="cart-main-section">
           <div className="cart-heading-row">
             <h2>Your Cart</h2>
@@ -147,17 +155,20 @@ const CartPage = () => {
 
           {message ? <div className="cart-message success">{message}</div> : null}
           {cartItems.length === 0 ? (
-            <div className="cart-empty-state">
-              <h3>Your cart is empty</h3>
-              <p>Add a product from the product page to begin checkout.</p>
-              <button
-                type="button"
-                className="cart-empty-btn"
-                onClick={() => navigate("/")}
-              >
-                Explore ReSello
-              </button>
-            </div>
+            <EmptyState
+              icon={ShoppingCart}
+              title="Your cart is empty"
+              description="Add a product from the product page to begin checkout."
+              action={
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => navigate("/")}
+                >
+                  Explore ReSello
+                </button>
+              }
+            />
           ) : (
             <div className="cart-grid">
               <div className="cart-items-card">

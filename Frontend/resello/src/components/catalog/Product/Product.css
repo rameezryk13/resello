@@ -4,9 +4,11 @@
   max-width: 240px;
   background: var(--color-white);
   border-radius: var(--radius-sm-md);
-  padding: 12px;
+  padding: var(--space-xs);
   border: 1px solid var(--color-border-light);
-  transition: all 0.2s ease;
+  /* was `all` — hover only changes transform and shadow, and `all` forces the
+     browser to consider every animatable property on each hover. */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -30,7 +32,7 @@
      visual will be 1px thinner */
   border-radius: var(--radius-sm);
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-xs);
   background-color: var(--color-bg);
 }
 
@@ -41,11 +43,16 @@
   background: transparent;
   color: var(--color-primary);
   padding: 0;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
   z-index: 2;
 }
 
+/* 36px is the drawn size and stays that way — a 44px white circle over a
+   190px thumbnail covers too much of the product. The pseudo-element below
+   supplies the 44px hit area. Its parent .product-img-container clips
+   (overflow: hidden), but at top/right 8px the 4px of overhang on each
+   side still lands inside the container, so nothing is cut off. */
 .favorite-btn {
   position: absolute;
   top: 8px;
@@ -62,10 +69,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--text-lg);
   line-height: 1;
   padding: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.favorite-btn::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  width: 44px;
+  height: 44px;
+  border-radius: inherit;
 }
 
 .favorite-btn:hover {
@@ -84,7 +101,12 @@
 }
 
 .favorite-btn.inactive {
-  color: var(--color-text-faint);
+  /* The un-favourited ♡ is a glyph on the white pill, so it answers to the text
+     threshold. --color-text-faint was 2.54:1 and failed — and this is the most
+     repeated control in the app (98 on the home page alone), so it was also the
+     single widest-reaching contrast defect. --color-text-muted is 4.83:1 and
+     still reads as "off" next to the filled red state. No palette value changed. */
+  color: var(--color-text-muted);
 }
 
 .favorite-btn.inactive:hover {
@@ -102,7 +124,7 @@
   background: rgba(31, 41, 55, 0.88);
   /* flagged — same recurring dark-tooltip gap flagged in PDP */
   color: var(--color-white);
-  font-size: 11px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   line-height: 1.25;
   box-shadow: var(--shadow-lg);
@@ -127,12 +149,12 @@
 }
 
 .product-info h4 {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
   font-weight: 600;
   line-height: 1.4;
   white-space: normal;
-  margin-bottom: 6px;
+  margin-bottom: var(--space-3xs);
   transition: color 0.2s ease;
   display: -webkit-box;
   line-clamp: 2;
@@ -147,28 +169,33 @@
 .product-rating {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: var(--space-3xs);
+  margin-bottom: var(--space-2xs);
 }
 
 .product-rating .stars {
-  color: var(--status-warning-icon);
-  /* flagged, see PDP note re: gold vs amber */
-  font-size: 12px;
+  /* The stars are ★ glyphs, i.e. real text, so they answer to the 4.5:1 text
+     threshold rather than the 3:1 one for graphics. --status-warning-icon
+     (--amber-500 #ca8a04) is 2.94:1 on the white card and fails. Switched to
+     --status-warning-text (--amber-600 #a16207) at 5.02:1 — the same amber
+     ramp, one step deeper, and the role that already means "warning as text".
+     No palette value changed. */
+  color: var(--status-warning-text);
+  font-size: var(--text-xs);
   letter-spacing: 1px;
 }
 
 .product-rating .reviews {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: var(--text-2xs);
   font-weight: 500;
 }
 
 .product-stock {
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 700;
   line-height: 1.2;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-2xs);
 }
 
 .product-stock.in-stock {
@@ -185,56 +212,57 @@
 .price-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2xs);
   margin-top: auto;
 }
 
 .old-price {
   text-decoration: line-through;
-  color: var(--color-text-faint);
-  /* flagged — reseller neutral-500, closest role */
-  font-size: 12px;
+  /* Was --color-text-faint (#9ca3af), which is 2.54:1 on the white card and
+     fails WCAG 1.4.3 for text this size. --color-text-muted is the next step
+     in the same neutral ramp at 4.83:1 — still clearly de-emphasised next to
+     the new price, but readable. No palette value changed. */
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
   font-weight: 500;
 }
 
 .new-price {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 800;
   color: var(--color-primary);
   line-height: 1;
   letter-spacing: -0.5px;
 }
 
-/* Product grids may become wider at reduced browser zoom.  Let their cards
-   fill the grid cell rather than retaining a narrow fixed desktop width. */
-@media (min-width: 769px) {
-  .more-products-grid .product-card,
-  .search-results-grid .product-card,
-  .related-products-grid .product-card {
-    width: 100%;
-    max-width: none;
-  }
-
-  .more-products-grid .product-img-container,
-  .search-results-grid .product-img-container,
-  .related-products-grid .product-img-container {
-    height: auto;
-    aspect-ratio: 1 / 1;
-  }
+/* Grid-hosted cards, at every width.
+   The `min-width` on .product-card exists for the horizontal carousels
+   (.product-track), where cards are `flex: 0 0 auto` and must not collapse.
+   Inside a grid that floor fights the track: at a 240px content width the
+   3-column mobile grid demanded 3x120 + 2x6 = 372px and overflowed — hidden
+   until `overflow-x: clip` on the root stopped masking it. Grid children get
+   the floor removed so the track can shrink them instead.
+   This block was previously scoped to `min-width: 768px`, which is exactly
+   where the problem did NOT occur. */
+.more-products-grid .product-card,
+.search-results-grid .product-card,
+.related-products-grid .product-card,
+.row-products-grid .product-card,
+.event-page-grid .product-card,
+.shop-products-grid .product-card {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
 }
 
-@media (max-width: 1600px) {
-  .product-card {
-      min-width: 150px;
-      width: min(220px, 100%);
-    }
-}
-
-@media (max-width: 1400px) {
-  .product-card {
-      min-width: 140px;
-      width: min(190px, 100%);
-    }
+.more-products-grid .product-img-container,
+.search-results-grid .product-img-container,
+.related-products-grid .product-img-container,
+.row-products-grid .product-img-container,
+.event-page-grid .product-img-container,
+.shop-products-grid .product-img-container {
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 
 @media (max-width: 1200px) {
@@ -244,57 +272,54 @@
     }
 }
 
-@media (max-width: 768px) {
-  .product-card {
-      min-width: 120px;
-      width: min(140px, 100%);
-    }
-  .product-img-container {
-      height: 140px;
-    }
-}
-
-@media (max-width: 768px) {
+/* Single mobile block. This previously existed twice with the same
+   max-width: 768px query — the first copy was entirely overridden by the
+   second and never applied. Merged into one. */
+@media (max-width: 767.98px) {
   .product-card {
       min-width: 135px;
-      width: 135px;
+      width: min(135px, 100%);
       border-radius: var(--radius-sm);
       overflow: hidden;
     }
   .product-img-container {
-      height: 135px;
+      height: auto;
+      aspect-ratio: 1 / 1;
       border-radius: var(--radius-xs) var(--radius-xs) 0 0;
     }
   .product-info {
-      padding: 10px 8px;
+      padding: var(--space-2xs) var(--space-2xs);
     }
   .product-info h4 {
-      font-size: 12px;
-      margin-bottom: 4px;
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-3xs);
     }
   .product-rating {
-      margin-bottom: 6px;
+      margin-bottom: var(--space-3xs);
     }
   .product-rating .stars {
-      font-size: 10px;
+      font-size: var(--text-2xs);
     }
   .product-rating .reviews {
-      font-size: 9px;
+      font-size: var(--text-2xs);
     }
   .product-price {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3xs);
     }
   .new-price {
-      font-size: 15px;
+      font-size: var(--text-base);
       font-weight: 700;
       color: var(--color-primary);
     }
   .old-price {
-      font-size: 11px;
+      font-size: var(--text-2xs);
       text-decoration: line-through;
-      color: var(--color-text-faint);
+      /* This block used to re-declare --color-text-faint here, which put the
+         2.54:1 failure straight back on every screen under 768px — i.e. on
+         exactly the devices that matter most. The base rule's colour is the
+         right one at every width, so this no longer sets colour at all. */
     }
 }
 
@@ -305,25 +330,26 @@
       border-radius: var(--radius-xs);
     }
   .product-img-container {
-      height: 120px;
+      height: auto;
+      aspect-ratio: 1 / 1;
     }
   .product-info {
-      padding: 8px;
+      padding: var(--space-2xs);
     }
   .product-info h4 {
-      font-size: 12px;
+      font-size: var(--text-xs);
     }
   .product-rating .stars {
-      font-size: 9px;
+      font-size: var(--text-2xs);
     }
   .product-rating .reviews {
-      font-size: 8px;
+      font-size: var(--text-2xs);
     }
   .new-price {
-      font-size: 14px;
+      font-size: var(--text-sm);
       font-weight: 700;
     }
   .old-price {
-      font-size: 10px;
+      font-size: var(--text-2xs);
     }
 }

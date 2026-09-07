@@ -5,7 +5,11 @@
    ============================================================ */
 
 .favorites-page {
-  min-height: 100vh;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
   background: linear-gradient(180deg, var(--color-white) 0%, var(--color-bg) 100%);
 }
 
@@ -24,7 +28,7 @@
 
 .favorites-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1.15;
   color: var(--color-text-primary);
   /* flagged — reseller slate-900, closest role */
@@ -50,7 +54,7 @@
   border-radius: var(--radius-sm);
   padding: 0 14px;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
@@ -99,7 +103,7 @@
   background: var(--color-tint-light);
   color: var(--color-primary-dark);
   /* flagged — reseller orange-800, closest role */
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
@@ -133,7 +137,7 @@
   /* flagged — original near-opaque white (0.96 alpha) simplified to
      solid surface, same treatment as PDP's .pdp-info */
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 700;
   box-shadow: 0 8px 18px rgba(31, 41, 55, 0.12);
   /* flagged — approximated slate-900-alpha shadow using vendor
@@ -148,46 +152,7 @@
   cursor: pointer;
 }
 
-.favorites-empty-state {
-  margin-top: 20px;
-  padding: 72px 24px;
-  text-align: center;
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  /* flagged, same near-opaque-white simplification as above */
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-xl);
-  /* flagged — 24px, closest step is xl (26px) */
-  box-shadow: var(--shadow-lg);
-  /* flagged, no exact geometry match, closest elevated role */
-}
-
-.favorites-empty-icon {
-  font-size: 48px;
-  line-height: 1;
-  margin-bottom: 16px;
-  color: var(--color-border-medium);
-  /* flagged — reseller slate-300, closest role */
-}
-
-.favorites-empty-title {
-  margin: 0 0 14px;
-  font-size: 24px;
-  color: var(--color-text-secondary);
-}
-
-.favorites-empty-copy {
-  margin: 0 0 24px;
-  font-size: 15px;
-}
-
-.favorites-empty-btn {
-  padding: 12px 30px;
-  font-size: 16px;
-  border-radius: var(--radius-md);
-}
-
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .favorites-page-content {
     padding: 28px 0 40px;
   }
@@ -204,21 +169,11 @@
   }
 
   .favorites-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
   .favorites-grid {
     gap: 14px;
-  }
-
-  .favorites-empty-state {
-    padding: 48px 20px;
-    border-radius: var(--radius-lg);
-    /* exact — 20px */
-  }
-
-  .favorites-empty-title {
-    font-size: 22px;
   }
 }
 
@@ -228,7 +183,7 @@
   }
 
   .favorites-title {
-    font-size: 22px;
+    font-size: var(--text-xl);
   }
 
   .favorites-actions {
@@ -241,42 +196,12 @@
     flex: 1 1 auto;
     min-height: 36px;
     padding: 0 10px;
-    font-size: 12px;
+    font-size: var(--text-xs);
   }
 
   .favorites-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-  }
-
-  .favorites-empty-state {
-    margin-top: 12px;
-    padding: 36px 16px;
-    border-radius: var(--radius-lg);
-    /* flagged — 18px, closest step is lg (20px) */
-  }
-
-  .favorites-empty-icon {
-    font-size: 38px;
-    margin-bottom: 12px;
-  }
-
-  .favorites-empty-title {
-    font-size: 19px;
-    margin-bottom: 10px;
-  }
-
-  .favorites-empty-copy {
-    font-size: 14px;
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-
-  .favorites-empty-btn {
-    width: 100%;
-    min-height: 44px;
-    padding: 10px 18px;
-    font-size: 14px;
   }
 }
 
@@ -295,8 +220,8 @@
    ============================================================ */
 .related-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 1fr));
+  gap: var(--space-md);
   justify-items: center;
 }
 
@@ -305,33 +230,24 @@
   min-width: unset;
 }
 
-@media (max-width: 1600px) {
-  .related-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-}
-
-@media (max-width: 1400px) {
-  .related-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-}
-
+/* Four separate width steps used to live here (1600, 1400, 1200, 768px) but
+   the first three all set the identical 220px track, so only the 1200px one
+   ever did anything. Collapsed to a single 1200px step plus the mobile one. */
 @media (max-width: 1200px) {
   .related-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .related-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .related-products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: var(--space-xs);
   }
 }

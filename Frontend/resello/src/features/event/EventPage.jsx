@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { CalendarOff } from "lucide-react";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import Product from "@/components/catalog/Product/Product.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import "./EventPage.css";
 
 const EventPage = () => {
@@ -91,7 +93,11 @@ const EventPage = () => {
             </div>
 
             {products.length === 0 ? (
-              <div className="event-page-empty">No products are linked to this event yet.</div>
+              <EmptyState
+                icon={CalendarOff}
+                title="No products in this event yet"
+                description="No products are linked to this event yet."
+              />
             ) : (
               <div className="event-page-grid">
                 {products.map((product) => (

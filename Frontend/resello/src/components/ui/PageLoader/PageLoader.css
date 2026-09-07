@@ -23,7 +23,7 @@
 }
 
 .page-loader__label {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 

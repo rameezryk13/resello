@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import useAuthGate from "@/features/auth/useAuthGate";
+import useWallet from "@/features/wallet/useWallet";
 
 const guessFileExtension = (url) => {
   try {
@@ -27,7 +29,9 @@ const useProductActions = ({
   currentVariantStock,
 }) => {
   const navigate = useNavigate();
-  const [isFav, setIsFav] = useState(false);
+  const { isAuthenticated, blocked } = useAuthGate();
+  const { wallet } = useWallet();
+  const [favorited, setFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState("");
   const [downloadLoading, setDownloadLoading] = useState(false);
@@ -38,15 +42,21 @@ const useProductActions = ({
 
   const productId = product?.productId;
 
+  // Derived rather than reset inside the effect: logging out empties the heart on
+  // the next render instead of scheduling a second pass.
+  const isFav = isAuthenticated && favorited;
+
+  // Favourites are per-user, so with no session this request is a guaranteed
+  // 401. Skipping it keeps the console clean.
   useEffect(() => {
-    if (!productId) return undefined;
+    if (!productId || !isAuthenticated) return undefined;
     let cancelled = false;
 
     get(endpoints.favorites)
       .then((data) => {
         if (cancelled) return;
         const favIds = (data.favorites || []).map((p) => p.productId);
-        setIsFav(favIds.includes(productId));
+        setFavorited(favIds.includes(productId));
       })
       .catch(() => {
         // If favorites fail, keep the UI in non-favorite state.
@@ -55,7 +65,7 @@ const useProductActions = ({
     return () => {
       cancelled = true;
     };
-  }, [productId]);
+  }, [productId, isAuthenticated]);
 
   useEffect(() => {
     return () => {
@@ -77,6 +87,7 @@ const useProductActions = ({
 
   const toggleFavorite = async () => {
     if (!productId || favLoading) return;
+    if (blocked()) return;
     setFavLoading(true);
     setActionError(null);
 
@@ -85,7 +96,7 @@ const useProductActions = ({
 
       const favIds = (data.favorites || []).map((p) => p.productId);
       const nextIsFav = favIds.includes(productId);
-      setIsFav(nextIsFav);
+      setFavorited(nextIsFav);
       showFavoriteMessage(
         nextIsFav ? "Added to favorites" : "Removed from favorites"
       );
@@ -99,6 +110,19 @@ const useProductActions = ({
 
   const saveToCart = async () => {
     if (!productId || addingToCart) return false;
+    // Gated before the spinner starts: the visitor is leaving for /login, so a
+    // button that flips to "Adding…" on the way out would be describing nothing.
+    if (blocked()) return false;
+
+    if (wallet?.deactivated) {
+      const email = wallet.support?.email || "support@resello.pk";
+      setActionError(
+        wallet.deactivationMessage ||
+          `Your account is disabled because you have received 5 return penalties. You cannot place orders. Please contact admin at ${email}`
+      );
+      return false;
+    }
+
     setAddingToCart(true);
     setActionError(null);
     setCartMessage(null);
@@ -126,6 +150,7 @@ const useProductActions = ({
       });
 
       setCartMessage("Product added to cart");
+      window.dispatchEvent(new CustomEvent("resello:cart-updated"));
       return true;
     } catch (e) {
       setActionError(e?.message || "Could not add to cart");
@@ -140,6 +165,14 @@ const useProductActions = ({
   };
 
   const handleBuyNow = async () => {
+    if (wallet?.deactivated) {
+      const email = wallet.support?.email || "support@resello.pk";
+      setActionError(
+        wallet.deactivationMessage ||
+          `Your account is disabled because you have received 5 return penalties. You cannot place orders. Please contact admin at ${email}`
+      );
+      return;
+    }
     const success = await saveToCart();
     if (success) {
       navigate("/checkout");

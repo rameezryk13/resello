@@ -1,0 +1,100 @@
+/* EmptyState.css — the single empty/loading/error state for every list.
+
+   Sizes are rem so the block honours the browser/OS font size (WCAG 1.4.4).
+   Border width and shadow geometry stay in px, per the convention in the
+   rest of the app. */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  /* Generous but bounded: enough presence to look deliberate, not so tall
+     that an empty list becomes a screenful of nothing — which is the
+     failure mode this component exists to fix. */
+  padding: var(--space-xl) var(--space-md);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.empty-state__icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--space-3xs);
+  border-radius: var(--radius-full);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.empty-state__icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.empty-state__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.empty-state__description {
+  /* Caps the line length so a long explanation doesn't run the full width
+     of a wide viewport. */
+  max-width: 42ch;
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.empty-state__action {
+  margin-top: var(--space-2xs);
+}
+
+/* Error keeps the same layout and only changes tone, so a failed load reads
+   as the same kind of object as an empty one rather than a different page. */
+.empty-state--error .empty-state__icon {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+}
+
+.empty-state--error .empty-state__title {
+  color: var(--status-danger-text);
+}
+
+/* Loading hides the icon (see the component comment) and softens the copy so
+   it doesn't compete with the content about to replace it. */
+.empty-state--loading {
+  border-style: dashed;
+}
+
+.empty-state--loading .empty-state__title {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 767.98px) {
+  .empty-state {
+    padding: var(--space-lg) var(--space-sm);
+  }
+
+  .empty-state__icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .empty-state__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .empty-state__title {
+    font-size: var(--text-base);
+  }
+}

@@ -10,9 +10,9 @@ const Footer = () => {
       title: "Information",
       links: [
         { label: "About us", path: "/about" },
-        { label: "Blog", path: "#" },
+        { label: "How Resello Works", path: "/how-it-works" },
         { label: "Dropshipping", path: "/dropshipping" },
-        { label: "Reseller", path: "/reseller" },
+        { label: "Reseller Program", path: "/reseller" },
         { label: "Terms & conditions", path: "/terms" },
         { label: "Privacy policy", path: "/privacy" },
       ],
@@ -20,11 +20,9 @@ const Footer = () => {
     {
       title: "Customer care",
       links: [
-        { label: "Customer support", path: "#" },
-        { label: "FAQs", path: "#" },
-        { label: "Refunds & returns", path: "#" },
-        { label: "Seller academy", path: "#" },
-        { label: "Careers", path: "#" },
+        { label: "Contact Support", path: "/contact" },
+        { label: "FAQs & Help Center", path: "/faq" },
+        { label: "Shipping & Returns", path: "/shipping-policy" },
       ],
     },
     {

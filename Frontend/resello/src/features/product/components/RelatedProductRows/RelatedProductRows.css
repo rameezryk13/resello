@@ -1,5 +1,5 @@
 .pdp-rows {
-  margin-top: 20px;
+  margin-top: var(--space-sm);
 }
 
 .pdp-rows .row-section:last-child {
@@ -8,6 +8,6 @@
 
 @media (max-width: 480px) {
   .pdp-rows {
-    margin-top: 14px;
+    margin-top: var(--space-xs);
   }
 }

@@ -1,53 +1,113 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  CreditCard,
-  Plus,
-  Receipt,
-  ShieldCheck,
-  Wallet as WalletIcon,
-} from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import Header from "@/components/layout/Header/Header.jsx";
 import AccountHero from "@/components/sections/AccountHero";
-import { get } from "@/api/client";
-import endpoints from "@/api/endpoints";
+import AccountAlert from "@/components/sections/AccountAlert";
 import { useToast } from "@/context/ToastContext";
-import { formatRupees } from "@/utils/currency";
+import { formatRupees, formatSignedRupees } from "@/utils/currency";
+import useWallet from "./useWallet";
+import WalletDemoBar from "./components/WalletDemoBar";
+import WalletBalanceBanner from "./components/WalletBalanceBanner";
+import WalletRequestsSection from "./components/WalletRequestsSection";
+import WalletLedgerSection from "./components/WalletLedgerSection";
+import WalletPayoutRules from "./components/WalletPayoutRules";
 import "./WalletPage.css";
 
-// No wallet ledger exists on the backend yet, so balances stay at zero and
-// the history panel shows its empty state until those endpoints land.
-const BALANCE = 0;
-const PENDING = 0;
-const TRANSACTIONS = [];
+const LEDGER_FILTERS = {
+  All: null,
+  Commission: ["commission", "commission-reversal"],
+  Penalties: ["penalty", "penalty-reversal"],
+  "Shipping & Return": ["shipping-return", "shipping-return-reversal", "shipping"],
+  Withdrawals: ["withdrawal"],
+};
 
-const LEDGER_FILTERS = ["All", "Deposits", "Withdrawals"];
+const FILTER_NAMES = Object.keys(LEDGER_FILTERS);
+
+const formatWindow = (value) =>
+  value
+    ? new Date(value).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })
+    : "Monday";
 
 const WalletPage = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [lifetimeProfit, setLifetimeProfit] = useState(0);
-  const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const {
+    wallet,
+    loading,
+    requestWithdraw,
+    approveWithdrawal,
+    rejectWithdrawal,
+    setDemoDate,
+  } = useWallet();
 
-  useEffect(() => {
-    const loadProfit = async () => {
-      try {
-        const data = await get(endpoints.profitSummary);
-        setLifetimeProfit(data?.totals?.totalProfit || 0);
-      } catch (error) {
-        // Lifetime profit stays at 0 on failure, which is indistinguishable
-        // from a genuine zero balance without this message.
-        toast.error(error?.message || "Could not load your wallet summary.");
-      } finally {
-        setLoading(false);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [amount, setAmount] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { withdrawal, transactions = [], withdrawalRequests = [] } = wallet;
+
+  const visible = useMemo(() => {
+    const types = LEDGER_FILTERS[activeFilter];
+    return types ? transactions.filter((entry) => types.includes(entry.type)) : transactions;
+  }, [transactions, activeFilter]);
+
+  const withdrawBlocked = wallet.deactivated
+    ? "Withdrawals paused"
+    : wallet.balance < 0
+      ? "Negative balance (Cannot withdraw)"
+      : !withdrawal?.allowedToday
+        ? `Opens ${formatWindow(withdrawal?.nextWindow)}`
+        : (withdrawal?.available || 0) <= 0
+          ? "Nothing to withdraw"
+          : null;
+
+  const handleWithdrawRequest = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await requestWithdraw(amount);
+      toast.success(`Withdrawal request of ${formatRupees(amount)} sent to admin.`);
+      setAmount("");
+      setFormOpen(false);
+    } catch (error) {
+      toast.error(error?.message || "Could not submit withdrawal request.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleApprove = async (requestId, reqAmount) => {
+    try {
+      await approveWithdrawal(requestId);
+      toast.success(`Withdrawal request of ${formatRupees(reqAmount)} accepted by Admin! Amount cut from wallet.`);
+    } catch (error) {
+      toast.error(error?.message || "Could not approve request.");
+    }
+  };
+
+  const handleReject = async (requestId) => {
+    try {
+      await rejectWithdrawal(requestId);
+      toast.info("Withdrawal request rejected by Admin.");
+    } catch (error) {
+      toast.error(error?.message || "Could not reject request.");
+    }
+  };
+
+  const handleDateChange = async (dateStr) => {
+    try {
+      await setDemoDate(dateStr || null);
+      if (dateStr) {
+        toast.info(`Demo date set to ${dateStr}`);
+      } else {
+        toast.info("Demo date reset to today.");
       }
-    };
-
-    loadProfit();
-  }, [toast]);
+    } catch (error) {
+      toast.error(error?.message || "Could not set demo date.");
+    }
+  };
 
   return (
     <div className="account-page animate-fade-in">
@@ -55,123 +115,57 @@ const WalletPage = () => {
       <div className="container account-content">
         <AccountHero
           title="Wallet"
-          description="Track your balance, deposit funds, and withdraw earnings to your own account."
+          description="Your commission clears here once an order is delivered. Send a withdrawal request to admin on payout day (Mondays)."
         />
 
-        {/* Balance banner: one wide bar instead of a card grid */}
-        <section className="wallet-banner">
-          <div className="wallet-banner-main">
-            <span className="wallet-banner-label">
-              <WalletIcon size={15} aria-hidden="true" /> Current balance
-            </span>
-            <strong className="wallet-banner-value">{formatRupees(BALANCE)}</strong>
-            <p className="wallet-banner-note">Ready to withdraw or spend on your next order.</p>
-          </div>
+        {/* Demo Date Controller Bar */}
+        <WalletDemoBar wallet={wallet} onDateChange={handleDateChange} />
 
-          <div className="wallet-banner-side">
-            <div className="wallet-banner-stat">
-              <span>Pending clearance</span>
-              <strong>{formatRupees(PENDING)}</strong>
-            </div>
-            <div className="wallet-banner-stat">
-              <span>Lifetime profit</span>
-              <strong>{loading ? "—" : formatRupees(lifetimeProfit)}</strong>
-            </div>
-            <div className="wallet-banner-actions">
-              <button type="button" className="wallet-btn-solid">
-                <Plus size={16} /> Deposit
-              </button>
-              <button type="button" className="wallet-btn-ghost">
-                <ArrowUpRight size={16} /> Withdraw
-              </button>
-            </div>
+        {/* Negative Balance Alert */}
+        {wallet.balance < 0 && (
+          <div className="wallet-negative-warning">
+            <ShieldAlert size={20} />
+            <p>
+              <strong>Negative Wallet Balance ({formatSignedRupees(wallet.balance)}):</strong> You cannot withdraw money while your balance is in negative. Recover your balance as pending commissions clear.
+            </p>
           </div>
-        </section>
+        )}
+
+        <AccountAlert wallet={wallet} />
+
+        {/* Balance banner */}
+        <WalletBalanceBanner
+          wallet={wallet}
+          loading={loading}
+          withdrawBlocked={withdrawBlocked}
+          formOpen={formOpen}
+          setFormOpen={setFormOpen}
+          amount={amount}
+          setAmount={setAmount}
+          submitting={submitting}
+          onWithdrawRequest={handleWithdrawRequest}
+        />
+
+        {/* Withdrawal Requests Section */}
+        <WalletRequestsSection
+          requests={withdrawalRequests}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
 
         <div className="wallet-layout">
           {/* Ledger */}
-          <section className="account-section wallet-ledger">
-            <div className="wallet-ledger-head">
-              <div>
-                <h2>Transaction history</h2>
-                <p>Every deposit, withdrawal and order payout in one place.</p>
-              </div>
-              <div className="wallet-filter-row">
-                {LEDGER_FILTERS.map((filter) => (
-                  <button
-                    key={filter}
-                    type="button"
-                    className={`wallet-filter ${activeFilter === filter ? "active" : ""}`}
-                    onClick={() => setActiveFilter(filter)}
-                  >
-                    {filter}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <WalletLedgerSection
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+            filterNames={FILTER_NAMES}
+            visible={visible}
+            totalTransactionsCount={transactions.length}
+            onNavigate={navigate}
+          />
 
-            {TRANSACTIONS.length === 0 ? (
-              <div className="wallet-ledger-empty">
-                <span className="wallet-ledger-empty-icon">
-                  <Receipt size={24} />
-                </span>
-                <strong>No transactions yet</strong>
-                <p>Once funds move in or out of your wallet, you will see every entry listed here.</p>
-                <button type="button" className="btn-outline" onClick={() => navigate("/my-orders")}>
-                  View your orders
-                </button>
-              </div>
-            ) : (
-              <div className="wallet-ledger-list">
-                {TRANSACTIONS.map((entry) => (
-                  <div key={entry.id} className="wallet-ledger-row">
-                    <span className={`wallet-ledger-icon ${entry.direction}`}>
-                      {entry.direction === "in" ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}
-                    </span>
-                    <span className="wallet-ledger-text">
-                      <strong>{entry.title}</strong>
-                      <small>{entry.date}</small>
-                    </span>
-                    <span className={`wallet-ledger-amount ${entry.direction}`}>
-                      {entry.direction === "in" ? "+" : "−"}
-                      {formatRupees(entry.amount)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* Side rail: payout method + safety note */}
-          <aside className="wallet-side">
-            <section className="account-section wallet-payout">
-              <span className="wallet-side-label">Default payout method</span>
-              <div className="wallet-payout-empty">
-                <span className="wallet-payout-icon">
-                  <CreditCard size={20} />
-                </span>
-                <div>
-                  <strong>No payout method added</strong>
-                  <p>Add a JazzCash, EasyPaisa or bank account to receive withdrawals.</p>
-                </div>
-              </div>
-              <button type="button" className="btn-primary wallet-payout-btn" onClick={() => navigate("/profit-account")}>
-                Add payout method
-              </button>
-            </section>
-
-            <section className="account-section wallet-note">
-              <span className="wallet-note-icon">
-                <ShieldCheck size={19} />
-              </span>
-              <div>
-                <strong>Withdrawals are verified</strong>
-                <p>
-                  Payouts are released to your saved account within 1–2 working days after your order profit clears.
-                </p>
-              </div>
-            </section>
-          </aside>
+          {/* Side rail */}
+          <WalletPayoutRules wallet={wallet} onNavigate={navigate} />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 .pdp-utility-row {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2xs);
   justify-items: start;
   align-self: stretch;
   margin-top: 0;
@@ -11,15 +11,15 @@
   border: 1px solid var(--color-border-light);
   background: var(--color-white);
   min-height: 50px;
-  padding: 0 12px;
+  padding: 0 var(--space-xs);
   cursor: pointer;
   border-radius: var(--radius-sm-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: var(--space-3xs);
   color: var(--color-text-primary);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   line-height: 1;
   box-shadow: var(--shadow-sm);
@@ -60,7 +60,7 @@
 .pdp-utility-bottom-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-xs);
   min-height: 50px;
   width: 100%;
 }
@@ -90,10 +90,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0 14px;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-xs);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
   box-shadow: var(--shadow-sm);
   position: relative;
@@ -112,13 +112,13 @@
 
 .pdp-favorite-control-icon {
   color: var(--color-primary);
-  font-size: 20px;
+  font-size: var(--text-xl);
   line-height: 1;
 }
 
 .pdp-favorite-control-count {
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .pdp-favorite-control-message {
@@ -128,14 +128,14 @@
   z-index: 2;
   transform: translateX(-50%);
   white-space: nowrap;
-  padding: 7px 10px;
+  padding: var(--space-3xs) var(--space-2xs);
   border-radius: var(--radius-sm-md);
   background: var(--color-text-primary);
   color: var(--color-white);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
-@media (max-width: 650px) {
+@media (max-width: 767.98px) {
   .pdp-utility-row {
     justify-content: flex-start;
     margin-top: 0;
@@ -151,25 +151,25 @@
     display: grid;
     grid-template-columns: 1fr;
     justify-items: stretch;
-    gap: 10px;
+    gap: var(--space-2xs);
   }
 
   .pdp-utility-btn {
     justify-content: center;
     min-height: 44px;
     border-radius: var(--radius-md);
-    padding: 0 14px;
+    padding: 0 var(--space-xs);
     width: 100%;
     min-width: 0;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 
   .pdp-utility-bottom-row {
-    gap: 12px;
+    gap: var(--space-xs);
   }
 
   .pdp-utility-top-row {
-    gap: 12px;
+    gap: var(--space-xs);
   }
 
   .pdp-share-btn {
@@ -184,7 +184,7 @@
 
 /* Appended last so it wins the cascade: on mobile the compact icon row next
    to the profit input replaces this labelled row entirely. */
-@media (max-width: 650px) {
+@media (max-width: 767.98px) {
   .pdp-utility-row {
     display: none;
   }

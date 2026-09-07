@@ -39,9 +39,11 @@ export const BANKS = ["HBL", "UBL", "Meezan Bank", "Bank Alfalah", "MCB"];
 export const EMPTY_ADDRESS = {
   name: "",
   line1: "",
+  area: "",
+  town: "",
   line2: "",
   city: "",
-  postalCode: "",
-  country: "Pakistan",
   phone: "",
+  // Optional backup number the courier can try if the primary one doesn't answer.
+  phone2: "",
 };

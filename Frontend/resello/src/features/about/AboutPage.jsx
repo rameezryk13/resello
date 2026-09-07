@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import StaticPageLayout from "@/components/sections/StaticPageLayout";
+import "./AboutPage.css";
 
 const AboutPage = () => {
   const navigate = useNavigate();

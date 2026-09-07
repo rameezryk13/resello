@@ -1,0 +1,652 @@
+/* ==========================================================================
+   Pitch Studio Share Modal — Resello Orange Theme
+   ========================================================================== */
+
+.pitch-studio-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1100);
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.pitch-studio-modal-card.orange-theme {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 92vh;
+  background-color: var(--color-surface, #ffffff);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(234, 88, 12, 0.25),
+              0 0 0 1px rgba(249, 115, 22, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(251, 146, 60, 0.25);
+}
+
+/* Header */
+.pitch-studio-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid #fed7aa;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+}
+
+.pitch-studio-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pitch-studio-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ea580c;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background-color: #ffedd5;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.pitch-studio-head h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pitch-studio-close {
+  background: none;
+  border: none;
+  padding: 0.4rem;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pitch-studio-close:hover {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+/* Body & Grid Layout */
+.pitch-studio-body {
+  position: relative;
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.pitch-studio-toast {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  color: #ffffff;
+  padding: 0.65rem 1.35rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 10px 20px -3px rgba(234, 88, 12, 0.4);
+  animation: fadeInDown 0.25s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.pitch-studio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.pitch-studio-section-label {
+  display: block;
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: #9a3412;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   LEFT COLUMN: LIVE PREVIEW & GALLERY SELECTOR
+   -------------------------------------------------------------------------- */
+.pitch-studio-preview-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.pitch-studio-preview-card {
+  background: linear-gradient(145deg, #fff7ed 0%, #fff 100%);
+  border: 1px solid #fed7aa;
+  border-radius: 16px;
+  padding: 1.15rem;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.08);
+}
+
+.pitch-studio-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffedd5;
+}
+
+.pitch-studio-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pitch-studio-no-img {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* Tilted Orange Ribbon Badge */
+.pitch-studio-ribbon-badge {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  background: linear-gradient(135deg, #ff6b00 0%, #ea580c 100%);
+  color: #ffffff;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  transform: rotate(-11deg);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  z-index: 2;
+  border: 1.5px dashed rgba(255, 255, 255, 0.7);
+}
+
+.ribbon-only {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  opacity: 0.95;
+}
+
+.ribbon-price {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* Gallery Thumbnail Selector Strip */
+.pitch-studio-gallery-picker {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gallery-picker-title {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #9a3412;
+}
+
+.gallery-thumb-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.gallery-thumb-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  border: 2px solid #fdba74;
+  overflow: hidden;
+  padding: 0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.gallery-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-thumb-btn:hover {
+  border-color: #ea580c;
+  transform: scale(1.05);
+}
+
+.gallery-thumb-btn.active {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.35);
+  transform: scale(1.08);
+}
+
+/* Card Details Below Image */
+.pitch-studio-card-details {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pitch-studio-card-title {
+  font-size: 0.975rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.2rem;
+  line-height: 1.35;
+}
+
+.pitch-studio-card-shop {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pitch-studio-card-phone {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pitch-studio-cod-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: #ffedd5;
+  color: #c2410c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  width: fit-content;
+  margin-top: 0.2rem;
+}
+
+.pitch-studio-cod-badge.free-del {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.pitch-studio-card-footer-prompt {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #fdba74;
+  text-align: center;
+}
+
+.pitch-studio-card-footer-prompt small {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.pitch-studio-card-footer-prompt p {
+  margin: 0.15rem 0 0;
+  font-size: 0.825rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.pitch-studio-disclaimer {
+  font-size: 0.775rem;
+  color: #64748b;
+  margin-top: 0.75rem;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: OPTIONS & CONTROLS
+   -------------------------------------------------------------------------- */
+.pitch-studio-controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pitch-studio-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Price Input Box */
+.pitch-studio-price-input-box {
+  display: flex;
+  align-items: center;
+  border: 2.5px solid #ea580c;
+  border-radius: 14px;
+  padding: 0.45rem 0.85rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.1);
+  transition: all 0.2s ease;
+}
+
+.pitch-studio-price-input-box:focus-within {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+}
+
+.price-currency-prefix {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #ea580c;
+  margin-right: 0.6rem;
+}
+
+.pitch-studio-price-input {
+  border: none;
+  outline: none;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  width: 100%;
+  background: transparent;
+}
+
+/* Preset Buttons */
+.pitch-studio-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pitch-studio-preset-btn {
+  background-color: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pitch-studio-preset-btn:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+  background-color: #fff7ed;
+}
+
+.pitch-studio-preset-btn.active {
+  background: linear-gradient(135deg, #ff6b00, #ea580c);
+  border-color: #ea580c;
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(234, 88, 12, 0.3);
+}
+
+.pitch-studio-cost-breakdown {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.6rem;
+}
+
+.earn-highlight {
+  font-weight: 800;
+  color: #ea580c;
+}
+
+/* Toggles List */
+.pitch-studio-toggles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.pitch-studio-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.toggle-label-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.toggle-label-block strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.toggle-label-block small {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.pitch-studio-inline-input {
+  margin-top: 0.25rem;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.825rem;
+  color: #1e293b;
+  outline: none;
+}
+
+.pitch-studio-inline-input:focus {
+  border-color: #ea580c;
+}
+
+/* iOS Style Switch Toggle with Orange Accent */
+.switch-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: 0.25s ease;
+  border-radius: 24px;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.25s ease;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.switch-toggle input:checked + .switch-slider {
+  background-color: #f97316;
+}
+
+.switch-toggle input:checked + .switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* Caption Textarea */
+.pitch-studio-caption-textarea {
+  width: 100%;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #1e293b;
+  background-color: #ffffff;
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+}
+
+.pitch-studio-caption-textarea:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+/* Share Action Primary Button */
+.btn-share-primary,
+.btn-share-all-featured {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #ff6b00 0%, #ea580c 100%);
+  color: #ffffff;
+  padding: 0.85rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.btn-share-primary:hover:not(:disabled),
+.btn-share-all-featured:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.45);
+}
+
+.pitch-studio-share-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pitch-studio-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.pitch-studio-share-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.pitch-studio-share-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-whatsapp {
+  background-color: #25d366;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+}
+
+.btn-whatsapp:hover {
+  background-color: #20bd5a;
+}
+
+.btn-native-share {
+  background: linear-gradient(135deg, #ff6b00, #ea580c);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.btn-native-share:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+}
+
+.btn-copy-img {
+  background-color: #ffffff;
+  border-color: #fed7aa;
+  color: #1e293b;
+}
+
+.btn-copy-img:hover {
+  border-color: #ea580c;
+  background-color: #fff7ed;
+}
+
+.btn-copy-img.copied {
+  background-color: #ffedd5;
+  border-color: #ea580c;
+  color: #c2410c;
+}
+
+/* Responsive Stack */
+@media (max-width: 768px) {
+  .pitch-studio-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .pitch-studio-head {
+    padding: 1rem;
+  }
+
+  .pitch-studio-body {
+    padding: 1rem;
+  }
+
+  .pitch-studio-share-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

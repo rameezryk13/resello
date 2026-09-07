@@ -34,6 +34,39 @@ Then open http://localhost:5173.
 The `cp .env.example .env` step is only needed the first time. Without a `.env` the
 frontend has no API URL, logs a warning to the console, and every request fails.
 
+## Demo accounts
+
+The wallet only tells a story once an account has orders behind it, so three demo
+resellers can be seeded — one per state:
+
+```bash
+cd Backend && npm run seed:demo
+```
+
+| Email | Password | What it shows |
+| --- | --- | --- |
+| `healthy@resello.pk` | `Demo@1234` | Rs. 950 cleared, Rs. 470 still pending. The account to try a withdrawal from. |
+| `negative@resello.pk` | `Demo@1234` | Rs. -100. Two returns cost more than the one cleared sale earned; the penalties are listed on Payment Summary. |
+| `blocked@resello.pk` | `Demo@1234` | Rs. -520, past the deactivation line. Checkout and withdrawal are both refused by the API, not just hidden in the UI. |
+
+The script is idempotent — it replaces those three accounts and leaves every other
+account in `db.json` alone, so it is safe to re-run after poking at the demo data.
+
+The rules the accounts demonstrate:
+
+| Rule | Value |
+| --- | --- |
+| Commission per order | the order's profit, credited when the order is **Delivered** |
+| Return penalty | Rs. 100 per returned order, plus the commission clawed back |
+| Deactivation | balance ≤ **Rs. -500** blocks checkout and withdrawal |
+| Withdrawal window | **Mondays only** |
+
+**My Orders** carries a status switcher on each order. It stands in for the courier
+webhook a real deployment would have, and it is the fastest way to watch a commission
+clear or a penalty land. Statuses are reversible: flipping an order back to Delivered
+re-credits the commission and refunds the penalty, so the demo data survives being
+played with.
+
 ## Configuration
 
 The frontend reads a single variable, `VITE_API_BASE_URL`, documented in
@@ -60,6 +93,7 @@ add it to the `origin` list in `app.js` or the browser will block every request.
 | Command | What it does |
 | --- | --- |
 | `npm start` | Starts the API on port 3000 |
+| `npm run seed:demo` | Creates the three demo reseller accounts (see above) |
 
 **Frontend** (`cd Frontend/resello`)
 
@@ -120,14 +154,15 @@ The backend has no tests; its `npm test` script is still the npm default and exi
 
 These are properties of the current build, not bugs to be surprised by:
 
-- **No authentication.** No login, no sessions, no per-user data. The API trusts
-  every caller, so the cart, orders, and favorites are global rather than
-  per-account.
-- **No database.** The backend keeps everything in memory. Restarting it discards
-  all carts, orders, addresses, and favorites, resetting to the seed data in
-  `defaultPagesData/`.
-- **Order statuses are synthetic.** `OrdersPage` derives a status by hashing the
-  order id, since the backend doesn't track fulfillment state.
+- **No database.** Everything persists to a single JSON file, `Backend/data/db.json`,
+  written whole on every change. Fine at this scale, but there is no concurrency
+  control and no migration path.
+- **Order statuses are set by hand.** There is no courier integration, so the status
+  switcher on My Orders is what moves an order to Delivered or Returned. Anyone
+  signed in can change the status of their own orders — which is exactly what a real
+  deployment must not allow.
+- **Passwords are the only factor.** No email verification, no password reset, no
+  rate limiting on sign-in.
 
 The first two are the ones to address before this handles real customers.
 

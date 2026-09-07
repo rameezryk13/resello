@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import { useToast } from "@/context/ToastContext";
 import Header from "@/components/layout/Header/Header.jsx";
 import Product from "@/components/catalog/Product/Product.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import "./FavoritesPage.css";
 
 const Favorites = () => {
@@ -65,6 +67,11 @@ const Favorites = () => {
       }
 
       setFavorites(latestFavorites);
+      window.dispatchEvent(
+        new CustomEvent("resello:favorites-updated", {
+          detail: { count: latestFavorites.length },
+        })
+      );
       setSelectedIds([]);
       setSelectionMode(false);
       setMessage("Selected favorites removed.");
@@ -154,19 +161,19 @@ const Favorites = () => {
             ))}
           </div>
         ) : (
-          <div className="favorites-empty-state">
-            <div className="favorites-empty-icon">{"\u2661"}</div>
-            <h3 className="favorites-empty-title">Your favorites list is empty</h3>
-            <p className="favorites-empty-copy">
-              Explore our products and add your favorite items here.
-            </p>
-            <button
-              className="btn-primary favorites-empty-btn"
-              onClick={() => navigate("/")}
-            >
-              Continue Shopping
-            </button>
-          </div>
+          <EmptyState
+            icon={Heart}
+            title="Your favorites list is empty"
+            description="Explore our products and add your favorite items here."
+            action={
+              <button
+                className="btn-primary"
+                onClick={() => navigate("/")}
+              >
+                Continue Shopping
+              </button>
+            }
+          />
         )}
       </div>
     </div>

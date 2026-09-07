@@ -1,15 +1,35 @@
+/* The cap here used to be 640px, which fought the page grid rather than
+   helping it: the left track grew with the viewport while the gallery stopped
+   at 640px, so the extra width turned into a blank gap between the gallery
+   and the buy column instead of a bigger product image. The page caps the
+   measure once now, on .pdp-page > .container, and the left track is the one
+   that takes the surplus — so the gallery fills it rather than capping again
+   here. What bounds the image instead is its own height, below: it is square,
+   so width is height, and a viewport-relative ceiling is the honest limit. */
 .pdp-gallery {
   display: grid;
-  grid-template-columns: 1fr minmax(72px, 96px);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(72px, 96px);
+  gap: var(--space-sm);
   width: 100%;
-  max-width: 640px;
+  height: 100%;
 }
 
-@media (max-width: 600px) {
+/* Below the grid's two-column breakpoint the gallery is alone on its row, so
+   filling the full content width would make the square image taller than most
+   laptop viewports. It keeps the size it had before and centres instead of
+   sitting against the left edge with the slack beside it. */
+@media (max-width: 992px) {
+  .pdp-gallery {
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 767.98px) {
   .pdp-gallery {
     grid-template-columns: 1fr;
   }
+
   .pdp-thumbs {
     flex-direction: row !important;
     overflow-x: auto;
@@ -26,6 +46,7 @@
   /* flagged — no exact geometry match, closest subtle-shadow role */
   overflow: hidden;
   background: var(--color-bg);
+  height: 90%;
 }
 
 .pdp-main-image img {
@@ -37,7 +58,7 @@
 .pdp-thumbs {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-2xs);
   max-height: min(100%, 520px);
   overflow-y: auto;
   padding-right: 2px;
@@ -77,7 +98,7 @@
 
 @media (max-width: 480px) {
   .pdp-gallery {
-    gap: 12px;
+    gap: var(--space-xs);
   }
 
   .pdp-main-image {
@@ -90,8 +111,8 @@
   }
 
   .pdp-thumbs {
-    gap: 8px;
-    padding-bottom: 4px;
+    gap: var(--space-2xs);
+    padding-bottom: var(--space-3xs);
   }
 
   .pdp-thumb {

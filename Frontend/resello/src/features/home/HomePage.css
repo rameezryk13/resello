@@ -1,25 +1,42 @@
+/* ============================================================
+   HomePage.css
+
+   The home page previously stacked its sections with gaps of 24, 20, 50,
+   0, 0, 0 and 20px — no rhythm at all, and the run of zeros fused the
+   five product rows into one wall of cards. Spacing between top-level
+   sections now comes from one owner: the flow gap below. Individual
+   sections no longer set their own outer margins, so adding or reordering
+   a section can't reintroduce an off-rhythm gap.
+   ============================================================ */
+
+/* One rule owns the vertical rhythm for every direct child of <main>.
+   The lobotomised-owl selector applies the gap *between* siblings only,
+   so the first section still sits tight against the header and the last
+   one doesn't push extra space onto the footer. */
+.home-page > * + * {
+  margin-top: var(--section-gap);
+}
+
+.home-page {
+  padding-block: var(--section-pad-y);
+}
+
 .home-showcase {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  gap: 30px;
-  margin: 20px 0 50px;
+  gap: var(--space-md);
 }
 
+/* The sidebar drops below the poster area before the tracks get narrow
+   enough to squeeze the wholesaler cards. */
 @media (max-width: 992px) {
   .home-showcase {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .home-showcase {
-    gap: 16px;
-    margin: 12px 0 32px;
+    gap: var(--space-sm);
   }
 }
-
-/* @media (min-width: 1920px) {
-    .container {
-        width: min(100% - 0px, 2200px);
-    }
-} */

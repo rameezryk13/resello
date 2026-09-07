@@ -1,5 +1,9 @@
 .event-page {
-  min-height: 100vh;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
   background: var(--color-bg);
 }
 
@@ -43,13 +47,13 @@
 .event-hero__content h2,
 .event-hero__content h1 {
   margin: 0 0 16px;
-  font-size: clamp(24px, 4vw, 40px);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   line-height: 1.2;
 }
 
 .event-hero__content p {
   margin: 0;
-  font-size: clamp(14px, 2vw, 18px);
+  font-size: clamp(0.875rem, 2vw, 1.125rem);
   opacity: 0.92;
 }
 
@@ -80,10 +84,14 @@
   font-size: 0.9rem;
 }
 
+/* auto-fill replaces four hand-tuned column-count breakpoints (1080/720/640/
+   360px). The track floor is min(150px, 100%) rather than a bare 150px so a
+   single column can still shrink below 150px on very narrow viewports — a
+   bare minmax(150px, …) floor cannot shrink and would overflow at high zoom. */
 .event-page-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+  gap: clamp(0.9rem, 1.5vw, 1.5rem);
 }
 
 .event-page-grid .product-card {
@@ -91,35 +99,6 @@
   min-width: 0;
 }
 
-/*
- * This page used to reuse the generic .empty-state class, which it never
- * defined — it only rendered styled because Checkout, RowProducts and ShopPage
- * each declare their own .empty-state and every page's CSS shipped in one
- * bundle. Once routes are code-split that stylesheet may not be loaded here.
- * These values are the union those three cascaded to, so this is the same
- * appearance the page has always had, now owned by the page that uses it.
- */
-.event-page-empty {
-  padding: 1.5rem;
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-text-muted, #6b7280);
-  text-align: center;
-  line-height: 1.75;
-}
-
-@media (max-width: 1080px) {
-  .event-page-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-@media (max-width: 720px) {
-  .event-page-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
-}
-
-@media (max-width: 640px) {
-  .event-page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
-}
-
-@media (max-width: 360px) {
-  .event-page-grid { grid-template-columns: 1fr; }
-}
+/* No column-count media queries needed — auto-fill above derives the count
+   from the available width, so it also adapts at zoom levels that fall
+   between breakpoints. */

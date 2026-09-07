@@ -1,5 +1,9 @@
 .row-products-page {
-  min-height: 100vh;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
   background: var(--color-bg);
 }
 
@@ -30,19 +34,19 @@
   color: var(--color-text-muted, #6b7280);
   font-size: 0.9rem;
 }
-
-.row-products-loading,
-.row-products-error,
 .empty-state {
   padding: 1.5rem;
   text-align: center;
   color: var(--color-text-muted, #6b7280);
 }
 
+/* auto-fill replaces five hand-tuned column-count breakpoints (1080/900/720/
+   640/360px). min(150px, 100%) keeps a lone column able to shrink below the
+   floor at extreme zoom instead of overflowing. */
 .row-products-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+  gap: clamp(0.9rem, 1.5vw, 1.5rem);
 }
 
 .row-products-grid .product-card {
@@ -50,34 +54,8 @@
   min-width: 0;
 }
 
-@media (max-width: 1080px) {
-  .row-products-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 900px) {
+@media (max-width: 992px) {
   .row-products-content {
     padding: 1.5rem 1rem 2.5rem;
-  }
-}
-
-@media (max-width: 720px) {
-  .row-products-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .row-products-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .row-products-grid {
-    grid-template-columns: 1fr;
   }
 }

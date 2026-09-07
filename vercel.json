@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd Frontend/resello && npm install && npm run build",
+  "outputDirectory": "Frontend/resello/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

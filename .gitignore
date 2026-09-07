@@ -30,3 +30,6 @@ yarn-error.log*
 # Test coverage
 coverage/
 .nyc_output/
+
+# Local account store: real accounts and password hashes, never committed
+Backend/data/

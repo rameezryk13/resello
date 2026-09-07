@@ -1,11 +1,16 @@
 .pdp-return-policy {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 16px;
+  gap: var(--space-sm);
   width: 100%;
-  max-width: 640px;
-  margin-bottom: 32px;
-  padding: 24px 22px;
+  /* The 640px cap that used to be here made this the one row on the page that
+     stopped short: every other block ran the full content width, so on a wide
+     screen the card ended in the middle of the page with a long empty stretch
+     to its right. It now fills whatever holds it — the grid's left column on
+     desktop, the content width below 992px — and the page's own measure does
+     the bounding. */
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-md);
   border: 1px solid var(--color-primary-light);
   /* flagged — reseller orange-200 vs vendor primary-light, closest role */
   background: var(--color-tint-light);
@@ -14,23 +19,11 @@
      see ProductDetailPage.css header note */
 }
 
-/* Desktop/window (default): keep the return policy in its original spot
-   after the main grid; the mobile duplicate (placed before the
-   description) stays hidden. On mobile this flips — see the 650px
-   media query below. */
+/* Default (>=993px): the desktop copy shows, stacked under the gallery inside
+   the main grid's left column. The copy placed after the grid stays hidden.
+   The two swap at 992px — see the media query below. */
 .pdp-return-policy--mobile {
   display: none;
-}
-
-@media (max-width: 650px) {
-  .pdp-return-policy--mobile {
-    display: grid;
-    margin-bottom: 24px;
-  }
-
-  .pdp-return-policy--desktop {
-    display: none;
-  }
 }
 
 .pdp-return-icon {
@@ -53,31 +46,68 @@
 }
 
 .pdp-return-policy h3 {
-  margin: 0 0 12px;
-  font-size: 18px;
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-lg);
   line-height: 1.35;
   font-weight: 800;
 }
 
 .pdp-return-policy p {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--text-base);
   line-height: 1.55;
 }
 
 .pdp-return-policy p + p {
-  margin-top: 16px;
+  margin-top: var(--space-sm);
 }
 
 .pdp-return-body {
   overflow: hidden;
 }
 
+/* The swap happens at the same width where .pdp-main-grid collapses to one
+   column (ProductDetailPage.css). Above it the desktop copy sits under the
+   gallery in the grid's left column; at or below it that column is directly
+   above the Add to Cart controls, so keeping the card there would push the
+   buy actions down the page. It hides, and this copy — placed after the grid,
+   ahead of the description — takes over.
+   This used to be 767.98px, which no longer matches where the grid changes
+   shape. */
+@media (max-width: 992px) {
+  .pdp-return-policy--mobile {
+    display: grid;
+    margin-bottom: var(--space-md);
+  }
+
+  .pdp-return-policy--desktop {
+    display: none;
+  }
+}
+
+/* Collapsing the body is a phone-width concern, not a one-column concern, so
+   it stays on its own breakpoint. Between 768px and 992px the card shows in
+   full: the "Show / Hide" button that drives this is itself only displayed
+   below 768px (see .pdp-mobile-show-all-btn in ProductDetailPage.css), so
+   clamping the height up here would hide the text with no way to reveal it.
+   These rules were previously merged with the swap above, which is why they
+   are called out separately now. */
+@media (max-width: 767.98px) {
+  .pdp-return-body {
+    max-height: 0;
+    transition: max-height 0.25s ease;
+  }
+
+  .pdp-return-body.expanded {
+    max-height: 400px;
+  }
+}
+
 @media (max-width: 480px) {
   .pdp-return-policy {
     width: 100%;
-    padding: 18px 16px;
-    gap: 12px;
+    padding: var(--space-sm);
+    gap: var(--space-xs);
   }
 
   .pdp-return-icon {
@@ -86,21 +116,10 @@
   }
 
   .pdp-return-policy h3 {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
 
   .pdp-return-policy p {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 768px) {
-  .pdp-return-body {
-    max-height: 0;
-    transition: max-height 0.25s ease;
-  }
-
-  .pdp-return-body.expanded {
-    max-height: 400px;
+    font-size: var(--text-sm);
   }
 }

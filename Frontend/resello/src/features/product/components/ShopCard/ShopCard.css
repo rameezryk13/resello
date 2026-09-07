@@ -1,18 +1,18 @@
 .pdp-shop-card {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 20px 22px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 22px;
   background: var(--color-white);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-light);
-  margin-bottom: 24px;
+  margin-bottom: var(--space-md);
 }
 
 .pdp-shop-card-top {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-xs);
 }
 
 .pdp-shop-avatar {
@@ -34,7 +34,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-3xs);
 }
 
 .pdp-shop-name {
@@ -49,7 +49,7 @@
 .pdp-shop-location {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-3xs);
   color: var(--color-text-muted);
   font-size: 0.9rem;
 }
@@ -79,14 +79,14 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--color-border-light);
-  padding-top: 16px;
+  padding-top: var(--space-sm);
 }
 
 .pdp-shop-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-3xs);
   text-align: center;
   border-right: 1px solid var(--color-border-light);
 }
@@ -98,7 +98,7 @@
 .pdp-shop-stat-value {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-3xs);
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--color-text-primary);
@@ -116,14 +116,14 @@
 
 @media (max-width: 480px) {
   .pdp-shop-card {
-    gap: 14px;
-    padding: 16px;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
     border-radius: var(--radius-lg);
     margin-bottom: 0;
   }
 
   .pdp-shop-card-top {
-    gap: 10px;
+    gap: var(--space-2xs);
   }
 
   .pdp-shop-avatar {
@@ -133,11 +133,11 @@
   }
 
   .pdp-shop-name {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 
   .pdp-shop-location {
-    font-size: 12px;
+    font-size: var(--text-xs);
   }
 
   .pdp-shop-visit-btn {
@@ -146,7 +146,7 @@
   }
 
   .pdp-shop-stats-grid {
-    padding-top: 12px;
+    padding-top: var(--space-xs);
   }
 
   .pdp-shop-stat-value {

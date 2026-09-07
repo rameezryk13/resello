@@ -3,31 +3,31 @@
    the old index.css. Those duplicates currently win the cascade, so the
    original top-to-bottom order is kept intact. */
 
-@media (max-width: 650px) {
+@media (max-width: 767.98px) {
   .size-selector,
   .color-selector {
-    gap: 8px;
+    gap: var(--space-2xs);
   }
 
   .size-btn,
   .color-btn {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: var(--space-2xs) var(--space-xs);
+    font-size: var(--text-sm);
   }
 }
 
 @media (max-width: 480px) {
   .size-btn,
   .color-btn {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: var(--space-2xs) var(--space-xs);
+    font-size: var(--text-xs);
     border-width: var(--border-width-thin);
     border-radius: var(--radius-sm-md);
   }
 
   .size-selector,
   .color-selector {
-    gap: 8px;
+    gap: var(--space-2xs);
   }
 
   .size-btn {
@@ -39,11 +39,11 @@
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 20px;
-  padding: 9px 12px;
+  gap: var(--space-3xs);
+  margin: 0 0 var(--space-sm);
+  padding: var(--space-2xs) var(--space-xs);
   border-radius: var(--radius-sm-md);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 700;
   line-height: 1.35;
 }
@@ -75,12 +75,12 @@
 .size-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2xs);
   width: 100%;
 }
 
 .size-btn {
-  padding: 10px 16px;
+  padding: var(--space-2xs) var(--space-sm);
   border: var(--border-width-thick) solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-white);
@@ -108,12 +108,12 @@
 .color-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2xs);
   width: 100%;
 }
 
 .color-btn {
-  padding: 5px 10px;
+  padding: var(--space-3xs) var(--space-2xs);
   border: var(--border-width-thick) solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-white);
@@ -121,7 +121,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: var(--text-sm);
   white-space: nowrap;
   text-align: center;
   flex-shrink: 0;
@@ -131,8 +131,8 @@
 .color-btn:hover {
   border-color: var(--color-primary);
   background: var(--color-tint-light);
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: var(--space-3xs);
+  margin-right: var(--space-3xs);
 }
 
 .color-btn.active {
@@ -144,13 +144,13 @@
 @media (max-width: 480px) {
   .size-selector,
   .color-selector {
-    gap: 8px;
+    gap: var(--space-2xs);
   }
 
   .size-btn,
   .color-btn {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: var(--space-2xs) var(--space-xs);
+    font-size: var(--text-xs);
     border-width: var(--border-width-thin);
     border-radius: var(--radius-sm-md);
   }
@@ -166,7 +166,7 @@
 
 .size-selector {
   display: flex;
-  gap: 10px;
+  gap: var(--space-2xs);
 }
 
 .size-btn {
@@ -189,7 +189,7 @@
 .color-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2xs);
 }
 
 .color-btn {
@@ -197,14 +197,14 @@
   width: auto;
   height: 40px;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-xs);
   border: var(--border-width-thick) solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-white);
   color: var(--color-text-primary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }

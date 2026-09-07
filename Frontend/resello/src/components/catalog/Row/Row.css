@@ -1,10 +1,31 @@
-.row-section {
-  margin-bottom: 0px;
+/* Row.css — a product row: optional event banner, section header, card track.
+
+   Two fixes made during the responsive/token pass:
+
+   1. Media-query source order. This file previously interleaved its
+      breakpoints as 768 → 480 → 768 → 480. The first 480px block set
+      `.section-header { gap: 8px }`, but the *second* 768px block then set
+      `gap: 12px` on the same selector — and because it came later with equal
+      specificity, it won at 480px too. The 8px rule could never apply. All
+      768px rules are now merged into one block that precedes the single
+      480px block, so narrow overrides always win.
+
+   2. Type and spacing now come from the scale in variables.css, in rem, so
+      text honours the browser/OS font size (WCAG 1.4.4). Border widths,
+      radii and shadow geometry stay in px on purpose — borders in rem go
+      blurry when scaled. */
+
+/* Consecutive rows used to sit at margin-bottom: 0, so five product rows on
+   the home page fused into one undifferentiated wall. The rhythm now comes
+   from the shared --section-gap token instead of a per-row margin, so every
+   stacked section on every page breathes the same amount. */
+.row-section + .row-section {
+  margin-top: var(--section-gap);
 }
 
 .event-banner {
   border-radius: var(--radius-sm-md);
-  padding: 60px 50px;
+  padding: var(--space-2xl) var(--space-xl);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -43,23 +64,26 @@
 
 .event-content h3 {
   color: var(--color-primary);
-  font-size: 16px;
+  font-size: var(--text-base);
   text-transform: uppercase;
   letter-spacing: 3px;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-xs);
   font-weight: 700;
 }
 
+/* --text-display is clamp(1.875rem, 4vw, 2.75rem) = 30→44px, which spans the
+   old fixed 42px desktop and 32px mobile values, so the separate mobile
+   override below is no longer needed. */
 .event-content h2 {
-  font-size: 42px;
-  margin-bottom: 15px;
+  font-size: var(--text-display);
+  margin-bottom: var(--space-sm);
   line-height: 1.2;
   font-family: 'Raleway', sans-serif;
 }
 
 .event-content p {
-  font-size: 16px;
-  margin-bottom: 30px;
+  font-size: var(--text-base);
+  margin-bottom: var(--space-md);
   opacity: 0.9;
   line-height: 1.6;
 }
@@ -72,10 +96,10 @@
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   position: relative;
-  padding-bottom: 10px;
+  padding-bottom: var(--space-2xs);
 }
 
 .section-title::after {
@@ -91,13 +115,22 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-md);
 }
 
+/* The link is 21px tall on its own — below the 44px minimum hit area. Padding
+   here rather than a taller font keeps it visually identical while giving it
+   a real target; the negative inline margin stops the padding from shifting
+   it away from the row edge. */
 .view-all-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--space-2xs);
+  margin-inline: calc(var(--space-2xs) * -1);
   color: var(--color-primary);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-sm);
   text-decoration: underline;
   transition: color 0.2s ease;
 }
@@ -108,10 +141,14 @@
 
 .slider-controls {
   display: flex;
-  gap: 20px;
+  gap: var(--space-md);
 }
 
+/* 40px visual size is deliberate — a 44px circle crowds the row header. The
+   pseudo-element below extends the clickable area to 44px without changing
+   what's drawn. */
 .slider-btn {
+  position: relative;
   width: 40px;
   height: 40px;
   border-radius: var(--radius-full);
@@ -121,9 +158,22 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 18px;
+  /* was `all` — only these three actually change on hover */
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  font-size: var(--text-lg);
   color: var(--color-text-primary);
+}
+
+/* Centred on the button and inheriting its click, so the target is 44px in
+   every direction while the drawn circle stays 40px. It sits above the
+   button's own content but takes no paint of its own. */
+.slider-btn::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  width: 44px;
+  height: 44px;
 }
 
 .slider-btn:hover {
@@ -141,11 +191,11 @@
 
 .product-track {
   display: flex;
-  gap: 14px;
+  gap: var(--space-xs);
   overflow-x: auto;
   scroll-behavior: smooth;
   scrollbar-width: none;
-  padding-bottom: 10px;
+  padding-bottom: var(--space-2xs);
   padding-top: 2px;
   scroll-snap-type: x mandatory;
   /* On very wide viewports (e.g. Chrome zoomed out to 50%) the whole
@@ -161,62 +211,70 @@
   display: none;
 }
 
-@media (max-width: 768px) {
+/* Single mobile block — merged from the two that used to straddle the 480px
+   one. See note 1 in the file header. */
+@media (max-width: 767.98px) {
   .event-banner {
-      padding: 40px 20px;
-    }
-  .event-content h2 {
-      font-size: 32px;
-    }
-}
+    padding: var(--space-lg) var(--space-sm);
+  }
 
-@media (max-width: 480px) {
   .section-header {
-      gap: 8px;
-    }
-}
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-top: var(--space-2xs);
+    margin-bottom: 2px;
+  }
 
-@media (max-width: 768px) {
-  .section-header {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 10px;
-      margin-bottom: 2px;
-    }
   .section-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+
+  /* 32px button + 12px gap = a 44px pitch, matching the hit area below so the
+     two targets meet without overlapping. */
   .slider-controls {
-      gap: 8px;
-    }
+    gap: 12px;
+  }
+
   .slider-btn {
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-      border-radius: var(--radius-xs);
-      background: var(--color-bg);
-      border: 1px solid var(--color-border-light);
-    }
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-light);
+  }
+
   .slider-btn:hover {
-      background: var(--color-primary);
-      color: var(--color-white);
-    }
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
   .product-track {
-      gap: 10px;
-    }
+    gap: var(--space-2xs);
+  }
 }
 
 @media (max-width: 480px) {
+  .section-header {
+    gap: var(--space-2xs);
+  }
+
   .section-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+
+  /* 30px button + 14px gap = a 44px pitch. See the note at 767.98px. */
+  .slider-controls {
+    gap: 14px;
+  }
+
   .slider-btn {
-      width: 30px;
-      height: 30px;
-      font-size: 14px;
-    }
+    width: 30px;
+    height: 30px;
+    font-size: var(--text-sm);
+  }
 }

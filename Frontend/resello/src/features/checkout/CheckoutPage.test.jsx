@@ -6,9 +6,11 @@ import CheckoutPage from "./CheckoutPage";
 import * as client from "@/api/client";
 import endpoints from "@/api/endpoints";
 
-// Header pulls in SearchBar and its own network calls; none of that is
-// under test here.
-vi.mock("../../../components/Header/Header.jsx", () => ({
+// Header pulls in SearchBar, its own network calls and now useAuth; none of
+// that is under test here. The specifier has to match the one CheckoutPage
+// imports — it used to point at a path that no longer exists, so the mock
+// silently did nothing.
+vi.mock("@/components/layout/Header/Header.jsx", () => ({
   default: () => <div data-testid="mock-header">Header</div>,
 }));
 
@@ -17,8 +19,6 @@ const ADDRESS = {
   name: "Ali Raza",
   line1: "12 Mall Road",
   city: "Lahore",
-  postalCode: "54000",
-  country: "Pakistan",
   phone: "03001234567",
 };
 
@@ -29,12 +29,22 @@ const cartItem = (overrides = {}) => ({
   ...overrides,
 });
 
-// Checkout loads the cart and the address book in parallel, so the mock has
-// to answer per endpoint rather than return one fixed payload.
-const mockLoad = ({ cart = [cartItem()], addresses = [ADDRESS] } = {}) =>
+// Only the fields checkout reads. The real payload carries the ledger too, but
+// the page never touches it, and a fixture that mirrored the whole shape would
+// need updating every time the wallet grows a field.
+const ACTIVE_WALLET = { deactivated: false, deactivationMessage: null };
+
+// Checkout loads the cart, the address book and the wallet in parallel, so the
+// mock has to answer per endpoint rather than return one fixed payload.
+const mockLoad = ({
+  cart = [cartItem()],
+  addresses = [ADDRESS],
+  wallet = ACTIVE_WALLET,
+} = {}) =>
   vi.spyOn(client, "get").mockImplementation((endpoint) => {
     if (endpoint === endpoints.cart.root) return Promise.resolve({ cart });
     if (endpoint === endpoints.addresses) return Promise.resolve({ addresses });
+    if (endpoint === endpoints.wallet.root) return Promise.resolve({ wallet });
     return Promise.reject(new Error(`Unexpected endpoint: ${endpoint}`));
   });
 
@@ -167,6 +177,45 @@ describe("CheckoutPage order placement", () => {
     expect(screen.getAllByText(/ORD-42/).length).toBeGreaterThan(0);
   });
 
+  it("lists every order when the cart is split across suppliers", async () => {
+    const user = userEvent.setup();
+    await renderCheckout({
+      cart: [
+        cartItem({ itemId: "1", product: { price: "500", name: "A", shopId: "s1", shopName: "Alpha Shop" } }),
+        cartItem({ itemId: "2", product: { price: "300", name: "B", shopId: "s2", shopName: "Beta Shop" } }),
+      ],
+    });
+    vi.spyOn(client, "post").mockResolvedValue({
+      orders: [
+        { orderId: "ORD-A", shopName: "Alpha Shop", totalAmount: 520 },
+        { orderId: "ORD-B", shopName: "Beta Shop", totalAmount: 312 },
+      ],
+    });
+
+    await user.click(screen.getByRole("button", { name: /Buy Now/i }));
+
+    // Both suppliers' orders are on the receipt, not just the first.
+    expect(await screen.findByText(/2 orders confirmed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Order ID: ORD-A/)).toBeInTheDocument();
+    expect(screen.getByText(/Order ID: ORD-B/)).toBeInTheDocument();
+    expect(screen.getByText("Alpha Shop")).toBeInTheDocument();
+    expect(screen.getByText("Beta Shop")).toBeInTheDocument();
+    expect(screen.getByText(/ship from 2 suppliers/i)).toBeInTheDocument();
+  });
+
+  it("keeps the single-order receipt when everything ships from one supplier", async () => {
+    const user = userEvent.setup();
+    await renderCheckout();
+    vi.spyOn(client, "post").mockResolvedValue({
+      orders: [{ orderId: "ORD-SOLO", shopName: "Shop 1", totalAmount: 505.99 }],
+    });
+
+    await user.click(screen.getByRole("button", { name: /Buy Now/i }));
+
+    expect(await screen.findByText(/^Order confirmed$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/separate orders/i)).not.toBeInTheDocument();
+  });
+
   it("surfaces the server's message when the order fails", async () => {
     const user = userEvent.setup();
     await renderCheckout();
@@ -196,6 +245,55 @@ describe("CheckoutPage order placement", () => {
     expect(await screen.findByRole("button", { name: /^Pay$/i })).toBeInTheDocument();
     // Nothing is ordered until payment details clear validation.
     expect(post).not.toHaveBeenCalled();
+  });
+});
+
+describe("CheckoutPage deactivated account", () => {
+  const DEACTIVATED_WALLET = {
+    deactivated: true,
+    deactivationMessage:
+      "Your account is deactivated because your wallet balance is Rs. -500 or lower.",
+    support: { email: "support@resello.pk", phone: "0300 1234567" },
+  };
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("explains the block and refuses to place the order", async () => {
+    const user = userEvent.setup();
+    await renderCheckout({ wallet: DEACTIVATED_WALLET });
+    const post = vi.spyOn(client, "post").mockResolvedValue({ order: { orderId: "ORD-1" } });
+
+    const alert = within(screen.getByRole("alert"));
+    expect(alert.getByText("Your account is deactivated")).toBeInTheDocument();
+    expect(alert.getByText(DEACTIVATED_WALLET.deactivationMessage)).toBeInTheDocument();
+
+    // The banner alone isn't the block — the button has to be dead too, or a
+    // deactivated reseller can still fire an order the server will only reject.
+    const button = screen.getByRole("button", { name: /Account deactivated/i });
+    expect(button).toBeDisabled();
+
+    await user.click(button);
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it("gives the reseller a way to get in touch via email and does not show phone", async () => {
+    await renderCheckout({ wallet: DEACTIVATED_WALLET });
+
+    const alert = within(screen.getByRole("alert"));
+    expect(alert.getByRole("link", { name: /support@resello\.pk/i })).toHaveAttribute(
+      "href",
+      "mailto:support@resello.pk"
+    );
+    expect(alert.queryByRole("link", { name: /0300/ })).not.toBeInTheDocument();
+  });
+
+  it("leaves an active account alone", async () => {
+    await renderCheckout();
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Buy Now/i })).toBeEnabled();
   });
 });
 

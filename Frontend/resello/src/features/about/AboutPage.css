@@ -1,0 +1,13 @@
+/* AboutPage.css — About Us / Company Story styling */
+
+.about-page-wrap {
+  position: relative;
+}
+
+.about-quote {
+  font-style: italic;
+  color: var(--color-text-secondary, #475569);
+  border-left: 3px solid var(--color-primary, #ff8c00);
+  padding-left: 16px;
+  margin: 16px 0;
+}

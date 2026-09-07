@@ -8,8 +8,12 @@ const ProductActions = ({
   actionError,
   onAddToCart,
   onBuyNow,
-  children,
 }) => (
+  /* The outer element stays even though the utility row it was named for has
+     moved up to the profit row: ProductDetailPage observes it to decide when
+     to raise the floating buy bar, and the mobile rules in ProductActions.css
+     pin `.pdp-actions-with-utilities .pdp-actions` to the bottom of the
+     viewport. */
   <div className="pdp-actions-with-utilities" ref={containerRef}>
     <div className="pdp-actions" aria-label="Primary actions">
       <button
@@ -34,13 +38,26 @@ const ProductActions = ({
             <p className="pdp-cart-feedback success">{cartMessage}</p>
           ) : null}
           {actionError ? (
-            <p className="pdp-cart-feedback error">{actionError}</p>
+            <p className="pdp-cart-feedback error">
+              {actionError.includes("support@resello.pk") ? (
+                <>
+                  {actionError.split("support@resello.pk")[0]}
+                  <a
+                    href="mailto:support@resello.pk"
+                    style={{ color: "#ffffff", textDecoration: "underline", fontWeight: 700 }}
+                  >
+                    support@resello.pk
+                  </a>
+                  {actionError.split("support@resello.pk")[1]}
+                </>
+              ) : (
+                actionError
+              )}
+            </p>
           ) : null}
         </div>
       )}
     </div>
-
-    {children}
   </div>
 );
 

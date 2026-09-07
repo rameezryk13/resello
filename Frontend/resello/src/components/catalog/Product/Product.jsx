@@ -2,26 +2,34 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import useAuthGate from "@/features/auth/useAuthGate";
 import { formatProductPrice } from "@/utils/currency";
 import "./Product.css";
 
 const Product = ({ product, showCategory = false }) => {
   const navigate = useNavigate();
-  const [isFav, setIsFav] = useState(false);
+  const { isAuthenticated, blocked } = useAuthGate();
+  const [favorited, setFavorited] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState("");
   const favoriteMessageTimer = useRef(null);
   const stock = Number(product?.stock);
 
+  // Derived rather than reset inside the effect below: logging out empties every
+  // heart on the next render instead of scheduling a second pass per card.
+  const isFav = isAuthenticated && favorited;
+
+  // Every card on the page runs this, so with no session it was one guaranteed
+  // 401 per card. Signed out there is nothing to check.
   useEffect(() => {
-    if (!product?.productId) return;
+    if (!product?.productId || !isAuthenticated) return;
 
     get(endpoints.favorites)
       .then((data) => {
         const favIds = (data.favorites || []).map((p) => p.productId);
-        setIsFav(favIds.includes(product.productId));
+        setFavorited(favIds.includes(product.productId));
       })
       .catch((err) => console.error("Error checking favorites:", err));
-  }, [product?.productId]);
+  }, [product?.productId, isAuthenticated]);
 
   useEffect(() => {
     return () => {
@@ -43,6 +51,7 @@ const Product = ({ product, showCategory = false }) => {
 
   const toggleFavorite = async () => {
     if (!product?.productId) return;
+    if (blocked()) return;
 
     try {
       const data = await post(endpoints.favorites, {
@@ -50,7 +59,10 @@ const Product = ({ product, showCategory = false }) => {
       });
       const favIds = (data.favorites || []).map((p) => p.productId);
       const nextIsFav = favIds.includes(product.productId);
-      setIsFav(nextIsFav);
+      setFavorited(nextIsFav);
+      window.dispatchEvent(
+        new CustomEvent("resello:favorites-updated", { detail: { count: favIds.length } })
+      );
       showFavoriteMessage(
         nextIsFav ? "Added to favorites" : "Removed from favorites"
       );

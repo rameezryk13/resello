@@ -13,5 +13,15 @@ export const parsePrice = (value) => {
 export const formatRupees = (value, maximumFractionDigits = 2) =>
   `Rs. ${parsePrice(value).toLocaleString("en-PK", { maximumFractionDigits })}`;
 
+// A wallet balance can go negative once return penalties outrun commission, and
+// formatRupees renders that as "Rs. -250" — the sign buried inside the amount.
+// Money in minus reads better with the sign in front of the whole figure.
+export const formatSignedRupees = (value, maximumFractionDigits = 2) => {
+  const amount = parsePrice(value);
+  return amount < 0
+    ? `− ${formatRupees(Math.abs(amount), maximumFractionDigits)}`
+    : formatRupees(amount, maximumFractionDigits);
+};
+
 export const formatProductPrice = (value) =>
   value === undefined || value === null || value === "" ? "" : formatRupees(value);

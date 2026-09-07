@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import Header from "@/components/layout/Header/Header.jsx";
+import AccountAlert from "@/components/sections/AccountAlert";
 import AddressStep from "./components/AddressStep/AddressStep";
 import ConfirmStep from "./components/ConfirmStep/ConfirmStep";
 import OrderSummaryCard from "./components/OrderSummaryCard/OrderSummaryCard";
@@ -21,6 +22,8 @@ const CheckoutPage = () => {
     selectedAddress,
     selectedAddressId,
     orderId,
+    placedOrders,
+    wallet,
     loading,
     error,
     message,
@@ -74,9 +77,17 @@ const CheckoutPage = () => {
           </button>
         </div>
 
+        <AccountAlert wallet={wallet} />
+
         {error ? <div className="checkout-error">{error}</div> : null}
         {message ? <div className="checkout-message success">{message}</div> : null}
-        {orderId ? <div className="checkout-message info">Order ID: {orderId}</div> : null}
+        {placedOrders.length > 1 ? (
+          <div className="checkout-message info">
+            Order IDs: {placedOrders.map((order) => order.orderId).join(", ")}
+          </div>
+        ) : orderId ? (
+          <div className="checkout-message info">Order ID: {orderId}</div>
+        ) : null}
 
         <div className="checkout-stepper" aria-label="Checkout progress">
           {STEP_LABELS.map((step, index) => {
@@ -121,6 +132,8 @@ const CheckoutPage = () => {
               orderPaymentType={orderPaymentType}
               submitting={submitting}
               selectedAddressId={selectedAddressId}
+              deactivated={wallet.deactivated}
+              wallet={wallet}
               onPrimaryAction={handlePrimaryAction}
             />
           </div>
@@ -138,14 +151,17 @@ const CheckoutPage = () => {
             onPaymentSubmit={handlePaymentSubmit}
             onBack={() => setCheckoutStep("address")}
             submitting={submitting}
+            deactivated={wallet.deactivated}
+            wallet={wallet}
           />
         ) : null}
 
         {checkoutStep === "confirm" ? (
           <ConfirmStep
             orderId={orderId}
+            placedOrders={placedOrders}
             selectedAddress={selectedAddress}
-            onViewOrders={() => navigate("/orders")}
+            onViewOrders={() => navigate("/my-orders")}
           />
         ) : null}
       </div>

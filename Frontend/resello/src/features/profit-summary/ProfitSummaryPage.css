@@ -1,242 +1,516 @@
 /* ============================================================
    ProfitSummaryPage.css
-   Mobile-card "wallet" style summary — self-contained, uses the
-   vendor token system where a token already fits, plus a small
-   set of local gradient values for the hero/payout cards since
-   no vendor token models this exact navy → teal / teal → green
-   diagonal treatment yet.
+
+   Redesigned away from the "mobile wallet app" treatment this page
+   used to have. What changed and why:
+
+   - The page was a 460px column centred in the viewport. On a
+     desktop that reads as a phone screenshot pasted onto the middle
+     of the page, with everything else on the site running full
+     width. It's now a responsive dashboard grid.
+   - Two full-bleed orange gradient cards (hero + payout) competed
+     with each other and gave the page a promo-banner feel. There is
+     one restrained brand panel now; the brand colour is used on the
+     data — the trend bars — rather than as large filled areas.
+   - #0a1240 navy was hardcoded in two places (.ps-range-toggle
+     button.active, .ps-tab.active). That colour isn't in the
+     palette at all. Both now use --color-button-dark, the existing
+     token for exactly this role (dark CTA that is neither brand nor
+     status).
+   - The file referenced Layer-1 primitives directly
+     (--orange-500/600/100), which breaks the "component CSS only
+     references Layer 2" rule. All swapped for their semantic
+     equivalents. --color-primary resolves to --orange-500, so these
+     are the same rendered colours, not a palette change.
+   - Hand-typed px spacing replaced with the --space-* scale.
    ============================================================ */
 
 .ps-page {
-  min-height: 100vh;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
   background: var(--color-bg);
 }
 
 .ps-wrap {
-  padding: 28px 0 64px;
-  display: flex;
-  justify-content: center;
+  /* padding-block, not the `padding` shorthand: this element is also
+     `.container`, which supplies the page's side gutter, and the shorthand
+     reset it to zero. Below the container's max-width — phones, and any
+     desktop at high zoom — that put every panel flush against the edge of
+     the screen while the header above it stayed inset. */
+  padding-block: var(--space-md) var(--space-2xl);
 }
 
-.ps-shell {
-  width: 100%;
-  max-width: 460px;
-}
-
-/* ── Top bar ─────────────────────────────────────────────── */
+/* ── Page head ───────────────────────────────────────────────
+   Was a mobile app bar: a back chevron and a centred title on its own
+   row. Now the title, its description and the range control share one
+   line on desktop and stack on a phone. */
 .ps-topbar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-md);
 }
 
 .ps-back {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  /* The heading beside it is a greedy flex sibling, so at very narrow widths
+     (high browser zoom) the button was being shrunk back below 44px. */
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
-  border: none;
-  background: transparent;
-  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background var(--duration-base) var(--ease-in-out),
+    border-color var(--duration-base) var(--ease-in-out);
 }
 
 .ps-back:hover {
   background: var(--color-tint-hover);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
 }
 
-.ps-topbar h1 {
-  font-size: 24px;
+.ps-topbar-text {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.ps-topbar-text h1 {
+  margin: 0;
+  font-size: var(--text-2xl);
   font-weight: 800;
   color: var(--color-text-primary);
-  margin: 0;
 }
 
-/* ── Hero gradient card ─────────────────────────────────── */
-.ps-hero {
-  border-radius: var(--radius-xl);
-  padding: 24px 22px 26px;
-  background: linear-gradient(135deg, var(--orange-600) 0%, var(--orange-500) 100%);
-  box-shadow: var(--shadow-lg);
-  color: var(--color-white);
-  margin-bottom: 16px;
-}
-
-.ps-hero-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.ps-hero-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.ps-hero-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.16);
-  flex-shrink: 0;
-}
-
-.ps-hero-label strong {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.ps-hero-label span {
-  display: block;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.72);
-  margin-top: 2px;
+.ps-topbar-text p {
+  margin: var(--space-3xs) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 .ps-range-toggle {
   display: inline-flex;
-  padding: 3px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.16);
   flex-shrink: 0;
+  padding: var(--space-3xs);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-surface);
 }
 
 .ps-range-toggle button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 11px;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
   font-weight: 700;
-  padding: 7px 12px;
+  padding: 0 var(--space-sm);
   border-radius: var(--radius-full);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: background var(--duration-base) var(--ease-in-out),
+    color var(--duration-base) var(--ease-in-out);
 }
 
 .ps-range-toggle button.active {
-  background: var(--color-white);
-  color: #0a1240;
+  /* Was a hardcoded #0a1240 navy — not a palette colour. This token exists
+     for dark controls that are neither brand nor status. */
+  background: var(--color-button-dark);
+  color: var(--color-text-inverse);
 }
 
-.ps-hero-amount {
+/* ── Dashboard grid ──────────────────────────────────────────
+   The whole reason the old page read as a phone screenshot: it was a
+   460px column no matter how wide the window was. These regions now
+   share the page's full measure and rearrange by width.
+
+   One full-width column up to 1200px — the headline figure and a
+   six-bar chart both need real width, and side by side below that the
+   bars get too narrow to compare. From 1200px they share a row, with
+   the stats strip and payouts full width beneath, so a desktop shows
+   the figure, its trend and the supporting numbers together.
+
+   The stats strip has its own narrower breakpoint further down; it's
+   three short figures, so it can go horizontal long before this does. */
+.ps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+@media (min-width: 1200px) {
+  .ps-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  }
+
+  .ps-headline {
+    grid-column: 1;
+  }
+
+  .ps-trend {
+    grid-column: 2;
+  }
+
+  .ps-stats,
+  .ps-payouts,
+  .ps-penalties {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Shared panel surface. The old page gave each block its own treatment
+   (gradient, then white with a heavy shadow, then bare); one surface
+   makes the page read as a single document. */
+.ps-headline,
+.ps-trend,
+.ps-stats,
+.ps-payouts,
+.ps-penalties {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-md);
+}
+
+/* ── Headline figure ─────────────────────────────────────────
+   The one brand-coloured panel on the page. It's a tint with a brand
+   left edge rather than a saturated gradient fill: the old full-bleed
+   orange card forced white text onto orange, which is the site's worst
+   contrast pairing, and two of them made the page look like an advert
+   rather than a statement of account. */
+.ps-headline {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--color-tint-light) 0%,
+    var(--color-surface) 62%
+  );
+  border-color: var(--color-primary-light);
+}
+
+.ps-headline::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-primary);
+}
+
+.ps-headline-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-sm);
+}
+
+.ps-headline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+/* Direct children of the text block, not bare descendant selectors. The
+   icon beside them is also a span inside .ps-headline-label, so
+   `.ps-headline-label span` (0,1,1) outranked `.ps-headline-icon` (0,1,0)
+   and turned the icon into a 12px muted block with its glyph jammed into
+   the corner instead of a centred inline-flex circle. */
+.ps-headline-label > div > strong {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.ps-headline-label > div > span {
+  display: block;
+  margin-top: 1px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.ps-headline-amount {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
 }
 
 .ps-currency {
-  font-size: 15px;
+  font-size: var(--text-base);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-text-muted);
 }
 
 .ps-amount {
-  font-size: clamp(34px, 6vw, 44px);
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  /* Long figures shouldn't push the panel wider than its grid track. */
+  overflow-wrap: anywhere;
 }
 
-.ps-hero-desc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
+.ps-headline-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-top: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.ps-margin-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--status-success-border);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.ps-headline-foot {
+  margin-top: var(--space-2xs);
+  padding-top: var(--space-2xs);
+  border-top: 1px solid var(--color-border-light);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Section heads ───────────────────────────────────────────── */
+.ps-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-sm);
+}
+
+.ps-section-head h2 {
   margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-text-primary);
 }
 
-/* ── Stat row ────────────────────────────────────────────── */
-.ps-stat-row {
+.ps-section-head > span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── Trend bars ──────────────────────────────────────────────
+   Six numbers don't justify a charting library. Bars are flex children
+   with a percentage height against the peak month; the value sits above
+   each bar so the chart is still readable if the bars are too similar
+   in height to compare by eye. */
+.ps-trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-height: 11rem;
+}
+
+.ps-trend-col {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.ps-trend-value {
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  /* Reserves the row even on empty months so every bar starts at the
+     same baseline instead of the columns jittering. */
+  min-height: 1em;
+}
+
+.ps-trend-track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  /* Six equal columns across a wide panel make each bar enormous — measured
+     at 200px on a 2560px screen, which reads as a stack of slabs rather than
+     a chart. The cap holds the bar at a bar's proportions and lets the extra
+     width become space between them; the column stays full width so the
+     month labels keep their even spacing. */
+  max-width: 7.5rem;
+  height: 7.5rem;
+  border-radius: var(--radius-xs);
+  background: var(--color-bg);
+}
+
+.ps-trend-bar {
+  width: 100%;
+  /* No CSS floor here on purpose. A floor would put a sliver of orange at
+     the baseline of months with no trading at all, reading as a small
+     amount of profit rather than none. The component already floors real
+     non-zero months at 6% so a genuinely tiny month stays visible; an
+     empty month gets 0% and shows only the empty track. */
+  border-radius: var(--radius-xs);
+  background: var(--color-primary-light);
+  transition: height var(--duration-slow) var(--ease-out);
+}
+
+/* The best month reads at full brand strength; the rest recede so the
+   shape of the trend is legible at a glance. */
+.ps-trend-bar.is-peak {
+  background: var(--color-primary);
+}
+
+.ps-trend-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.ps-trend-empty {
+  margin: 0;
+  padding: var(--space-md) 0;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Supporting stats ────────────────────────────────────────
+   Three figures in a row that wraps rather than a fixed set of cards, so
+   the strip works at 320px and at 2560px without a breakpoint per count. */
+.ps-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: var(--color-white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  padding: 20px 8px;
-  margin-bottom: 18px;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+/* Four figures rather than three since the wallet balance joined them, so the
+   row goes 1 → 2 → 4 across instead of straight to three. */
+@media (min-width: 560px) {
+  .ps-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .ps-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .ps-stat {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 0 8px;
-  position: relative;
-}
-
-.ps-stat + .ps-stat::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 4px;
-  bottom: 4px;
-  width: 1px;
-  background: var(--color-border-light);
+  gap: var(--space-2xs);
+  min-width: 0;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
 }
 
 .ps-stat-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-full);
-  background: var(--color-tint-light);
-  color: var(--color-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
 }
 
 .ps-stat-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--color-text-muted);
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .ps-stat strong {
-  font-size: 17px;
+  font-size: var(--text-base);
   font-weight: 800;
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
-/* ── Pending / Paid tabs ─────────────────────────────────── */
+/* A wallet in minus. On this page the panels are white, so the danger token
+   works directly — unlike the wallet banner and dashboard card, which sit on
+   the orange gradient and need a paler red. */
+.ps-stat strong.is-negative {
+  color: var(--status-danger-text);
+}
+
+/* ── Payout tabs ─────────────────────────────────────────────── */
 .ps-tabs {
   display: inline-flex;
-  gap: 10px;
-  margin-bottom: 18px;
+  flex-shrink: 0;
+  gap: var(--space-3xs);
+  padding: var(--space-3xs);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg);
 }
 
 .ps-tab {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border: 1.5px solid var(--color-border-medium);
-  background: var(--color-white);
-  color: var(--color-text-secondary);
+  gap: var(--space-3xs);
+  min-height: 38px;
+  padding: 0 var(--space-sm);
+  border: none;
   border-radius: var(--radius-full);
-  padding: 10px 16px;
-  font-size: 14px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--duration-base) var(--ease-in-out),
+    color var(--duration-base) var(--ease-in-out);
+}
+
+.ps-tab:hover {
+  color: var(--color-text-primary);
 }
 
 .ps-tab.active {
-  background: #0a1240;
-  border-color: #0a1240;
-  color: var(--color-white);
+  /* Same hardcoded #0a1240 as the range toggle, same replacement. */
+  background: var(--color-button-dark);
+  color: var(--color-text-inverse);
 }
 
 .ps-tab-badge {
@@ -244,141 +518,246 @@
   align-items: center;
   justify-content: center;
   min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
+  padding: 0 var(--space-3xs);
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.24);
-  font-size: 11px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--text-2xs);
   font-weight: 800;
+  line-height: 18px;
 }
 
-/* ── Upcoming payout card ───────────────────────────────── */
-.ps-payout-card {
-  border-radius: var(--radius-xl);
-  padding: 22px 22px 24px;
-  background: linear-gradient(135deg, var(--orange-600) 0%, var(--orange-500) 100%);
-  color: var(--color-white);
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 18px;
+.ps-tab.active .ps-tab-badge {
+  /* On the dark pill the brand orange loses too much separation from the
+     fill, so the badge inverts instead. */
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* ── Pending payout banner ───────────────────────────────────
+   The old page gave this its own orange gradient card, a second full-bleed
+   brand area directly below the hero. It's a strip inside the payouts
+   panel now: still the first thing read in the section, without pulling
+   the eye away from the headline figure. */
+.ps-payout-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  margin-bottom: var(--space-sm);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-light);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+/* Money leaving instead of arriving — the same banner, flipped to danger so
+   the two totals can't be mistaken for each other at a glance. */
+.ps-payout-banner.is-penalty {
+  border-left-color: var(--status-danger-solid);
 }
 
 .ps-payout-label {
   display: block;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .ps-payout-amount {
-  font-size: clamp(28px, 5vw, 34px);
+  margin-top: var(--space-3xs);
+  font-size: var(--text-xl);
   font-weight: 800;
-  margin-bottom: 8px;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.ps-payout-amount.is-negative {
+  color: var(--status-danger-text);
 }
 
 .ps-payout-desc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  flex: 1 1 14rem;
   margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
-/* ── Transaction list ───────────────────────────────────── */
+/* ── Payout rows ─────────────────────────────────────────────── */
 .ps-list {
-  display: grid;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
 }
 
 .ps-list-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: var(--color-white);
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--duration-base) var(--ease-in-out),
+    box-shadow var(--duration-base) var(--ease-in-out);
+}
+
+.ps-list-item:hover {
+  border-color: var(--color-primary-light);
   box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
 }
 
 .ps-list-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 38px;
   height: 38px;
   border-radius: var(--radius-full);
   background: var(--status-warning-bg);
-  color: var(--status-warning-icon);
-  flex-shrink: 0;
+  border: 1px solid var(--status-warning-border);
+  color: var(--status-warning-text);
 }
 
-.ps-list-item:has(.ps-list-amount.positive) .ps-list-icon {
-  background: var(--orange-100);
-  color: var(--orange-500);
+.ps-list-icon.is-paid {
+  background: var(--status-success-bg);
+  border-color: var(--status-success-border);
+  color: var(--status-success-text);
+}
+
+.ps-list-icon.is-penalty {
+  background: var(--status-danger-bg);
+  border-color: var(--status-danger-border);
+  color: var(--status-danger-text);
 }
 
 .ps-list-main {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .ps-list-main strong {
   display: block;
-  font-size: 14.5px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text-primary);
+  /* Order IDs are long and unbreakable, so they'd otherwise widen the row
+     past its panel. */
+  overflow-wrap: anywhere;
 }
 
 .ps-list-main span {
   display: block;
-  font-size: 12.5px;
+  margin-top: 1px;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
-  margin-top: 2px;
+}
+
+.ps-list-figures {
+  flex-shrink: 0;
+  text-align: right;
 }
 
 .ps-list-amount {
-  font-size: 14.5px;
+  display: block;
+  font-size: var(--text-sm);
   font-weight: 800;
-  color: var(--status-danger-text);
+  color: var(--color-text-primary);
   white-space: nowrap;
 }
 
 .ps-list-amount.positive {
-  color: var(--orange-600);
+  color: var(--status-success-text);
 }
 
-.ps-empty {
+.ps-list-amount.is-negative {
+  color: var(--status-danger-text);
+}
+
+.ps-list-sub {
+  display: block;
+  margin-top: 1px;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
-  font-size: 14px;
-  padding: 18px 4px;
-  text-align: center;
+  white-space: nowrap;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
+/* ── Narrow widths / high zoom ───────────────────────────────
+   Everything above is already fluid; these are the two places where a row
+   genuinely stops fitting. Chrome at 500% zoom is roughly a 256px
+   viewport, so this is the same rule serving phones and deep zoom. */
 @media (max-width: 480px) {
   .ps-wrap {
-    padding: 18px 0 40px;
+    padding-bottom: var(--space-xl);
+  }
+  .ps-headline,
+  .ps-trend,
+  .ps-stats,
+  .ps-payouts,
+  .ps-penalties {
+    padding: var(--space-sm);
   }
 
-  .ps-shell {
-    max-width: 100%;
+  /* The amount and the "of PKR …" line stop fitting beside the order ID,
+     so the figures drop under the text instead of squeezing it. */
+  .ps-list-item {
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-xs);
   }
 
-  .ps-hero {
-    padding: 20px 18px 22px;
-    border-radius: var(--radius-lg);
+  .ps-list-figures {
+    flex: 1 1 100%;
+    padding-left: calc(38px + var(--space-xs));
+    text-align: left;
   }
 
-  .ps-payout-card {
-    padding: 18px 18px 20px;
-    border-radius: var(--radius-lg);
+  .ps-list-amount,
+  .ps-list-sub {
+    display: inline;
+    white-space: normal;
   }
 
-  .ps-stat-row {
-    padding: 16px 4px;
-    border-radius: var(--radius-lg);
+  .ps-list-sub {
+    margin-left: var(--space-3xs);
   }
 
-  .ps-topbar h1 {
-    font-size: 20px;
+  /* Six bar labels plus their values need more room than a phone has, so
+     the value above each bar goes and the months carry the axis. */
+  .ps-trend-value {
+    display: none;
+  }
+
+  .ps-trend-track {
+    height: 6rem;
+  }
+
+  .ps-trend-chart {
+    min-height: auto;
+  }
+
+  .ps-section-head,
+  .ps-topbar {
+    gap: var(--space-2xs);
+  }
+
+  .ps-range-toggle,
+  .ps-tabs {
+    /* Both pills are flex-shrink: 0 for desktop; at this width they need to
+       be allowed to take the full row rather than force an overflow. */
+    flex-shrink: 1;
+    width: 100%;
+  }
+
+  .ps-range-toggle button,
+  .ps-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding: 0 var(--space-2xs);
   }
 }

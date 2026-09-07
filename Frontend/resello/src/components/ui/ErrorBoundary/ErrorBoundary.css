@@ -1,5 +1,9 @@
 .error-boundary {
-  min-height: 100vh;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,14 +27,14 @@
 }
 
 .error-boundary__title {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 12px 0;
 }
 
 .error-boundary__message {
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.6;
   color: var(--color-text-secondary);
   margin: 0 0 32px 0;
@@ -51,10 +55,10 @@
   }
 
   .error-boundary__title {
-    font-size: 20px;
+    font-size: var(--text-xl);
   }
 
   .error-boundary__message {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 }

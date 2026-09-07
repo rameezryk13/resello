@@ -203,6 +203,65 @@
   --color-neutral-glow: rgba(156, 163, 175, 0.2);   /* NEW — names the existing literal used
                                                          in .store-dot.closed */
 
+  /* ── Spacing ────────────────────────────────────────────── NEW
+     An 8pt grid replacing the 42 distinct hand-typed px values found
+     across the app (which included off-grid 7, 9, 11, 15, 22 and 26px).
+     Expressed in rem so that padding and margins scale with the user's
+     browser/OS font size instead of staying pinned at a fixed size. */
+  --space-3xs: 0.25rem;   /*  4px */
+  --space-2xs: 0.5rem;    /*  8px */
+  --space-xs:  0.75rem;   /* 12px */
+  --space-sm:  1rem;      /* 16px */
+  --space-md:  1.5rem;    /* 24px */
+  --space-lg:  2rem;      /* 32px */
+  --space-xl:  3rem;      /* 48px */
+  --space-2xl: 4rem;      /* 64px */
+  --space-3xl: 6rem;      /* 96px */
+
+  /* ── Type scale ─────────────────────────────────────────── NEW
+     Every size is rem, never px. This is the whole point of the scale:
+     a px font-size ignores the browser's font-size setting entirely, so
+     text cannot be resized by users who need it larger (WCAG 1.4.4).
+
+     The comments record which raw px sizes each step absorbs — the app
+     previously shipped 29 distinct sizes including half-pixel values
+     (10.5, 11.5, 13.5, 14.5, 15.5px) that no design intent required. */
+  --text-2xs:  0.6875rem;  /* 11px — absorbs 10, 10.5, 11, 11.5px */
+  --text-xs:   0.75rem;    /* 12px — absorbs 12, 12.5px */
+  --text-sm:   0.875rem;   /* 14px — absorbs 13, 13.5, 14, 14.5px */
+  --text-base: 1rem;       /* 16px — absorbs 15, 15.5, 16px */
+  --text-lg:   1.125rem;   /* 18px — absorbs 17, 18px */
+  --text-xl:   1.375rem;   /* 22px — absorbs 19, 20, 21, 22px */
+  --text-2xl:  1.5rem;     /* 24px — absorbs 24, 28px. Section headings. */
+
+  /* The two fluid steps are for display copy only — text that is meant to
+     grow with the viewport. They are deliberately NOT part of the ladder
+     above: section headings sat at a fixed 24px by design, and mapping them
+     onto a clamp that tops out at 32px enlarged every `<h2>` on the page.
+     Use --text-2xl for a heading; reach for these only for hero text. */
+  --text-display: clamp(1.875rem, 4vw, 2.75rem);   /* 30→44px hero */
+  --text-hero:    clamp(2.25rem, 5vw, 3.5rem);     /* 36→56px banner */
+
+  /* ── Section rhythm ─────────────────────────────────────── NEW
+     Home previously stacked its sections with gaps of 24, 20, 50, 0, 0,
+     0 and 20px — no rhythm, and five product rows fused into one wall.
+     One fluid token gives every page the same vertical cadence and lets
+     it tighten on small screens without a media query. */
+  --section-gap:   clamp(2rem, 4vw, 3.5rem);
+  --section-pad-y: clamp(1.5rem, 3vw, 2.5rem);
+
+  /* ── Breakpoints ────────────────────────────────────────── NEW
+     Reference only — @media cannot read a custom property, so these
+     can't be used directly in a query. They're recorded here so the
+     five canonical widths have one home and new CSS doesn't reintroduce
+     the 20 ad-hoc breakpoints this scale replaced.
+
+       xs   480px   phones
+       md   768px   tablets / mobile-nav boundary
+       lg   992px   small laptops
+       xl  1200px   desktops
+       2xl 1920px   large / zoomed-out viewports  */
+
   /* ── Radius ─────────────────────────────────────────────── */
   --radius-2xs:   4px;    /* NEW — code labels, small chips */
   --radius-xs:    6px;    /* NEW — tracking ID pills, color chips */

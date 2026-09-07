@@ -64,7 +64,7 @@
   border: 1px solid rgba(255, 255, 255, 0.4);
   /* flagged, same gap */
   color: var(--color-white);
-  font-size: 11px; font-weight: 700;
+  font-size: var(--text-2xs); font-weight: 700;
   letter-spacing: 2px; text-transform: uppercase;
   padding: 5px 14px; border-radius: var(--radius-full);
   margin-bottom: 14px;
@@ -99,7 +99,7 @@
   color: var(--color-primary);
 }
 .sp-stat-lbl {
-  font-size: 12px; color: var(--color-text-muted);
+  font-size: var(--text-xs); color: var(--color-text-muted);
   margin-top: 4px; font-weight: 500;
 }
 
@@ -114,14 +114,14 @@
   margin-bottom: 24px;
 }
 .sp-card p {
-  font-size: 14px; color: var(--color-text-muted); line-height: 1.9;
+  font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.9;
   margin-bottom: 10px;
 }
 .sp-card p:last-child { margin-bottom: 0; }
 
 /* ---- SECTION TITLE ---- */
 .sp-section-title {
-  font-size: 22px; font-weight: 700;
+  font-size: var(--text-xl); font-weight: 700;
   position: relative; padding-bottom: 10px;
   margin-bottom: 20px; color: var(--color-text-primary);
 }
@@ -166,11 +166,11 @@
   font-size: 1.5rem; margin-bottom: 14px;
 }
 .sp-icon-card h3 {
-  font-size: 15px; font-weight: 700;
+  font-size: var(--text-base); font-weight: 700;
   color: var(--color-text-primary); margin-bottom: 6px;
 }
 .sp-icon-card p {
-  font-size: 13.5px; color: var(--color-text-muted); line-height: 1.7;
+  font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.7;
 }
 
 /* ---- STEPS ---- */
@@ -184,15 +184,17 @@
   width: 34px; height: 34px; min-width: 34px;
   border-radius: var(--radius-full); background: var(--color-primary);
   color: var(--color-white); display: flex; align-items: center;
-  justify-content: center; font-size: 13px; font-weight: 700;
+  justify-content: center; font-size: var(--text-sm); font-weight: 700;
 }
 .sp-step-num.sp-check {
-  background: var(--status-success-solid);
-  /* exact hex match — vendor's success-solid IS green-500 */
-  font-size: 15px;
+  /* The white ✓ sits on this fill, so the fill is its backdrop: --green-500 was
+     3.30:1 and failed the 4.5:1 bar for a glyph this size. --green-600 via
+     --status-success-text takes it to 5.02:1. No palette value changed. */
+  background: var(--status-success-text);
+  font-size: var(--text-base);
 }
-.sp-step h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-.sp-step p { font-size: 13px; color: var(--color-text-muted); line-height: 1.7; }
+.sp-step h3 { font-size: var(--text-sm); font-weight: 700; margin-bottom: 4px; }
+.sp-step p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.7; }
 
 /* ---- TEAM ---- */
 .sp-team-card {
@@ -211,8 +213,8 @@
   box-shadow: 0 8px 20px var(--color-primary-glow);
   /* flagged — original alpha 0.28, using vendor's fixed 0.18 */
 }
-.sp-team-card h3 { font-size: 15px; font-weight: 700; }
-.sp-team-card p { font-size: 13px; color: var(--color-text-muted); margin-top: 4px; }
+.sp-team-card h3 { font-size: var(--text-base); font-weight: 700; }
+.sp-team-card p { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 4px; }
 
 /* ---- BADGES ---- */
 .sp-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
@@ -222,7 +224,7 @@
   /* flagged, see orange-200 note */
   color: var(--color-primary-dark);
   padding: 5px 14px;
-  border-radius: var(--radius-full); font-size: 13px; font-weight: 600;
+  border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: 600;
 }
 
 /* ---- HIGHLIGHT ---- */
@@ -236,7 +238,7 @@
   padding: 16px 20px; margin-bottom: 24px;
 }
 .sp-highlight p {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--color-primary-dark);
   /* flagged — reseller warm-800, closest role */
   line-height: 1.7;
@@ -247,15 +249,22 @@
   display: flex; justify-content: space-between;
   align-items: center; padding: 12px 0;
   border-bottom: 1px solid var(--color-border-light);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .sp-profit-row:last-child { border-bottom: none; }
 .sp-profit-row span:first-child { color: var(--color-text-muted); }
 .sp-profit-row span:last-child { font-weight: 700; color: var(--color-text-primary); }
 .sp-profit-total span:first-child { color: var(--color-text-primary); font-weight: 600; }
-.sp-profit-total span:last-child { color: var(--status-success-solid); font-size: 16px; }
-.sp-small-label { font-size: 12px !important; color: var(--color-text-faint) !important; margin-bottom: 14px !important; }
-/* flagged — reseller neutral-500, closest role */
+.sp-profit-total span:last-child { color: var(--status-success-text); font-size: var(--text-base); }
+/* Was --status-success-solid (--green-500 #16a34a): 3.30:1 on the white card,
+   short of the 4.5:1 this text size needs. --status-success-text (--green-600
+   #15803d) is 5.02:1 and is the role that already means "success as text".
+   Same swap applied to .sp-check below. No palette value changed. */
+/* Was --color-text-faint (#9ca3af) on the white .sp-card: 2.54:1, a WCAG 1.4.3
+   failure at this size. --color-text-muted is the next step down the same
+   neutral ramp at 4.83:1 and keeps the label subordinate to the rows above it.
+   No palette value changed. */
+.sp-small-label { font-size: var(--text-xs) !important; color: var(--color-text-muted) !important; margin-bottom: 14px !important; }
 .sp-divider { height: 1px; background: var(--color-border-light); margin: 16px 0; }
 
 /* ---- CTA STRIP ---- */
@@ -274,7 +283,13 @@
   font-family: 'Raleway', sans-serif;
   font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;
 }
-.sp-cta-strip p { font-size: 14px; opacity: 0.92; }
+.sp-cta-strip p { font-size: var(--text-sm); opacity: 0.92; }
+/* These two are the mailto: and tel: links inside the CTA sentence. They stay
+   at text height on purpose: WCAG 2.5.8 exempts targets whose size is
+   constrained by the line-height of the non-target text around them, and
+   padding them out to 44px would make their hit areas overlap each other once
+   the sentence wraps — the second link would then take clicks meant for the
+   first. Everything not inline in prose is at 44px. */
 .sp-cta-strip a {
   color: var(--color-primary-light);
   /* flagged — reseller warm-300 (#ffe8b3, pale gold) has no close
@@ -287,25 +302,25 @@
 /* ---- LEGAL ---- */
 .sp-legal-section { margin-bottom: 28px; }
 .sp-legal-section h2 {
-  font-size: 14px; font-weight: 700;
+  font-size: var(--text-sm); font-weight: 700;
   color: var(--color-primary-dark);
   margin-bottom: 10px; padding-bottom: 8px;
   border-bottom: 2px solid var(--color-tint-light);
   text-transform: uppercase; letter-spacing: 0.5px;
 }
 .sp-legal-section p {
-  font-size: 14px; color: var(--color-text-muted); line-height: 1.9; margin-bottom: 6px;
+  font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.9; margin-bottom: 6px;
 }
 .sp-legal-section ul {
   padding-left: 20px; list-style: disc; margin-top: 8px;
 }
 .sp-legal-section li {
-  font-size: 14px; color: var(--color-text-muted); line-height: 1.9; margin-bottom: 4px;
+  font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.9; margin-bottom: 4px;
 }
 .sp-legal-section a { color: var(--color-primary); font-weight: 600; }
 
 /* ---- RESPONSIVE ---- */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .static-page { padding: 24px 16px 60px; }
   .sp-hero { padding: 32px 24px; }
   .sp-hero h1 { font-size: 1.7rem; }

@@ -11,26 +11,13 @@ import {
   XCircle,
 } from "lucide-react";
 import Header from "@/components/layout/Header/Header.jsx";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import AccountHero from "@/components/sections/AccountHero";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import { STATUS_PROGRESS, STATUS_TONE } from "@/constants/orderStatus";
 import { formatRupees } from "@/utils/currency";
 import "./TrackOrderPage.css";
-
-const ORDER_STATUSES = ["In-progress", "Shipper's Advice", "Delivered", "Returned", "Cancelled"];
-
-// Same derivation OrdersPage uses, so a given order reads the same status
-// on both pages until the backend stores a real status field.
-const getOrderStatus = (order) => {
-  const source = String(order?.orderId || "");
-  let total = 0;
-
-  for (let index = 0; index < source.length; index += 1) {
-    total += source.charCodeAt(index);
-  }
-
-  return ORDER_STATUSES[total % ORDER_STATUSES.length];
-};
 
 const TRACKING_STEPS = [
   { key: "placed", label: "Order placed", detail: "We received your order.", icon: ClipboardCheck },
@@ -39,23 +26,6 @@ const TRACKING_STEPS = [
   { key: "transit", label: "In transit", detail: "On the way to the address.", icon: Truck },
   { key: "delivered", label: "Delivered", detail: "Handed over to the customer.", icon: CheckCircle2 },
 ];
-
-// How far along the 5-step rail each derived status sits.
-const STATUS_PROGRESS = {
-  "In-progress": 2,
-  "Shipper's Advice": 3,
-  Delivered: 5,
-  Returned: 4,
-  Cancelled: 1,
-};
-
-const STATUS_TONE = {
-  "In-progress": "warning",
-  "Shipper's Advice": "process",
-  Delivered: "success",
-  Returned: "return",
-  Cancelled: "danger",
-};
 
 const COURIERS = ["Leopards Courier", "TCS Express", "M&P Logistics", "Post Express"];
 
@@ -102,12 +72,9 @@ const TrackOrderPage = () => {
 
       try {
         const data = await get(endpoints.orders);
-        const enriched = (data.orders || []).map((order) => ({
-          ...order,
-          status: getOrderStatus(order),
-        }));
-        setOrders(enriched);
-        if (enriched.length > 0) setSelectedId(enriched[0].orderId);
+        const loaded = data.orders || [];
+        setOrders(loaded);
+        if (loaded.length > 0) setSelectedId(loaded[0].orderId);
       } catch (err) {
         setError(err?.message || "Unable to load your orders");
       } finally {
@@ -149,6 +116,7 @@ const TrackOrderPage = () => {
 
   const reachedSteps = selectedOrder ? STATUS_PROGRESS[selectedOrder.status] || 1 : 0;
   const isCancelled = selectedOrder?.status === "Cancelled";
+  const isVerificationFailed = selectedOrder?.status === "Verification Failed";
   const isReturned = selectedOrder?.status === "Returned";
 
   return (
@@ -182,20 +150,22 @@ const TrackOrderPage = () => {
           {searchError ? <p className="track-search-error">{searchError}</p> : null}
         </section>
 
-        {loading ? <p className="account-empty">Loading your orders…</p> : null}
-        {error ? <p className="account-empty">{error}</p> : null}
+        {loading ? <EmptyState variant="loading" title="Loading your orders…" /> : null}
+        {error ? (
+          <EmptyState variant="error" title="Could not load your orders" description={error} />
+        ) : null}
 
         {!loading && !error && orders.length === 0 ? (
-          <section className="account-section track-empty">
-            <span className="track-empty-icon">
-              <PackageSearch size={26} />
-            </span>
-            <h2>Nothing to track yet</h2>
-            <p>Once you place an order it will show up here with live delivery stages.</p>
-            <button type="button" className="btn-primary" onClick={() => navigate("/")}>
-              Start shopping
-            </button>
-          </section>
+          <EmptyState
+            icon={PackageSearch}
+            title="Nothing to track yet"
+            description="Once you place an order it will show up here with live delivery stages."
+            action={
+              <button type="button" className="btn-primary" onClick={() => navigate("/")}>
+                Start shopping
+              </button>
+            }
+          />
         ) : null}
 
         {!loading && !error && orders.length > 0 ? (
@@ -266,7 +236,6 @@ const TrackOrderPage = () => {
                           selectedOrder.address?.line1,
                           selectedOrder.address?.line2,
                           selectedOrder.address?.city,
-                          selectedOrder.address?.country,
                         ]
                           .filter(Boolean)
                           .join(", ") || "No address on this order."}
@@ -284,10 +253,19 @@ const TrackOrderPage = () => {
                       <span>This order was cancelled, so it will not move any further.</span>
                     </div>
                   ) : null}
+                  {isVerificationFailed ? (
+                    <div className="track-alert track-alert-danger">
+                      <XCircle size={18} />
+                      <span>This order failed verification and will not move any further.</span>
+                    </div>
+                  ) : null}
                   {isReturned ? (
                     <div className="track-alert track-alert-return">
                       <PackageCheck size={18} />
-                      <span>This parcel was returned and is on its way back to the seller.</span>
+                      <span>
+                        This parcel was returned and is on its way back to the seller. A return penalty
+                        was charged to your wallet — see Payment Summary for the amount.
+                      </span>
                     </div>
                   ) : null}
 

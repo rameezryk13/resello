@@ -23,47 +23,167 @@
    ============================================================ */
 
 .pdp-page {
-  min-height: 100vh;
-  padding-bottom: 60px;
+  /* Pages sit inside the flex .app-shell, which already fills the viewport
+     and pushes the footer down. A full 100vh here stacked on top of the
+     header and footer, so short pages always overflowed by exactly the
+     chrome height. `auto` lets the shell do the work. */
+  min-height: auto;
+  padding-bottom: var(--space-xl);
+}
+
+/* One shared measure for the whole page.
+   The global `.container` is capped at 1680px and then *widens* to 92% / 88%
+   of the viewport above 1920px / 2560px. That is right for the grid-of-cards
+   pages, where more width means more cards per row, but it is wrong here: the
+   PDP's widest row is the two-column buy area, and every one of its parts is
+   a fixed-size or naturally-narrow block. Past roughly 1440px the two grid
+   columns kept growing while their contents did not — measured at a 2560px
+   viewport the left column was 1162px wide around a 640px gallery and the
+   right was 990px around a 520px info panel, i.e. ~992px of dead width and a
+   569px empty band straight down the middle of the page.
+   Capping the measure here means the columns stop growing at the point their
+   contents stop growing, and every row on the page — breadcrumb, buy grid,
+   return policy, details, related rows, reviews — lines up on the same two
+   edges instead of some rows spanning the viewport and others stopping at
+   640px.
+   `92vw` is the same proportion the global `.container` uses above 1920px, so
+   the side margin here matches the rest of the site instead of being visibly
+   deeper on this one page; the first 84rem term keeps a laptop from going
+   edge-to-edge and the last stops a very large display from running the buy
+   grid the full width of the glass. This is a ceiling, not a width, so the
+   global rule still wins on smaller viewports and at high zoom. */
+.pdp-page > .container {
+  max-width: clamp(84rem, 92vw, 118rem);
 }
 
 .pdp-loading,
 .pdp-error {
-  padding: 80px 20px;
+  padding: 80px var(--space-sm);
   text-align: center;
   color: var(--color-text-muted);
 }
 
+/* Two columns is the base: gallery, then the buy column with the supporting
+   cards folded underneath it. Both tracks are clamped near the size their
+   contents actually want — a square image that shouldn't tower over the fold,
+   and a form whose description shouldn't stretch into over-long lines. The
+   three-column arrangement for wide screens is further down. */
 .pdp-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-  gap: 40px 48px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+  gap: var(--space-lg) var(--space-xl);
   align-items: start;
-  margin-bottom: 40px;
+  margin-bottom: var(--space-lg);
 }
 
-.pdp-info {
-  max-width: 520px;
+/* Grid and flex children default to min-content width, so without these the
+   gallery's images and the long product title can refuse to shrink and push
+   their column past its track. */
+.pdp-info,
+.pdp-aside {
+  min-width: 0;
+}
+
+.pdp-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* The shop card was drawn for a full-width row; in the aside it lives in the
+   page's narrowest column. Its top row is a fixed 54px avatar, the shop name,
+   and a "Visit" button that never shrinks, so the name absorbs every squeeze
+   and ellipsises early — measured at a 327px track, "ReSello Select" rendered
+   at 90px of the 134px it wants. Giving the name block a floor and letting the
+   row wrap means the Visit button drops to its own line instead, which costs
+   one row of height and keeps the shop's name readable. Shop names vary in
+   length, so this matters at more than one viewport width. */
+.pdp-aside .pdp-shop-card-top {
+  flex-wrap: wrap;
+}
+
+.pdp-aside .pdp-shop-basic {
+  min-width: 8.5rem;
+}
+
+.pdp-aside .pdp-shop-visit-btn {
+  flex: 1 0 auto;
+}
+
+/* The cards are rows in a flex column now, so the column gap owns the spacing
+   between them. Their own bottom margins would double up. */
+.pdp-aside > .pdp-shop-card,
+.pdp-aside > .pdp-return-policy {
+  margin-bottom: 0;
+}
+
+/* At the base width the aside sits under the buy column, which already has
+   its own rhythm — the flex gap above is for the three-column case. */
+.pdp-aside {
+  grid-column: 2;
+}
+
+/* Wide screens: the supporting cards get their own column.
+   This is what lets the page use a full-width monitor honestly. With only two
+   columns the surplus had nowhere useful to go — it either inflated the
+   square product image until it dominated the page (measured 840px at a
+   1905px viewport) or spread the buy controls apart and stretched the
+   description into long lines. A third column absorbs it as content instead,
+   and it also brings the shop card and return policy up beside the buy
+   controls rather than below the fold.
+   1600px is where all three tracks fit at workable sizes. It used to be
+   1400px, which was right when the aside took a 0.8fr share; at the 0.58fr
+   below it the third track arrived at only 261px, and measured there the shop
+   card's name ellipsised to 25px and the policy paragraph wrapped into a
+   156px ribbon 174px tall. Splitting into three columns has to wait until the
+   third one can actually hold its contents — under this width the two-column
+   arrangement, where the aside sits full-width beneath the buy column, reads
+   better than a crushed third track.
+
+   The aside is deliberately the narrowest of the three. It holds a shop card
+   and a policy note — supporting material, not the reason anyone opened the
+   page — so a share comparable to the gallery or the buy column would read as
+   though the three were equally important.
+
+   0.68fr is the floor of what the shop card can actually use, found by
+   measuring rather than taste. Its top row is a 54px avatar, the shop name,
+   and a 113px "Visit" button that does not shrink; with 22px side padding the
+   name only gets whatever is left. At 0.58fr the track came out 289px and the
+   name — "ReSello Select", 134px at its natural width — was truncated to a
+   52px stub. 0.68fr lands the track near 330px, which clears the name, and
+   still leaves the aside visibly third against the gallery and buy column.
+   The 18rem floor holds that same row together if the tracks are squeezed. */
+@media (min-width: 1600px) {
+  .pdp-main-grid {
+    grid-template-columns:
+      minmax(0, 1.15fr)
+      minmax(20rem, 0.95fr)
+      minmax(18rem, 0.68fr);
+  }
+
+  .pdp-aside {
+    grid-column: 3;
+  }
 }
 
 .pdp-option-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-sm);
   width: 100%;
 }
 
 .option-heading {
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-xs);
   display: block;
   color: var(--color-text-primary);
 }
 
 .pdp-action-error {
-  margin-top: 12px;
+  margin-top: var(--space-xs);
   color: var(--status-danger-text);
   /* flagged — reseller --color-danger (#ef4444) close to vendor
      danger-text (red-500, #dc2626) */
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 /* Mobile-only "Show all / Show less" toggle, shared by the return-policy
@@ -87,60 +207,65 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 992px) {
   .pdp-main-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: var(--space-lg);
+  }
+
+  /* One column, so the explicit placement above would put the aside in a
+     second track that no longer exists. */
+  .pdp-aside {
+    grid-column: 1;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .pdp-mobile-show-all-btn {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: var(--space-2xs);
     border: none;
     background: transparent;
     color: var(--color-primary);
     font: inherit;
     font-weight: 800;
-    font-size: 13px;
-    padding: 4px 0;
+    font-size: var(--text-sm);
+    padding: var(--space-3xs) 0;
     cursor: pointer;
   }
 
   .pdp-mobile-show-all-btn:hover {
     color: var(--color-primary-dark);
   }
-}
 
-/* Leaves room for the Add to Cart / Buy Now bar that ProductActions.css
-   pins to the bottom of the viewport at this width. */
-@media (max-width: 650px) {
+  /* Leaves room for the Add to Cart / Buy Now bar that ProductActions.css
+     pins to the bottom of the viewport at this same width. Merged in from a
+     separate 650px query so the padding and the bar can't disagree. */
   .pdp-page {
-    padding-bottom: 104px;
+    padding-bottom: 6.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .pdp-page {
-    padding-bottom: 40px;
+    padding-bottom: var(--space-lg);
     background: linear-gradient(180deg, var(--color-white) 0%, var(--color-bg) 100%);
   }
 
   .pdp-loading,
   .pdp-error {
-    padding: 56px 16px;
-    font-size: 14px;
+    padding: var(--space-xl) var(--space-sm);
+    font-size: var(--text-sm);
   }
 
   .pdp-main-grid {
-    gap: 20px;
-    margin-bottom: 24px;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
   }
 
   .pdp-info {
     max-width: none;
-    padding: 18px;
+    padding: var(--space-sm);
     border: 1px solid var(--color-border-light);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
@@ -151,19 +276,19 @@
   }
 
   .pdp-option-group {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-sm);
   }
 
   .option-heading {
-    margin-bottom: 10px;
-    font-size: 13px;
+    margin-bottom: var(--space-2xs);
+    font-size: var(--text-sm);
     letter-spacing: 0.01em;
     text-transform: uppercase;
     color: var(--color-text-secondary);
   }
 
   .pdp-action-error {
-    margin-top: 10px;
-    font-size: 13px;
+    margin-top: var(--space-2xs);
+    font-size: var(--text-sm);
   }
 }

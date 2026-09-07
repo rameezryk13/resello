@@ -27,6 +27,26 @@ export class ApiError extends Error {
   }
 }
 
+// The session token, held here rather than read from localStorage per request
+// so the client stays synchronous and testable. AuthProvider owns it and calls
+// setAuthToken on login, logout, and when it restores a token on mount.
+let authToken = null;
+
+export function setAuthToken(token) {
+  authToken = token || null;
+}
+
+// A 401 means the server no longer honours this token — expired, revoked, or
+// signed out in another tab. Drop it and announce it once; AuthProvider listens
+// and clears the user, which sends protected pages to /login.
+export const UNAUTHORIZED_EVENT = "resello:unauthorized";
+
+function handleUnauthorized() {
+  if (!authToken) return;
+  authToken = null;
+  window.dispatchEvent(new CustomEvent(UNAUTHORIZED_EVENT));
+}
+
 // The server sends { message } on failure. Prefer it over the bare status
 // text, since it is written for humans. Falls back when the body is empty or
 // isn't JSON — which is what happens when the backend is down entirely.
@@ -51,19 +71,24 @@ async function errorFrom(response) {
 }
 
 async function request(endpoint, options = {}) {
-  const { body, signal, ...rest } = options;
+  const { body, signal, headers: extraHeaders, ...rest } = options;
+
+  // Built up rather than hardcoded so that with no body and no token the
+  // options object carries no headers key at all — exactly the shape a plain
+  // GET or DELETE had before auth existed.
+  const headers = {
+    ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    ...extraHeaders,
+  };
 
   let response;
   try {
     response = await fetch(`${API_BASE}${endpoint}`, {
       ...rest,
       signal,
-      ...(body === undefined
-        ? {}
-        : {
-            headers: { "Content-Type": "application/json", ...rest.headers },
-            body: JSON.stringify(body),
-          }),
+      ...(Object.keys(headers).length === 0 ? {} : { headers }),
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch (err) {
     // An aborted request is the caller cancelling on unmount, not a failure —
@@ -74,6 +99,8 @@ async function request(endpoint, options = {}) {
       0
     );
   }
+
+  if (response.status === 401) handleUnauthorized();
 
   if (!response.ok) throw await errorFrom(response);
 

@@ -1,7 +1,7 @@
 .pdp-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-xs);
   align-items: flex-start;
 }
 
@@ -9,9 +9,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
-  margin-top: 12px;
-  margin-bottom: 32px;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-lg);
 }
 
 .pdp-actions-with-utilities .pdp-actions {
@@ -24,9 +24,9 @@
 .pdp-small-action-btn {
   min-width: 124px;
   min-height: 50px;
-  padding: 0 18px !important;
+  padding: 0 var(--space-sm) !important;
   border-radius: var(--radius-sm) !important;
-  font-size: 14px !important;
+  font-size: var(--text-sm) !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@
 .pdp-cart-feedback-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2xs);
   flex-basis: 100%;
   width: 100%;
   animation: pdpSlideDown 0.24s ease-out;
@@ -62,9 +62,9 @@
 
 .pdp-cart-feedback {
   margin: 0;
-  padding: 10px 12px;
+  padding: var(--space-2xs) var(--space-xs);
   border-radius: var(--radius-sm-md);
-  font-size: 13px;
+  font-size: var(--text-sm);
   line-height: 1.4;
 }
 
@@ -82,18 +82,18 @@
   border: 1px solid var(--status-danger-border);
 }
 
-@media (max-width: 650px) {
+@media (max-width: 767.98px) {
   .pdp-actions-with-utilities {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
-    margin-bottom: 24px;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
   }
 
   .pdp-actions-with-utilities .pdp-actions {
     justify-content: stretch;
-    gap: 10px;
+    gap: var(--space-2xs);
   }
 }
 
@@ -106,7 +106,7 @@
     width: 100%;
     min-height: 46px;
     border-radius: var(--radius-md) !important;
-    font-size: 14px !important;
+    font-size: var(--text-sm) !important;
     justify-content: center;
   }
 
@@ -121,7 +121,7 @@
 
 /* Appended last so it wins the cascade: pin Add to Cart / Buy Now to the
    bottom of the viewport so they stay reachable while the page scrolls. */
-@media (max-width: 650px) {
+@media (max-width: 767.98px) {
   .pdp-actions-with-utilities .pdp-actions {
     position: fixed;
     left: 0;
@@ -133,7 +133,7 @@
     max-width: none;
     width: 100%;
     margin: 0;
-    gap: 10px;
+    gap: var(--space-2xs);
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
     background: var(--color-white);
     border-top: 1px solid var(--color-border-light);
@@ -151,6 +151,6 @@
     left: 16px;
     right: 16px;
     bottom: 100%;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2xs);
   }
 }

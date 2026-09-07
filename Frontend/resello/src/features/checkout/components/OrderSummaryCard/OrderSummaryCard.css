@@ -74,6 +74,85 @@
   cursor: not-allowed;
 }
 
+.buy-now-btn-container {
+  width: 100%;
+}
+
+.buy-now-btn.disabled-deactivated {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  pointer-events: none;
+}
+
+.buy-now-btn-container:has(.disabled-deactivated) {
+  cursor: not-allowed;
+}
+
+.account-disabled-badge-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: #fff1f2;
+  border: 1.5px solid #fecdd3;
+  border-radius: var(--radius-md, 8px);
+  color: #9f1239;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.account-disabled-badge-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.account-disabled-badge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-disabled-badge-body strong {
+  color: #be123c;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.account-disabled-badge-desc {
+  margin: 0;
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.account-disabled-admin-contact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.account-disabled-email-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #e11d48;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.account-disabled-email-link:hover {
+  color: #9f1239;
+}
+
 .payment-summary {
   padding: 0;
   background: transparent;
@@ -134,7 +213,7 @@
   font-size: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .summary-item-row {
     flex-direction: column;
     gap: 0.5rem;

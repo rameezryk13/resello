@@ -1,5 +1,5 @@
-import { ArrowLeft, Lock, ShieldCheck } from "lucide-react";
-import { isValidCnic, isValidPakistanIban } from "@/utils/validation";
+import { ArrowLeft, Lock, Mail, ShieldCheck } from "lucide-react";
+import { isValidCnic, isValidPakistanIban, normalizeIban } from "@/utils/validation";
 import { BANKS, PAYMENT_METHODS } from "../../constants";
 import OrderSummaryCard from "../OrderSummaryCard/OrderSummaryCard";
 import "./PaymentStep.css";
@@ -26,6 +26,8 @@ const PaymentStep = ({
   onPaymentSubmit,
   onBack,
   submitting,
+  deactivated = false,
+  wallet,
 }) => (
   <div className="payment-layout">
     <div className="payment-summary-shell">
@@ -99,7 +101,22 @@ const PaymentStep = ({
             value={paymentDetails.accountNumber}
             onChange={(e) => onPaymentChange("accountNumber", e.target.value)}
           />
-          <small>Use Pakistani IBAN format: PK + 2 digits + 4 bank letters + 16 characters</small>
+          <small
+            style={{
+              color: paymentDetails.accountNumber
+                ? isValidPakistanIban(paymentDetails.accountNumber)
+                  ? "#16a34a"
+                  : "#dc2626"
+                : undefined,
+              fontWeight: paymentDetails.accountNumber ? 600 : undefined,
+            }}
+          >
+            {paymentDetails.accountNumber
+              ? isValidPakistanIban(paymentDetails.accountNumber)
+                ? "✓ Valid Pakistani IBAN format (24 characters)"
+                : `IBAN format: PK + 2 digits + 4 bank letters + 16 chars (${normalizeIban(paymentDetails.accountNumber).length}/24)`
+              : "Use Pakistani IBAN format: PK + 2 digits + 4 bank letters + 16 characters"}
+          </small>
         </label>
         <label>
           CNIC
@@ -116,12 +133,33 @@ const PaymentStep = ({
         </label>
         <button
           type="button"
-          className="payment-pay-btn"
+          className={`payment-pay-btn ${deactivated ? "disabled-deactivated" : ""}`}
           onClick={onPaymentSubmit}
-          disabled={submitting || cartItems.length === 0}
+          disabled={submitting || cartItems.length === 0 || deactivated}
         >
-          {submitting ? "Processing..." : "Pay"}
+          {deactivated ? "Payment Disabled (Account Deactivated)" : submitting ? "Processing..." : "Pay"}
         </button>
+        {deactivated && (
+          <div className="account-disabled-badge-msg" role="status" style={{ marginTop: "1rem" }}>
+            <span className="account-disabled-badge-icon">⚠️</span>
+            <div className="account-disabled-badge-body">
+              <strong>Payment Disabled</strong>
+              <p className="account-disabled-badge-desc">
+                Payment is disabled because your account has 5 return penalties or balance is Rs. -500.
+              </p>
+              <div className="account-disabled-admin-contact">
+                <span>Contact Admin:</span>{" "}
+                <a
+                  href={`mailto:${wallet?.support?.email || "support@resello.pk"}`}
+                  className="account-disabled-email-link"
+                >
+                  <Mail size={13} aria-hidden="true" />
+                  {wallet?.support?.email || "support@resello.pk"}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   </div>

@@ -42,43 +42,39 @@ const AddressStep = ({
             />
           </label>
           <label>
-            Street Address*
+            Street Address / House No.*
             <input
               type="text"
+              placeholder="House/Plot no., Street name"
               value={newAddress.line1}
               onChange={(e) => onNewAddressChange("line1", e.target.value)}
             />
           </label>
           <label>
-            Apartment, floor, etc. (optional)
+            Area / Sector*
             <input
               type="text"
-              value={newAddress.line2}
-              onChange={(e) => onNewAddressChange("line2", e.target.value)}
+              placeholder="e.g. Sector F-7, Gulberg III, DHA Phase 5"
+              value={newAddress.area || ""}
+              onChange={(e) => onNewAddressChange("area", e.target.value)}
             />
           </label>
           <label>
-            Town/City*
+            Town*
             <input
               type="text"
+              placeholder="e.g. Model Town, Saddar, Cantt"
+              value={newAddress.town || ""}
+              onChange={(e) => onNewAddressChange("town", e.target.value)}
+            />
+          </label>
+          <label>
+            City*
+            <input
+              type="text"
+              placeholder="e.g. Lahore, Karachi, Islamabad"
               value={newAddress.city}
               onChange={(e) => onNewAddressChange("city", e.target.value)}
-            />
-          </label>
-          <label>
-            Postal Code*
-            <input
-              type="text"
-              value={newAddress.postalCode}
-              onChange={(e) => onNewAddressChange("postalCode", e.target.value)}
-            />
-          </label>
-          <label>
-            Country*
-            <input
-              type="text"
-              value={newAddress.country}
-              onChange={(e) => onNewAddressChange("country", e.target.value)}
             />
           </label>
           <label>
@@ -87,6 +83,14 @@ const AddressStep = ({
               type="tel"
               value={newAddress.phone}
               onChange={(e) => onNewAddressChange("phone", e.target.value)}
+            />
+          </label>
+          <label>
+            Second Phone Number (optional)
+            <input
+              type="tel"
+              value={newAddress.phone2}
+              onChange={(e) => onNewAddressChange("phone2", e.target.value)}
             />
           </label>
           <button
@@ -113,10 +117,14 @@ const AddressStep = ({
               <div className="address-meta">
                 <strong>{address.name}</strong>
                 <span>{address.line1}</span>
-                <span>{address.line2}</span>
-                <span>{address.city}, {address.postalCode}</span>
-                <span>{address.country}</span>
-                <span>Phone: {address.phone}</span>
+                {address.area && <span>Area: {address.area}</span>}
+                {address.town && <span>Town: {address.town}</span>}
+                {!address.area && !address.town && address.line2 && <span>{address.line2}</span>}
+                <span>{address.city}</span>
+                <span>
+                  Phone: {address.phone}
+                  {address.phone2 ? `, ${address.phone2}` : ""}
+                </span>
               </div>
             </button>
           ))}

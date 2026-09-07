@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import useWallet from "@/features/wallet/useWallet";
 import { parsePrice } from "@/utils/currency";
 import {
   formatCnic,
@@ -34,6 +35,10 @@ const useCheckout = () => {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
+  // A mixed cart is split into one order per supplier server-side, so what
+  // comes back is a list. placedOrders keeps the whole list for the receipt;
+  // orderId stays as the first one for the single-order banner.
+  const [placedOrders, setPlacedOrders] = useState([]);
   const [orderId, setOrderId] = useState(null);
   const [checkoutStep, setCheckoutStep] = useState("address");
   const [orderPaymentType, setOrderPaymentType] = useState("cod");
@@ -45,6 +50,10 @@ const useCheckout = () => {
   });
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [newAddress, setNewAddress] = useState(EMPTY_ADDRESS);
+  // A deactivated reseller can't place an order. The backend refuses it with a
+  // 403 regardless — this is only so the page can say why up front instead of
+  // letting someone fill in an address and a payment form for nothing.
+  const { wallet } = useWallet();
 
   const loadCheckoutData = async () => {
     setLoading(true);
@@ -110,8 +119,8 @@ const useCheckout = () => {
   };
 
   const submitNewAddress = async () => {
-    const { name, line1, city, postalCode, country, phone } = newAddress;
-    if (!name || !line1 || !city || !postalCode || !country || !phone) {
+    const { name, line1, area, town, city, phone } = newAddress;
+    if (!name || !line1 || !city || !phone) {
       setError("Please fill in all required address fields.");
       return;
     }
@@ -120,8 +129,13 @@ const useCheckout = () => {
     setError(null);
     setMessage(null);
 
+    const combinedLine2 = [area, town].filter(Boolean).join(", ") || newAddress.line2 || "";
+
     try {
-      const data = await post(endpoints.addresses, newAddress);
+      const data = await post(endpoints.addresses, {
+        ...newAddress,
+        line2: combinedLine2,
+      });
 
       const newAddressId = data.addresses?.[data.addresses.length - 1]?.id || "";
       setAddresses(data.addresses || []);
@@ -140,6 +154,13 @@ const useCheckout = () => {
     const addressId = addressIdOverride || selectedAddressId;
     if (!addressId || cartItems.length === 0) return;
 
+    // Both entry points — Buy Now and the payment step — come through here, so
+    // one check covers them.
+    if (wallet.deactivated) {
+      setError(wallet.deactivationMessage);
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     setMessage(null);
@@ -153,10 +174,20 @@ const useCheckout = () => {
         paymentType: orderPaymentType,
       });
 
-      setOrderId(data.order?.orderId || null);
+      // Falls back to the single `order` field so an older API response, or a
+      // test that mocks only that shape, still confirms.
+      const orders = data.orders?.length ? data.orders : [data.order].filter(Boolean);
+
+      setPlacedOrders(orders);
+      setOrderId(orders[0]?.orderId || null);
       setCartItems([]);
+      window.dispatchEvent(new CustomEvent("resello:cart-updated", { detail: { count: 0 } }));
       setCheckoutStep("confirm");
-      setMessage("Order placed successfully.");
+      setMessage(
+        orders.length > 1
+          ? `Order placed successfully. Your items ship from ${orders.length} suppliers, so they were placed as ${orders.length} separate orders.`
+          : "Order placed successfully."
+      );
     } catch (err) {
       setError(err?.message || "Unable to complete order");
     } finally {
@@ -168,6 +199,15 @@ const useCheckout = () => {
   // Pay Now (advance) moves to the payment step first — nothing is ordered
   // until the payment details clear validation.
   const handlePrimaryAction = () => {
+    if (wallet.deactivated) {
+      const email = wallet.support?.email || "support@resello.pk";
+      setError(
+        wallet.deactivationMessage ||
+          `Your account is disabled because you have received 5 return penalties. You cannot place orders. Please contact admin at ${email}`
+      );
+      return;
+    }
+
     if (!selectedAddressId) {
       setError("Please select a shipping address first.");
       return;
@@ -184,6 +224,15 @@ const useCheckout = () => {
   };
 
   const handlePaymentSubmit = async () => {
+    if (wallet.deactivated) {
+      const email = wallet.support?.email || "support@resello.pk";
+      setError(
+        wallet.deactivationMessage ||
+          `Your account is disabled because you have received 5 return penalties. You cannot place orders. Please contact admin at ${email}`
+      );
+      return;
+    }
+
     if (!selectedAddressId) {
       setError("Please select a shipping address first.");
       setCheckoutStep("address");
@@ -220,6 +269,8 @@ const useCheckout = () => {
     selectedAddress,
     selectedAddressId,
     orderId,
+    placedOrders,
+    wallet,
     // status
     loading,
     error,

@@ -1,4 +1,5 @@
 import StaticPageLayout from "@/components/sections/StaticPageLayout";
+import "./ResellerPage.css";
 
 const ResellerPage = () => {
   return (

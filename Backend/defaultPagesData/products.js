@@ -1047,22 +1047,36 @@ const REVIEW_DATES = [
 ];
 
 const MENTION_PRESETS = [
-  ["customer", "quality", "good", "satisfied", "order", "useful"],
-  ["packing", "delivery", "value", "original", "recommended"],
-  ["material", "color", "finish", "resale", "fast"],
+  ["price", "delivery", "quality", "value", "recommended"],
+  ["quality", "price", "delivery", "recommended", "original"],
+  ["delivery", "quality", "price", "fast", "original"],
 ];
 
 function buildReview(product, productIndex, reviewIndex) {
   const ratingBase = Number(product.rating) || 5;
   const rating = Math.max(3, Math.min(5, ratingBase - (reviewIndex === 2 && ratingBase < 5 ? 1 : 0)));
 
+  const productImages = (product.images && product.images.length > 0) ? product.images : [product.img];
+  const demoPhotos = [
+    productImages[0] || product.img,
+    productImages[1] || productImages[0] || product.img,
+    productImages[2] || productImages[0] || product.img,
+  ].filter(Boolean);
+
   return {
     reviewId: `${product.productId}-review-${reviewIndex + 1}`,
     productId: product.productId,
     reviewerName: REVIEWERS[(productIndex + reviewIndex) % REVIEWERS.length],
     rating,
+    ratings: {
+      delivery: Math.max(4, Math.min(5, rating)),
+      quality: Math.max(4, Math.min(5, rating)),
+      price: Math.max(4, Math.min(5, rating)),
+    },
     comment: REVIEW_COMMENTS[(productIndex + reviewIndex) % REVIEW_COMMENTS.length],
     date: REVIEW_DATES[(productIndex + reviewIndex) % REVIEW_DATES.length],
+    images: demoPhotos,
+    image: demoPhotos[0] || null,
   };
 }
 

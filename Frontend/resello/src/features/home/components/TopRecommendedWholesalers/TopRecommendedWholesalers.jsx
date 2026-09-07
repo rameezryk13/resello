@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./TopRatedWholesalers.css";
+import "./TopRecommendedWholesalers.css";
 
 // Shops have no logo field in the API, so the avatar is built from the name.
 // Capitalised words only, which keeps "Grace by Ahmed" as GA rather than GB.
@@ -27,7 +27,7 @@ const parseFollowers = (followers) => {
   return Number(clean) || 0;
 };
 
-const TopRatedWholesalers = ({ shops = [] }) => {
+const TopRecommendedWholesalers = ({ shops = [] }) => {
   const navigate = useNavigate();
 
   // Highest rated first, most-followed breaking ties. Followers arrive as
@@ -38,10 +38,10 @@ const TopRatedWholesalers = ({ shops = [] }) => {
   });
 
   return (
-    <aside className="top-rated-wholesalers" aria-label="Top rated wholesalers">
-      <h2>Top Rated Wholesalers</h2>
+    <aside className="top-recommended-wholesalers" aria-label="Top recommended wholesalers">
+      <h2>Top Recommended Wholesalers</h2>
       {rankedShops.length === 0 ? (
-        <p className="top-rated-wholesalers-empty">No wholesalers to show yet.</p>
+        <p className="top-recommended-wholesalers-empty">No wholesalers to show yet.</p>
       ) : (
         <ul>
           {rankedShops.map((shop) => (
@@ -66,4 +66,4 @@ const TopRatedWholesalers = ({ shops = [] }) => {
   );
 };
 
-export default TopRatedWholesalers;
+export default TopRecommendedWholesalers;

@@ -1,12 +1,19 @@
+/* Events.css — the rotating hero banner at the top of Home.
+
+   Sizes are rem so the banner and its text grow with the user's browser/OS
+   font size (WCAG 1.4.4). The `vw` middle terms of each clamp are unchanged,
+   so at the default 16px root this renders pixel-for-pixel as before.
+   Dot diameters stay in px — they are decorative shapes, not text. */
+
 .events__banner {
   position: relative;
   display: flex;
-  min-height: clamp(280px, 40vw, 400px);
+  min-height: clamp(17.5rem, 40vw, 25rem);
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   overflow: hidden;
-  padding: clamp(24px, 5vw, 60px);
+  padding: clamp(1.5rem, 5vw, 3.75rem);
   border-radius: var(--radius-sm-md);
   background-position: center;
   background-size: cover;
@@ -16,25 +23,38 @@
 
 .events__banner::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2)); }
 .events__content { position: relative; z-index: 1; max-width: 500px; }
-.events__content h2 { margin-bottom: 20px; font-size: clamp(28px, 5vw, 48px); line-height: 1.2; }
-.events__content p { margin-bottom: 30px; font-size: clamp(14px, 2vw, 18px); opacity: 0.9; }
-.events__content button { display: inline-block; padding: 12px 30px; border: 0; border-radius: var(--radius-xs); background: var(--color-primary); color: var(--color-white); cursor: pointer; font-weight: 600; transition: transform 0.2s ease, background 0.2s ease; }
+.events__content h2 { margin-bottom: var(--space-md); font-size: clamp(1.75rem, 5vw, 3rem); line-height: 1.2; }
+.events__content p { margin-bottom: var(--space-lg); font-size: clamp(var(--text-sm), 2vw, var(--text-lg)); opacity: 0.9; }
+.events__content button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: var(--space-xs) var(--space-lg); border: 0; border-radius: var(--radius-xs); background: var(--color-primary); color: var(--color-white); cursor: pointer; font-weight: 600; transition: transform 0.2s ease, background 0.2s ease; }
 .events__content button:hover { background: var(--color-primary-dark); transform: translateY(-2px); }
-.events__dots { position: absolute; z-index: 2; bottom: 20px; left: 50%; display: flex; gap: 12px; transform: translateX(-50%); }
-.events__dots button { width: 12px; height: 12px; padding: 0; border: 0; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.4); cursor: pointer; }
+/* The 44px hit areas below are wider than the dots, so the gap has to carry
+   the difference: 12px dot + 32px gap = a 44px pitch, which is exactly the
+   point where neighbouring targets meet without overlapping. At the old 8px
+   gap each dot's target would have covered half of the one beside it. */
+.events__dots { position: absolute; z-index: 2; bottom: var(--space-md); left: 50%; display: flex; gap: 32px; transform: translateX(-50%); }
+
+/* Dots stay 12px drawn (8px on mobile) — anything larger stops reading as a
+   pagination dot — so the hit area is a centred pseudo-element instead.
+   The row sits --space-md above the bottom of .events__banner, which clips,
+   so the 16px of vertical overhang stays inside the banner. */
+.events__dots button { position: relative; width: 12px; height: 12px; padding: 0; border: 0; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.4); cursor: pointer; }
+.events__dots button::after { content: ""; position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; width: 44px; height: 44px; }
 .events__dots button.is-active { background: var(--color-primary); transform: scale(1.3); }
 
-@media (max-width: 768px) {
-  .events__banner { min-height: 220px; padding: 18px; border-radius: var(--radius-sm-md); }
-  .events__content h2 { margin-bottom: 10px; font-size: 22px; }
-  .events__content p { margin-bottom: 12px; font-size: 13px; line-height: 1.4; }
-  .events__content button { padding: 10px 16px; font-size: 13px; }
-  .events__dots { bottom: 12px; gap: 6px; }
+@media (max-width: 767.98px) {
+  .events__banner { min-height: 13.75rem; padding: var(--space-sm); border-radius: var(--radius-sm-md); }
+  .events__content h2 { margin-bottom: var(--space-2xs); font-size: var(--text-xl); }
+  .events__content p { margin-bottom: var(--space-xs); font-size: var(--text-sm); line-height: 1.4; }
+  .events__content button { padding: var(--space-2xs) var(--space-sm); font-size: var(--text-sm); }
+  .events__dots { bottom: var(--space-xs); gap: 36px; }
   .events__dots button { width: 8px; height: 8px; }
 }
 
-@media (max-width: 480px) {
-  .events__banner { min-height: 200px; padding: 15px; }
-  .events__content h2 { margin-bottom: 8px; font-size: 20px; }
-  .events__content p { margin-bottom: 10px; }
+/* The 480px h2 rule that used to live here set font-size: 1.25rem and
+   margin-bottom: 0.5rem. Both now round to the same tokens the 47.9988rem block
+   above already applies (--text-xl / --space-2xs), so the rule would have
+   been a no-op. Only the values that still differ are kept. */
+@media (max-width: 30rem) {
+  .events__banner { min-height: 12.5rem; padding: var(--space-xs); }
+  .events__content p { margin-bottom: var(--space-2xs); }
 }

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Store } from "lucide-react";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import AccountHero from "@/components/sections/AccountHero";
+import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import "./FollowedShopsPage.css";
 
 const formatDate = (value) =>
@@ -57,10 +59,20 @@ const FollowedShopsPage = () => {
         <AccountHero title="Followed Shop" description="Every shop you follow is saved by the backend and listed here so you can return to it anytime." />
 
         <section className="account-section">
-          {loading ? <p className="account-empty">Loading followed shops...</p> : null}
-          {error ? <p className="account-empty">{error}</p> : null}
+          {loading ? <EmptyState variant="loading" title="Loading followed shops..." /> : null}
+          {error ? (
+            <EmptyState
+              variant="error"
+              title="Could not load followed shops"
+              description={error}
+            />
+          ) : null}
           {!loading && !error && shops.length === 0 ? (
-            <p className="account-empty">No followed shops yet. Use the Follow Shop button on a product or shop page.</p>
+            <EmptyState
+              icon={Store}
+              title="No followed shops yet"
+              description="Use the Follow Shop button on a product or shop page."
+            />
           ) : null}
 
           {!loading && !error && shops.length > 0 ? (
