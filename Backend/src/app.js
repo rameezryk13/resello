@@ -7,10 +7,9 @@ const supportRoutes = require('./routes/support.route');
 
 const app = express();
 
-// Enable CORS for your frontend origin
-// allows all origins
+// Enable CORS for frontend (local and deployed on GitHub Pages / Vercel)
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173'],
+  origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
