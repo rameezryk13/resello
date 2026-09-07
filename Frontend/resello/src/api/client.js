@@ -7,7 +7,17 @@
 // All helpers return the parsed JSON body and throw an Error carrying a
 // message fit to show a user. Callers only need try/catch.
 
+import { handleMockRequest } from './mockService';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+const isMockActive = () => {
+  if (import.meta.env.MODE === 'test') return false;
+  if (typeof window === 'undefined') return false;
+  // On GitHub Pages or when no API base URL is provided, run self-contained mock service
+  if (!API_BASE || window.location.hostname.includes('github.io')) return true;
+  return false;
+};
 
 if (!API_BASE) {
   console.warn(
@@ -71,6 +81,10 @@ async function errorFrom(response) {
 }
 
 async function request(endpoint, options = {}) {
+  if (isMockActive()) {
+    return await handleMockRequest(endpoint, options);
+  }
+
   const { body, signal, headers: extraHeaders, ...rest } = options;
 
   // Built up rather than hardcoded so that with no body and no token the
@@ -94,6 +108,16 @@ async function request(endpoint, options = {}) {
     // An aborted request is the caller cancelling on unmount, not a failure —
     // let it through untouched so effects can ignore it by name.
     if (err?.name === "AbortError") throw err;
+
+    // In non-test browser environments, fall back to mock service if server is unreachable
+    if (import.meta.env.MODE !== 'test') {
+      try {
+        return await handleMockRequest(endpoint, options);
+      } catch (mockErr) {
+        console.warn("Mock fallback error:", mockErr);
+      }
+    }
+
     throw new ApiError(
       "Cannot reach the server. Check your connection and try again.",
       0

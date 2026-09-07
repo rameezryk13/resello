@@ -1,0 +1,59 @@
+/**
+ * Homepage row sections: fixed productId lists.
+ * For dynamic rows by category or subcategory, use GET /api/products/related
+ * (see Product detail page — "Related category" & "Subcategory" rows).
+ */
+const row = [
+  {
+    id: 1,
+    title: "Eid Special item",
+    productIds: [
+      "MZ65800000108TW", "MZ65800000112TW", "MZ65800000113TW", "MZ65800000105TW",
+      "MZ65800000123TW", "MZ65800000128TW", "MZ65800000126TW", "MZ65800000118TW",
+      "MZ65800000111TW", "MZ65800000107TW",
+    ],
+  },
+  {
+    id: 2,
+    title: "Top items",
+    productIds: [
+      "MZ65800000101TW", "MZ65800000104TW", "MZ65800000111TW", "MZ65800000113TW",
+      "MZ65800000117TW", "MZ65800000121TW", "MZ65800000127TW", "MZ65800000129TW",
+      "MZ65800000133TW", "MZ65800000103TW",
+    ],
+  },
+  {
+    id: 3,
+    title: "Best Rating",
+    productIds: [
+      "MZ65800000101TW", "MZ65800000103TW", "MZ65800000105TW", "MZ65800000107TW",
+      "MZ65800000111TW", "MZ65800000117TW", "MZ65800000121TW", "MZ65800000124TW",
+      "MZ65800000127TW", "MZ65800000129TW", "MZ65800000130TW", "MZ65800000133TW",
+    ],
+  },
+  {
+    id: 4,
+    title: "New arrivals",
+    productIds: [
+      "MZ65800000120TW", "MZ65800000121TW", "MZ65800000122TW", "MZ65800000123TW",
+      "MZ65800000124TW", "MZ65800000125TW", "MZ65800000132TW", "MZ65800000133TW",
+      "MZ65800000134TW", "MZ65800000135TW",
+      "MZ65800000136TW", "MZ65800000137TW", "MZ65800000138TW", "MZ65800000139TW",
+      "MZ65800000140TW", "MZ65800000141TW", "MZ65800000142TW", "MZ65800000143TW",
+      "MZ65800000144TW", "MZ65800000145TW", "MZ65800000146TW", "MZ65800000147TW",
+      "MZ65800000148TW",
+    ],
+  },
+  {
+    id: 5,
+    title: "Summer deals",
+    productIds: [
+      "MZ65800000109TW", "MZ65800000112TW", "MZ65800000115TW", "MZ65800000116TW",
+      "MZ65800000120TW", "MZ65800000127TW", "MZ65800000133TW", "MZ65800000134TW",
+      "MZ65800000106TW", "MZ65800000114TW",
+    ],
+  },
+];
+
+export { row };
+export default row;
