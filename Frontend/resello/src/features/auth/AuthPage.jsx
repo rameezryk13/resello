@@ -10,6 +10,7 @@ import {
 } from "@/utils/authValidation";
 import BrandPanel from "./components/BrandPanel";
 import PasswordField from "./components/PasswordField";
+import PhoneInput from "@/components/ui/PhoneInput/PhoneInput.jsx";
 import "./AuthPage.css";
 
 const EMPTY = { name: "", email: "", phone: "", password: "", confirm: "" };
@@ -65,10 +66,16 @@ const AuthPage = ({ mode }) => {
     else if (!isValidEmail(values.email)) next.email = "Enter a valid email address.";
 
     // Phone is required at signup and must be a valid Pakistani mobile number
-    if (isSignup && !values.phone.trim()) {
-      next.phone = "Enter your phone number.";
+    if (isSignup && (!values.phone.trim() || values.phone === "+92" || values.phone.length <= 3)) {
+      next.phone = "Phone number is required";
     } else if (isSignup && !isValidPakistanPhone(values.phone)) {
-      next.phone = "Use a Pakistani mobile number, like 0300 1234567.";
+      const cleanPhone = (values.phone || "").replace("+92", "").replace(/\D/g, "");
+      if (cleanPhone.length < 10) {
+        const digitsLeft = 10 - cleanPhone.length;
+        next.phone = `${digitsLeft} more digit${digitsLeft === 1 ? "" : "s"} needed`;
+      } else {
+        next.phone = "Use a Pakistani mobile number, like 0300 1234567.";
+      }
     }
 
     if (!values.password) next.password = "Enter your password.";
@@ -101,10 +108,12 @@ const AuthPage = ({ mode }) => {
     setSubmitting(true);
     try {
       if (isSignup) {
+        const cleanDigits = (values.phone || "").replace("+92", "").replace(/\D/g, "");
+        const formattedPhone = cleanDigits ? `+92${cleanDigits}` : values.phone.trim();
         const user = await signup({
           name: values.name.trim(),
           email: values.email.trim(),
-          phone: values.phone.trim(),
+          phone: formattedPhone,
           password: values.password,
         });
         // Same vocabulary as the button that got them here.
@@ -206,24 +215,14 @@ const AuthPage = ({ mode }) => {
 
               {isSignup && (
                 <div className="auth-field">
-                  <label htmlFor="auth-phone">Phone number</label>
-                  <div className={`auth-input-wrap${errors.phone ? " auth-input-wrap--error" : ""}`}>
-                    <input
-                      id="auth-phone"
-                      type="tel"
-                      value={values.phone}
-                      onChange={(event) => setField("phone")(event.target.value)}
-                      autoComplete="tel"
-                      placeholder="0300 1234567"
-                      aria-invalid={errors.phone ? true : undefined}
-                      aria-describedby={errors.phone ? "auth-phone-error" : undefined}
-                    />
-                  </div>
-                  {errors.phone && (
-                    <p className="auth-error" id="auth-phone-error">
-                      {errors.phone}
-                    </p>
-                  )}
+                  <PhoneInput
+                    id="auth-phone"
+                    label="Phone number"
+                    value={values.phone}
+                    onChange={setField("phone")}
+                    error={errors.phone}
+                    required={false}
+                  />
                 </div>
               )}
 

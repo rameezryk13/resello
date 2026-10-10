@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import { useToast } from "@/context/ToastContext";
 import Header from "@/components/layout/Header/Header";
 import Row from "@/components/catalog/Row/Row";
+import AdBanner from "@/components/common/AdBanner/AdBanner";
 import MoreProducts from "./components/MoreProducts/MoreProducts";
 import Events from "./components/Events/Events";
 import ShopByCategory from "./components/ShopByCategory/ShopByCategory";
@@ -94,20 +95,22 @@ const Home = () => {
       <Header />
 
       <main className="container home-page">
-        <ShopByCategory categories={visualCategories} onCategoryClick={handleCategoryClick} />
-
         <section className="home-showcase animate-fade-in-up delay-100">
           <TopRecommendedWholesalers shops={shops} />
           <Events posters={heroPosters} />
         </section>
 
-        {rows.map((row) => (
-          <Row
-            key={row.id}
-            rowId={row.id}
-            title={row.title}
-            products={products.filter((product) => row.productIds.includes(product.productId))}
-          />
+        <ShopByCategory categories={visualCategories} onCategoryClick={handleCategoryClick} />
+
+        {rows.map((row, index) => (
+          <Fragment key={row.id}>
+            <Row
+              rowId={row.id}
+              title={row.title}
+              products={products.filter((product) => row.productIds.includes(product.productId))}
+            />
+            {index === 1 && <AdBanner />}
+          </Fragment>
         ))}
 
         <div ref={moreProductsRef}>

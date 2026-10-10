@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import Header from "./Header.jsx";
 import * as client from "@/api/client";
 import { AuthContext } from "@/context/AuthContext";
 import { ToastProvider } from "@/components/ui/Toast/ToastContainer";
-import { signedInAuth, signedOutAuth } from "@/test/authFixtures";
+import { signedInAuth, signedOutAuth, TEST_USER } from "@/test/authFixtures";
 
 // The desktop bell and the mobile menu entry are both in the DOM at once
 // (only CSS hides one), so every query here is scoped to one of them.
@@ -160,5 +160,65 @@ describe("Header account state", () => {
     await user.click(desktop.getByRole("button", { name: "Log out" }));
 
     expect(auth.logout).toHaveBeenCalledOnce();
+  });
+
+  it("displays the red verification banner when the user is under verification", () => {
+    renderHeader(
+      signedInAuth({
+        user: { ...TEST_USER, isVerified: false, isUnderVerification: true },
+      })
+    );
+
+    const banner = screen.getByRole("alert");
+    expect(banner).toBeInTheDocument();
+    expect(banner).toHaveTextContent(/Your account is under verification/i);
+    expect(banner).toHaveTextContent(/takes up to 24 hours to be verified by admin/i);
+    expect(banner).toHaveTextContent(/you cannot place an order/i);
+  });
+
+  it("does not display the verification banner when the user is verified", () => {
+    renderHeader(
+      signedInAuth({
+        user: { ...TEST_USER, isVerified: true, isUnderVerification: false },
+      })
+    );
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("renders the demo admin verify button and calls adminVerifyUser when clicked", async () => {
+    const user = userEvent.setup();
+    const adminVerifyUser = vi.fn().mockResolvedValue({ ...TEST_USER, isVerified: true, isUnderVerification: false });
+    renderHeader(
+      signedInAuth({
+        user: { ...TEST_USER, isVerified: false, isUnderVerification: true },
+        adminVerifyUser,
+      })
+    );
+
+    const demoBtn = screen.getByRole("button", { name: /Verify as Admin \(Demo\)|Verify account by admin/i });
+    expect(demoBtn).toBeInTheDocument();
+
+    await user.click(demoBtn);
+    expect(adminVerifyUser).toHaveBeenCalledWith(TEST_USER.id);
+  });
+
+  it("blinks the verification banner when resello:blink-verification-banner is dispatched", async () => {
+    renderHeader(
+      signedInAuth({
+        user: { ...TEST_USER, isVerified: false, isUnderVerification: true },
+      })
+    );
+
+    const banner = screen.getByRole("alert");
+    expect(banner).toBeInTheDocument();
+    expect(banner).not.toHaveClass("is-blinking");
+
+    await act(async () => {
+      window.dispatchEvent(new CustomEvent("resello:blink-verification-banner"));
+      await Promise.resolve();
+    });
+
+    expect(banner).toHaveClass("is-blinking");
   });
 });

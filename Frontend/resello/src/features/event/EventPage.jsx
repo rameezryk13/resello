@@ -4,8 +4,7 @@ import { CalendarOff } from "lucide-react";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
-import Product from "@/components/catalog/Product/Product.jsx";
-import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import CatalogLayout from "@/components/catalog/CatalogLayout/CatalogLayout.jsx";
 import "./EventPage.css";
 
 const EventPage = () => {
@@ -50,63 +49,50 @@ const EventPage = () => {
     };
   }, [eventId]);
 
+  const headerBanner = poster ? (
+    <div
+      className="event-hero"
+      style={{ backgroundImage: `url(${poster.img})`, borderRadius: "var(--radius-md, 12px)" }}
+    >
+      <div className="container event-hero__content">
+        <h1>
+          {poster.title.split("\n").map((line) => (
+            <span key={line}>
+              {line}
+              <br />
+            </span>
+          ))}
+        </h1>
+        <p>{poster.desc}</p>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className="event-page animate-fade-in">
       <Header />
 
       {loading ? (
-        <div className="container event-page-loading">Loading event...</div>
+        <div className="container event-page-loading" style={{ padding: "60px 0" }}>Loading event...</div>
       ) : error ? (
-        <div className="container event-page-error">
+        <div className="container event-page-error" style={{ padding: "60px 0" }}>
           {error}
-          <button type="button" className="btn-outline" onClick={() => navigate("/")}>
+          <button type="button" className="btn-outline" onClick={() => navigate("/")} style={{ marginTop: 12 }}>
             Back to home
           </button>
         </div>
       ) : (
-        <>
-          {poster && (
-            <div
-              className="event-hero"
-              style={{ backgroundImage: `url(${poster.img})` }}
-            >
-              <div className="container event-hero__content">
-                <h1>
-                  {poster.title.split("\n").map((line) => (
-                    <span key={line}>
-                      {line}
-                      <br />
-                    </span>
-                  ))}
-                </h1>
-                <p>{poster.desc}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="container event-page-content">
-            <div className="event-page-header">
-              <h2>Products in this event</h2>
-              <p className="event-page-count">
-                {products.length} {products.length === 1 ? "product" : "products"}
-              </p>
-            </div>
-
-            {products.length === 0 ? (
-              <EmptyState
-                icon={CalendarOff}
-                title="No products in this event yet"
-                description="No products are linked to this event yet."
-              />
-            ) : (
-              <div className="event-page-grid">
-                {products.map((product) => (
-                  <Product key={product.productId} product={product} showCategory />
-                ))}
-              </div>
-            )}
-          </div>
-        </>
+        <CatalogLayout
+          products={products}
+          pageTitle={poster?.title?.replace(/\n/g, " ") || "Event Products"}
+          badgeText="Featured Event"
+          breadcrumbItems={[
+            { label: "Home", path: "/" },
+            { label: "Events" },
+            { label: poster?.title?.replace(/\n/g, " ") || "Event" },
+          ]}
+          headerBanner={headerBanner}
+        />
       )}
     </div>
   );

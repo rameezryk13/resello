@@ -127,7 +127,124 @@
 
 .address-list {
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
+}
+
+/* ==========================================================================
+   Saved Address Selection Cards
+   ========================================================================== */
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  border: 1.5px solid var(--color-border-medium, #e2e8f0);
+  border-radius: var(--radius-sm-md, 10px);
+  background: var(--color-white, #ffffff);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.address-card:hover {
+  border-color: var(--color-primary, #ff8a00);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.address-card.selected {
+  border: 2px solid var(--color-primary, #ff8a00);
+  background: var(--color-tint-light, rgba(255, 138, 0, 0.05));
+  box-shadow: 0 6px 18px var(--color-primary-glow, rgba(255, 138, 0, 0.14));
+}
+
+.address-card-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.address-card-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-medium, #cbd5e1);
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.address-card:hover .address-card-radio-circle {
+  border-color: var(--color-primary, #ff8a00);
+}
+
+.address-card-check-icon.active {
+  color: var(--color-primary, #ff8a00);
+}
+
+.address-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+}
+
+.address-meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.address-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.selected-address-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: var(--color-primary, #ff8a00);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 3px rgba(255, 138, 0, 0.25);
+}
+
+.address-full-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: var(--color-text-secondary, #334155);
+  line-height: 1.45;
+  text-align: left;
+}
+
+.address-inline-icon {
+  color: var(--color-primary, #ff8a00);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.address-phone-line {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--color-text-muted, #64748b);
+  font-weight: 500;
+  text-align: left;
 }
 
 .add-address-btn {
@@ -178,27 +295,85 @@
   color: var(--color-text-primary);
 }
 
+.address-form-error {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: var(--radius-sm-md);
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-bottom: 0.85rem;
+}
+
+.address-live-preview-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px dashed var(--color-border-medium);
+  border-radius: var(--radius-sm-md);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+}
+
+.live-preview-label {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+.live-preview-text {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.new-address-form-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.add-address-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 1.25rem;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-address-cancel-btn:hover {
+  background: #f8fafc;
+  color: var(--color-text-primary);
+}
+
 .add-address-submit-btn {
-  width: 100%;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   padding: 0.95rem 1rem;
   border: none;
   border-radius: var(--radius-full);
   background: var(--color-button-dark);
-  /* FLAGGED — new token needed. Vendor has no semantic
-     "dark button background" token; gray-900 is only ever used
-     for --color-text-primary in vendor's system. Using the
-     primitive directly here (rather than misusing a text-role
-     token as a background) until a --color-button-dark token
-     is added to the master variables.css. */
   color: var(--color-white);
   font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .add-address-submit-btn:hover:not(:disabled) {
   background: var(--color-button-dark-hover);
-  /* flagged, same new-token gap as above — lighter shade on hover */
 }
 
 .add-address-submit-btn:disabled {
@@ -206,35 +381,167 @@
   cursor: not-allowed;
 }
 
-.address-card {
-  text-align: left;
-  width: 100%;
-  border: 1px solid var(--color-border-light);
-  /* flagged, see stepper note in CheckoutPage.css */
-  border-radius: var(--radius-sm-md);
-  padding: 1rem;
-  background: var(--color-white);
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* ==========================================================================
+   Full Address Preview & Confirmation Card
+   ========================================================================== */
+.address-preview-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-tint-light, rgba(255, 138, 0, 0.04));
+  box-shadow: 0 4px 14px rgba(255, 138, 0, 0.08);
+  margin-bottom: 1.5rem;
 }
 
-.address-card:hover,
-.address-card.selected {
-  border-color: var(--color-primary);
-  box-shadow: 0 8px 18px var(--color-primary-glow);
-  /* flagged — original alpha (0.16) is slightly softer than
-     --color-primary-glow's 0.18, close enough to reuse */
+.address-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 138, 0, 0.18);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.address-card strong {
-  display: block;
-  margin-bottom: 0.5rem;
+.address-preview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
 }
 
-.address-card span {
-  display: block;
+.address-preview-pin {
+  color: var(--color-primary);
+}
+
+.address-preview-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.address-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.address-preview-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.address-preview-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.address-preview-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--color-text-muted);
+}
+
+.address-preview-value {
   font-size: 0.95rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.address-preview-value.preview-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.full-address-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm-md);
+}
+
+.preview-home-icon {
+  color: var(--color-primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.address-preview-inline-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  resize: vertical;
+  outline: none;
+  line-height: 1.45;
+}
+
+.address-preview-assembled-line {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  background: rgba(255, 138, 0, 0.08);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.35rem;
+  word-break: break-word;
+}
+
+.address-preview-actions {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 138, 0, 0.18);
+}
+
+.address-preview-edit-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.address-preview-edit-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--color-text-muted);
+}
+
+.address-preview-confirm-btn {
+  flex: 1.4;
+  background: var(--color-primary);
+}
+
+.address-preview-confirm-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
 }
 
 /* Shown only while advance payment is selected. Tinted rather than bordered

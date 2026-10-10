@@ -144,6 +144,7 @@ const ContactPage = () => {
   const [customIssueType, setCustomIssueType] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -202,24 +203,22 @@ const ContactPage = () => {
     fetchIssues();
   }, []);
 
-  // Helper to count words
-  const countWords = (str) => {
-    if (!str) return 0;
-    return str.trim().split(/\s+/).filter(Boolean).length;
-  };
-
-  const wordCount = countWords(description);
-  const isDescriptionValid = wordCount >= 5;
-
-  // File upload handler for customer request
+  // File upload handler for customer request (images only, max 3)
   const handleFileSelect = (files) => {
     const fileList = Array.from(files);
-    const newAttachments = fileList.map((file) => {
-      const isImage = file.type.startsWith("image/");
-      const isVideo = file.type.startsWith("video/");
-      const previewUrl = isImage || isVideo ? URL.createObjectURL(file) : null;
+    const imageFiles = fileList.filter((f) => f.type.startsWith("image/"));
 
-      // format file size
+    if (imageFiles.length === 0) {
+      toast.error("Please select valid image files (JPG, PNG, WebP).");
+      return;
+    }
+
+    if (attachments.length + imageFiles.length > 3) {
+      toast.error("Maximum 3 pictures allowed.");
+      return;
+    }
+
+    const newAttachments = imageFiles.map((file) => {
       let sizeStr = `${(file.size / 1024).toFixed(0)} KB`;
       if (file.size > 1024 * 1024) {
         sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
@@ -231,13 +230,12 @@ const ContactPage = () => {
         name: file.name,
         type: file.type,
         size: sizeStr,
-        isImage,
-        isVideo,
-        url: previewUrl,
+        isImage: true,
+        url: URL.createObjectURL(file),
       };
     });
 
-    setAttachments((prev) => [...prev, ...newAttachments]);
+    setAttachments((prev) => [...prev, ...newAttachments].slice(0, 3));
   };
 
   const removeAttachment = (id) => {
@@ -248,8 +246,25 @@ const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (countWords(description) < 5) {
-      toast.error("Description must contain at least 5 words.");
+    const trimmedTitle = title.trim();
+    if (trimmedTitle.length < 5 || trimmedTitle.length > 20) {
+      toast.error("Title must be between 5 and 20 characters (including spaces).");
+      return;
+    }
+
+    const trimmedDesc = description.trim();
+    if (trimmedDesc.length < 20 || trimmedDesc.length > 1000) {
+      toast.error("Description must be between 20 and 1,000 characters.");
+      return;
+    }
+
+    if (attachments.length < 1) {
+      toast.error("At least 1 picture is required (maximum 3).");
+      return;
+    }
+
+    if (attachments.length > 3) {
+      toast.error("Maximum 3 pictures allowed.");
       return;
     }
 
@@ -266,14 +281,14 @@ const ContactPage = () => {
         : selectedIssueType;
 
     const payload = {
+      title: trimmedTitle,
       issueType: finalIssueType,
-      description: description.trim(),
+      description: trimmedDesc,
       attachments: attachments.map((a) => ({
         name: a.name,
         type: a.type,
         size: a.size,
-        isImage: a.isImage,
-        isVideo: a.isVideo,
+        isImage: true,
         url: a.url,
       })),
     };
@@ -290,8 +305,9 @@ const ContactPage = () => {
       // Fallback local issue creation
       const localIssue = {
         id: `ISS-${Math.floor(100000 + Math.random() * 900000)}`,
+        title: trimmedTitle,
         issueType: finalIssueType,
-        description: description.trim(),
+        description: trimmedDesc,
         attachments: payload.attachments,
         status: "active",
         createdAt: new Date().toISOString(),
@@ -302,6 +318,7 @@ const ContactPage = () => {
     }
 
     toast.success("Support request submitted successfully! Support team will reply shortly in chat.");
+    setTitle("");
     setDescription("");
     setCustomIssueType("");
     setSelectedIssueType("Delivery Issues");
@@ -428,6 +445,8 @@ const ContactPage = () => {
         {activeTab === "new" && (
           <ContactNewRequestForm
             onSubmit={handleSubmit}
+            title={title}
+            setTitle={setTitle}
             selectedIssueType={selectedIssueType}
             setSelectedIssueType={setSelectedIssueType}
             customIssueType={customIssueType}
@@ -437,8 +456,6 @@ const ContactPage = () => {
             issueOptions={ISSUE_OPTIONS}
             description={description}
             setDescription={setDescription}
-            isDescriptionValid={isDescriptionValid}
-            wordCount={wordCount}
             attachments={attachments}
             handleFileSelect={handleFileSelect}
             removeAttachment={removeAttachment}

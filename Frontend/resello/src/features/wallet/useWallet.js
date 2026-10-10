@@ -87,6 +87,12 @@ export function useWallet() {
     return data?.wallet;
   }, []);
 
+  const releaseCommission = useCallback(async () => {
+    const data = await post(endpoints.wallet.releaseCommission);
+    setWallet(data?.wallet || EMPTY_WALLET);
+    return data;
+  }, []);
+
   const applyWallet = useCallback((next) => {
     if (next) setWallet(next);
   }, []);
@@ -101,6 +107,7 @@ export function useWallet() {
     approveWithdrawal,
     rejectWithdrawal,
     setDemoDate,
+    releaseCommission,
     applyWallet,
   };
 }

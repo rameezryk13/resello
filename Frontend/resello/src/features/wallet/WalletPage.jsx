@@ -39,12 +39,14 @@ const WalletPage = () => {
     approveWithdrawal,
     rejectWithdrawal,
     setDemoDate,
+    releaseCommission,
   } = useWallet();
 
   const [activeFilter, setActiveFilter] = useState("All");
   const [amount, setAmount] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [releasingCommission, setReleasingCommission] = useState(false);
 
   const { withdrawal, transactions = [], withdrawalRequests = [] } = wallet;
 
@@ -109,6 +111,19 @@ const WalletPage = () => {
     }
   };
 
+  const handleReleaseCommission = async () => {
+    setReleasingCommission(true);
+    try {
+      const result = await releaseCommission();
+      const amountStr = result?.releasedAmount ? formatRupees(result.releasedAmount) : "commission";
+      toast.success(result?.message || `Demo: Released ${amountStr} pending commission to wallet!`);
+    } catch (error) {
+      toast.error(error?.message || "Could not release pending commission.");
+    } finally {
+      setReleasingCommission(false);
+    }
+  };
+
   return (
     <div className="account-page animate-fade-in">
       <Header />
@@ -118,8 +133,13 @@ const WalletPage = () => {
           description="Your commission clears here once an order is delivered. Send a withdrawal request to admin on payout day (Mondays)."
         />
 
-        {/* Demo Date Controller Bar */}
-        <WalletDemoBar wallet={wallet} onDateChange={handleDateChange} />
+        {/* Demo Controller Bar */}
+        <WalletDemoBar
+          wallet={wallet}
+          onDateChange={handleDateChange}
+          onReleaseCommission={handleReleaseCommission}
+          releasingCommission={releasingCommission}
+        />
 
         {/* Negative Balance Alert */}
         {wallet.balance < 0 && (
@@ -144,6 +164,8 @@ const WalletPage = () => {
           setAmount={setAmount}
           submitting={submitting}
           onWithdrawRequest={handleWithdrawRequest}
+          onReleaseCommission={handleReleaseCommission}
+          releasingCommission={releasingCommission}
         />
 
         {/* Withdrawal Requests Section */}

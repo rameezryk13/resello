@@ -34,18 +34,23 @@
   align-items: baseline;
   gap: var(--space-xs);
   margin-bottom: var(--space-xs);
+  flex-wrap: wrap;
 }
 
 .pdp-old-price {
   text-decoration: line-through;
   color: var(--color-text-faint);
   font-size: var(--text-lg);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .pdp-price {
   font-size: var(--text-2xl);
   font-weight: 800;
   color: var(--color-text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .pdp-desc {

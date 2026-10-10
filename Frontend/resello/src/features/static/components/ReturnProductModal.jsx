@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import {
+  AlertCircle,
   AlertTriangle,
   Camera,
   CheckCircle2,
+  FileVideo,
   Image as ImageIcon,
   Link as LinkIcon,
   Package,
+  Plus,
   Trash2,
   Upload,
   Video,
@@ -31,22 +34,32 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
   const [selectedProductId, setSelectedProductId] = useState("");
   const [reason, setReason] = useState(RETURN_REASONS[0].label);
   const [description, setDescription] = useState("");
-  const [uploadMode, setUploadMode] = useState("paste"); // "paste" | "file"
-  const [pastedUrl, setPastedUrl] = useState("");
-  const [mediaPreview, setMediaPreview] = useState(null);
-  const [mediaType, setMediaType] = useState("image"); // "image" | "video"
+
+  // Video Proof State (MANDATORY - 1 Video)
+  const [videoMode, setVideoMode] = useState("file"); // "file" | "paste"
+  const [pastedVideoUrl, setPastedVideoUrl] = useState("");
+  const [videoPreview, setVideoPreview] = useState(null);
+
+  // Picture Proof State (OPTIONAL - Minimum 3 Pictures if provided)
+  const [photoMode, setPhotoMode] = useState("file"); // "file" | "paste"
+  const [pastedPhotoUrl, setPastedPhotoUrl] = useState("");
+  const [pictures, setPictures] = useState([]);
+
   const [submitting, setSubmitting] = useState(false);
 
-  // Initialize selected product when order changes
+  // Initialize selected product and reset form when order changes
   useEffect(() => {
     if (order?.cart?.length) {
       setSelectedProductId(order.cart[0]?.product?.productId || "");
     }
     setReason(RETURN_REASONS[0].label);
     setDescription("");
-    setPastedUrl("");
-    setMediaPreview(null);
-    setMediaType("image");
+    setPastedVideoUrl("");
+    setVideoPreview(null);
+    setVideoMode("file");
+    setPastedPhotoUrl("");
+    setPictures([]);
+    setPhotoMode("file");
   }, [order]);
 
   // Handle Escape key
@@ -67,49 +80,107 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
     cartItems[0];
   const activeProduct = activeItem?.product;
 
-  const handleFileUpload = (e) => {
+  // --- Video Handlers ---
+  const handleVideoFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const isVideo = file.type.startsWith("video/");
-    const isImage = file.type.startsWith("image/");
-
-    if (!isImage && !isVideo) {
-      toast.error("Please upload a valid image (PNG, JPG, WEBP) or video (MP4, WEBM).");
+    if (!isVideo) {
+      toast.error("Please upload a valid video file (MP4, WEBM, MOV).");
       return;
     }
 
-    if (file.size > 25 * 1024 * 1024) {
-      toast.error("File size must be under 25MB.");
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Video file size must be under 50MB.");
       return;
     }
-
-    const determinedType = isVideo ? "video" : "image";
-    setMediaType(determinedType);
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setMediaPreview(reader.result);
+      setVideoPreview(reader.result);
+      toast.success("Video proof attached successfully!");
     };
     reader.readAsDataURL(file);
   };
 
-  const handlePastedUrlChange = (url) => {
-    setPastedUrl(url);
+  const handlePastedVideoUrlChange = (url) => {
+    setPastedVideoUrl(url);
     const trimmed = url.trim();
     if (!trimmed) {
-      setMediaPreview(null);
+      setVideoPreview(null);
+      return;
+    }
+    setVideoPreview(trimmed);
+  };
+
+  const clearVideo = () => {
+    setVideoPreview(null);
+    setPastedVideoUrl("");
+  };
+
+  // --- Pictures Handlers ---
+  const handlePhotoFileUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const validImageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (validImageFiles.length === 0) {
+      toast.error("Please upload valid image files (PNG, JPG, WEBP).");
       return;
     }
 
-    const isVideoLink =
-      trimmed.includes("youtube.com") ||
-      trimmed.includes("youtu.be") ||
-      trimmed.includes("vimeo.com") ||
-      trimmed.match(/\.(mp4|webm|mov|ogg)(\?.*)?$/i);
+    let loadedCount = 0;
+    const newPictures = [];
 
-    setMediaType(isVideoLink ? "video" : "image");
-    setMediaPreview(trimmed);
+    validImageFiles.forEach((file) => {
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error(`Image "${file.name}" exceeds 15MB limit.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newPictures.push(reader.result);
+        loadedCount += 1;
+        if (loadedCount === validImageFiles.length) {
+          setPictures((prev) => {
+            const combined = [...prev, ...newPictures];
+            if (combined.length > 10) {
+              toast.error("You can attach up to 10 photos maximum.");
+              return combined.slice(0, 10);
+            }
+            return combined;
+          });
+          toast.success(`${newPictures.length} photo(s) added.`);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input value so same files can be re-selected if needed
+    e.target.value = "";
+  };
+
+  const handleAddPastedPhotoUrl = () => {
+    const trimmed = pastedPhotoUrl.trim();
+    if (!trimmed) return;
+    if (pictures.length >= 10) {
+      toast.error("You can attach up to 10 photos maximum.");
+      return;
+    }
+    setPictures((prev) => [...prev, trimmed]);
+    setPastedPhotoUrl("");
+    toast.success("Photo URL added.");
+  };
+
+  const handleRemovePicture = (index) => {
+    setPictures((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const clearAllPictures = () => {
+    setPictures([]);
+    setPastedPhotoUrl("");
   };
 
   const handleClipboardPaste = (e) => {
@@ -121,10 +192,12 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
         const blob = items[i].getAsFile();
         const reader = new FileReader();
         reader.onload = (event) => {
-          setMediaPreview(event.target.result);
-          setMediaType("image");
-          setUploadMode("file");
-          toast.success("Image pasted from clipboard!");
+          if (pictures.length >= 10) {
+            toast.error("Maximum 10 photos reached.");
+            return;
+          }
+          setPictures((prev) => [...prev, event.target.result]);
+          toast.success("Photo pasted from clipboard!");
         };
         reader.readAsDataURL(blob);
         break;
@@ -132,17 +205,21 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
     }
   };
 
-  const clearMedia = () => {
-    setMediaPreview(null);
-    setPastedUrl("");
-  };
-
+  // --- Form Submission ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const activeProof = mediaPreview || pastedUrl.trim();
-    if (!activeProof) {
-      toast.error("Please paste or upload a video/picture proof of the defective product.");
+    // 1. Mandatory 1 Video validation
+    if (!videoPreview) {
+      toast.error("Please add 1 video proof of the defective product (Mandatory).");
+      return;
+    }
+
+    // 2. Optional minimum 3 pictures validation
+    if (pictures.length > 0 && pictures.length < 3) {
+      toast.error(
+        `If including pictures, a minimum of 3 pictures is required (currently ${pictures.length} attached). Please add at least 3 pictures or remove them.`
+      );
       return;
     }
 
@@ -155,8 +232,10 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
         productName: activeProduct?.name || "Product",
         reason,
         description: description.trim(),
-        mediaUrl: activeProof,
-        mediaType,
+        videoUrl: videoPreview,
+        mediaUrl: videoPreview,
+        mediaType: "video",
+        images: pictures,
       };
 
       const data = await post(endpoints.returnOrder(order.orderId), payload);
@@ -175,7 +254,7 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
   };
 
   const renderVideoEmbed = (url) => {
-    if (url.includes("youtube.com/watch?v=")) {
+    if (typeof url === "string" && url.includes("youtube.com/watch?v=")) {
       const videoId = url.split("v=")[1]?.split("&")[0];
       return (
         <iframe
@@ -186,7 +265,7 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
         />
       );
     }
-    if (url.includes("youtu.be/")) {
+    if (typeof url === "string" && url.includes("youtu.be/")) {
       const videoId = url.split("youtu.be/")[1]?.split("?")[0];
       return (
         <iframe
@@ -198,11 +277,7 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
       );
     }
     return (
-      <video
-        src={url}
-        controls
-        className="return-media-video-player"
-      >
+      <video src={url} controls className="return-media-video-player">
         Your browser does not support playing this video directly.
       </video>
     );
@@ -327,93 +402,203 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
             />
           </div>
 
-          {/* Picture / Video Proof Attachment Section */}
-          <div className="return-form-group">
+          {/* SECTION 1: MANDATORY 1 VIDEO PROOF */}
+          <div className="return-proof-section required-section">
             <div className="return-proof-header">
-              <label className="return-form-label">
-                Defective Product Picture / Video Proof <span className="text-required">*</span>
-              </label>
+              <div className="return-section-label-group">
+                <label className="return-form-label">
+                  <Video size={16} className="text-primary" />
+                  1 Video Proof <span className="text-required">* (Mandatory)</span>
+                </label>
+                <span className="return-hint-pill mandatory">Must add 1 video</span>
+              </div>
               <div className="return-mode-toggle">
                 <button
                   type="button"
-                  className={`return-mode-btn ${uploadMode === "paste" ? "active" : ""}`}
-                  onClick={() => setUploadMode("paste")}
+                  className={`return-mode-btn ${videoMode === "file" ? "active" : ""}`}
+                  onClick={() => setVideoMode("file")}
                 >
-                  <LinkIcon size={14} /> Paste Link
+                  <Upload size={13} /> Upload Video
                 </button>
                 <button
                   type="button"
-                  className={`return-mode-btn ${uploadMode === "file" ? "active" : ""}`}
-                  onClick={() => setUploadMode("file")}
+                  className={`return-mode-btn ${videoMode === "paste" ? "active" : ""}`}
+                  onClick={() => setVideoMode("paste")}
                 >
-                  <Upload size={14} /> Upload File
+                  <LinkIcon size={13} /> Paste Link
                 </button>
               </div>
             </div>
 
-            {uploadMode === "paste" ? (
-              <div className="return-url-input-wrap">
-                <input
-                  type="url"
-                  value={pastedUrl}
-                  onChange={(e) => handlePastedUrlChange(e.target.value)}
-                  placeholder="Paste picture or video URL (e.g. https://... or YouTube video link)"
-                  className="return-url-input"
-                />
-                <span className="return-paste-tip">
-                  💡 Tip: You can also paste image from clipboard (Ctrl+V) directly.
-                </span>
-              </div>
+            {!videoPreview ? (
+              videoMode === "file" ? (
+                <label className="return-file-dropzone video-dropzone">
+                  <FileVideo size={30} className="text-primary" />
+                  <span>Click to browse 1 video file showing the defect</span>
+                  <small>MP4, WEBM, MOV (Max 50MB) • Mandatory unboxing or defect video</small>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoFileUpload}
+                    className="return-file-input"
+                  />
+                </label>
+              ) : (
+                <div className="return-url-input-wrap">
+                  <input
+                    type="url"
+                    value={pastedVideoUrl}
+                    onChange={(e) => handlePastedVideoUrlChange(e.target.value)}
+                    placeholder="Paste video link (YouTube, Vimeo, or direct MP4/video URL)"
+                    className="return-url-input"
+                  />
+                  <span className="return-paste-tip">
+                    Attach a direct video URL showing the defect or unboxing of this item.
+                  </span>
+                </div>
+              )
             ) : (
-              <label className="return-file-dropzone">
-                <Camera size={26} className="text-primary" />
-                <span>Click to browse photo or video file</span>
-                <small>PNG, JPG, WEBP, MP4 or WEBM (Max 25MB)</small>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileUpload}
-                  className="return-file-input"
-                />
-              </label>
-            )}
-
-            {/* Media Preview Box */}
-            {mediaPreview && (
               <div className="return-media-preview-container">
                 <div className="return-preview-header">
-                  <span className="return-preview-tag">
-                    {mediaType === "video" ? (
-                      <>
-                        <Video size={14} /> Video Proof Attached
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon size={14} /> Photo Proof Attached
-                      </>
-                    )}
+                  <span className="return-preview-tag success">
+                    <CheckCircle2 size={14} /> 1 Video Proof Attached
                   </span>
                   <button
                     type="button"
                     className="return-media-remove-btn"
-                    onClick={clearMedia}
-                    title="Remove attached proof"
+                    onClick={clearVideo}
+                    title="Remove attached video"
                   >
-                    <Trash2 size={15} /> Remove Proof
+                    <Trash2 size={14} /> Remove Video
                   </button>
                 </div>
-
                 <div className="return-preview-media-box">
-                  {mediaType === "video" ? (
-                    renderVideoEmbed(mediaPreview)
-                  ) : (
-                    <img
-                      src={mediaPreview}
-                      alt="Defective product proof"
-                      className="return-media-img"
-                    />
-                  )}
+                  {renderVideoEmbed(videoPreview)}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 2: OPTIONAL PICTURES (MINIMUM 3 REQUIRED IF PROVIDED) */}
+          <div className="return-proof-section optional-section">
+            <div className="return-proof-header">
+              <div className="return-section-label-group">
+                <label className="return-form-label">
+                  <ImageIcon size={16} className="text-primary" />
+                  Defect Pictures <span className="text-optional">(Optional)</span>
+                </label>
+                <span className="return-hint-pill optional">Option: Mini 3 Pictures</span>
+              </div>
+              <div className="return-mode-toggle">
+                <button
+                  type="button"
+                  className={`return-mode-btn ${photoMode === "file" ? "active" : ""}`}
+                  onClick={() => setPhotoMode("file")}
+                >
+                  <Upload size={13} /> Upload Photos
+                </button>
+                <button
+                  type="button"
+                  className={`return-mode-btn ${photoMode === "paste" ? "active" : ""}`}
+                  onClick={() => setPhotoMode("paste")}
+                >
+                  <LinkIcon size={13} /> Paste URL
+                </button>
+              </div>
+            </div>
+
+            <div className="return-pictures-status-bar">
+              {pictures.length === 0 ? (
+                <span className="photo-status-tag neutral">
+                  📷 0 photos attached (Optional — leave empty or add at least 3)
+                </span>
+              ) : pictures.length < 3 ? (
+                <span className="photo-status-tag warning">
+                  <AlertTriangle size={13} /> {pictures.length} / 3 min photos added (Add {3 - pictures.length} more, or clear photos)
+                </span>
+              ) : (
+                <span className="photo-status-tag success">
+                  <CheckCircle2 size={13} /> {pictures.length} photos attached (Requirement met)
+                </span>
+              )}
+
+              {pictures.length > 0 && (
+                <button
+                  type="button"
+                  className="photo-clear-all-btn"
+                  onClick={clearAllPictures}
+                >
+                  <Trash2 size={12} /> Clear all
+                </button>
+              )}
+            </div>
+
+            {photoMode === "file" ? (
+              <label className="return-file-dropzone photo-dropzone">
+                <Camera size={26} className="text-primary" />
+                <span>Click to select multiple photo files (or paste with Ctrl+V)</span>
+                <small>PNG, JPG, WEBP • If providing photos, add at least 3 different angles/views</small>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoFileUpload}
+                  className="return-file-input"
+                />
+              </label>
+            ) : (
+              <div className="return-url-input-wrap">
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    type="url"
+                    value={pastedPhotoUrl}
+                    onChange={(e) => setPastedPhotoUrl(e.target.value)}
+                    placeholder="Paste image URL (https://...)"
+                    className="return-url-input"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddPastedPhotoUrl();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="btn-outline return-add-photo-btn"
+                    onClick={handleAddPastedPhotoUrl}
+                    disabled={!pastedPhotoUrl.trim()}
+                  >
+                    <Plus size={15} /> Add
+                  </button>
+                </div>
+                <span className="return-paste-tip">
+                  💡 Tip: You can also paste screenshots directly from your clipboard (Ctrl+V).
+                </span>
+              </div>
+            )}
+
+            {/* Gallery Thumbnails */}
+            {pictures.length > 0 && (
+              <div className="return-photos-gallery-grid">
+                {pictures.map((picUrl, index) => (
+                  <div key={index} className="return-photo-thumb-card">
+                    <img
+                      src={picUrl}
+                      alt={`Defect photo proof ${index + 1}`}
+                      className="return-photo-thumb-img"
+                    />
+                    <span className="return-photo-index-badge">#{index + 1}</span>
+                    <button
+                      type="button"
+                      className="return-photo-remove-btn"
+                      onClick={() => handleRemovePicture(index)}
+                      title={`Remove photo #${index + 1}`}
+                      aria-label={`Remove photo #${index + 1}`}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -422,8 +607,9 @@ export const ReturnProductModal = ({ open, order, onClose, onSubmitSuccess }) =>
           <div className="return-assurance-box">
             <CheckCircle2 size={18} className="text-success" />
             <p>
-              <strong>7-Day Replacement Guarantee:</strong> Our inspection team will verify the
-              provided defective proof and arrange a free courier pickup.
+              <strong>7-Day Replacement Guarantee:</strong> Resellers must provide 1 video proof
+              demonstrating the defect. Product pictures are optional, but if submitted, a minimum
+              of 3 photos is required for warehouse verification.
             </p>
           </div>
 

@@ -56,7 +56,7 @@ describe("AuthPage Signup validation", () => {
 
     await user.click(screen.getByRole("button", { name: /Create free account/i }));
 
-    expect(screen.getByText("Enter your phone number.")).toBeInTheDocument();
+    expect(screen.getByText("Phone number is required")).toBeInTheDocument();
     expect(auth.signup).not.toHaveBeenCalled();
   });
 
@@ -74,7 +74,7 @@ describe("AuthPage Signup validation", () => {
     await user.click(screen.getByRole("button", { name: /Create free account/i }));
 
     expect(
-      screen.getByText("Use a Pakistani mobile number, like 0300 1234567.")
+      screen.getByText(/more digits? needed/i)
     ).toBeInTheDocument();
     expect(auth.signup).not.toHaveBeenCalled();
   });
@@ -85,7 +85,8 @@ describe("AuthPage Signup validation", () => {
 
     await user.type(screen.getByLabelText(/Full name/i), "Fatima Ali");
     await user.type(screen.getByLabelText(/Email/i), "fatima@example.com");
-    await user.type(screen.getByLabelText(/Phone number/i), "0300 1234567");
+    // Pre-filled with +92 3, so user types the remaining 9 digits
+    await user.type(screen.getByLabelText(/Phone number/i), "00 1234567");
     await user.type(screen.getByLabelText(/^Password/i), "SecurePassword123!");
     await user.type(screen.getByLabelText(/Confirm password/i), "SecurePassword123!");
     await user.click(screen.getByRole("checkbox", { name: /I agree/i }));
@@ -95,7 +96,7 @@ describe("AuthPage Signup validation", () => {
     expect(auth.signup).toHaveBeenCalledWith({
       name: "Fatima Ali",
       email: "fatima@example.com",
-      phone: "0300 1234567",
+      phone: "+923001234567",
       password: "SecurePassword123!",
     });
   });

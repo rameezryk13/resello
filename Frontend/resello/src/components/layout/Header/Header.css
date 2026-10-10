@@ -33,18 +33,34 @@
 }
 
 .logo {
-  font-family: 'Raleway', sans-serif;
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  font-weight: 700;
-  color: var(--color-white);
-  background: var(--color-white);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 10px rgba(224, 123, 0, 0.2);
-  /* flagged — approximated "brown-deep" tone, see file header note */
   cursor: pointer;
   flex: 0 0 auto;
   order: 1;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.logo:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 3px;
+}
+
+.site-logo-img {
+  height: 42px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.logo:hover .site-logo-img {
+  transform: scale(1.03);
+  filter: brightness(1.06);
 }
 
 .nav-icons {
@@ -569,12 +585,11 @@
 }
 
 .header-info-bar {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary) 54%, var(--color-primary-dark) 100%);
-  /* flagged, same flattened-gradient treatment as .top-bar */
+  background: var(--white);
+  border-bottom: 1px solid var(--color-border-light);
   padding: 6px 0;
   font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.92);
-  /* flagged — overlay-light gap */
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
@@ -597,8 +612,7 @@
   display: flex;
   gap: 20px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
-  /* flagged, same gap */
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 767.98px) {
@@ -768,3 +782,152 @@
   .search-bar input { padding: 9px 10px; }
   .search-btn { padding: 9px 11px; }
 }
+
+/* ==========================================================================
+   Account Under Verification Header Alert Banner
+   ========================================================================== */
+.header-verification-banner {
+  background-color: #fff1f2;
+  border-top: 1px solid #fecdd3;
+  border-bottom: 2px solid #ef4444;
+  color: #dc2626;
+  padding: 10px 16px;
+  font-size: var(--text-sm, 14px);
+  line-height: 1.45;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);
+  position: relative;
+  z-index: 40;
+}
+
+.header-verification-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.header-verification-banner-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verification-banner-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.verification-banner-text {
+  color: #dc2626;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.verification-banner-text strong {
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.header-demo-verify-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.25);
+}
+
+.header-demo-verify-btn:hover:not(:disabled) {
+  background: #b91c1c;
+  border-color: #991b1b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(185, 28, 28, 0.35);
+}
+
+.header-demo-verify-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.header-demo-verify-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .header-verification-banner {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .header-verification-banner-content {
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .header-verification-banner-main {
+    text-align: left;
+    align-items: flex-start;
+  }
+  .verification-banner-icon {
+    margin-top: 2px;
+  }
+}
+
+/* Blinking animation when triggered from actions (e.g. Buy Now) */
+.header-verification-banner.is-blinking {
+  animation: verificationBannerBlink 0.55s ease-in-out 5;
+}
+
+.header-verification-banner.is-blinking .verification-banner-icon {
+  animation: verificationIconPulse 0.55s ease-in-out 5;
+}
+
+@keyframes verificationBannerBlink {
+  0%, 100% {
+    background-color: #fff1f2;
+    border-top-color: #fecdd3;
+    border-bottom-color: #ef4444;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    background-color: #fee2e2;
+    border-top-color: #f43f5e;
+    border-bottom-color: #b91c1c;
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.45), 0 6px 22px rgba(220, 38, 38, 0.35);
+    opacity: 0.3;
+    transform: scale(1.008);
+  }
+}
+
+@keyframes verificationIconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+    color: #991b1b;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-verification-banner.is-blinking {
+    animation-duration: 0.9s;
+    animation-iteration-count: 2;
+    transform: none;
+  }
+  .header-verification-banner.is-blinking .verification-banner-icon {
+    animation: none;
+  }
+}
+
+

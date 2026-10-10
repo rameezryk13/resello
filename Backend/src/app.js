@@ -22,4 +22,13 @@ app.use('/api', walletRoutes);
 app.use('/api', supportRoutes);
 app.use('/api', homePageProducts);
 
+// Global JSON error handler ensures unexpected server errors return JSON instead of raw HTML
+app.use((err, req, res, next) => {
+  console.error('Unhandled server error:', err);
+  const status = typeof err.status === 'number' ? err.status : 500;
+  res.status(status).json({
+    message: err.message || 'Internal server error occurred. Please try again.',
+  });
+});
+
 module.exports = app;

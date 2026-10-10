@@ -741,7 +741,7 @@
    ============================================================ */
 
 .profit-account-options {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .profit-account-option {
@@ -755,11 +755,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
   color: var(--color-white);
+}
+
+.profit-account-option-icon.accent-smart-wallet {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
 }
 
 .profit-account-option-icon.accent-jazzcash {
@@ -771,7 +775,7 @@
 }
 
 .profit-account-option-icon.accent-bank {
-  background: #16234d;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
 }
 
 .profit-account-option-text {

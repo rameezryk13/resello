@@ -7,9 +7,10 @@
 // The list must stay in step with Backend/src/lib/orderStatus.js.
 
 export const ORDER_STATUSES = [
-  "In-progress",
   "Under Verification",
   "Verification Failed",
+  "In-progress",
+  "In Transit",
   "Delivered",
   "Returned",
   "Cancelled",
@@ -26,9 +27,10 @@ export const DEAD_STATUSES = ["Returned", "Cancelled", "Verification Failed"];
 
 // How far along Track Order's 5-step rail each status sits.
 export const STATUS_PROGRESS = {
-  "In-progress": 2,
-  "Under Verification": 2,
+  "Under Verification": 1,
   "Verification Failed": 1,
+  "In-progress": 2,
+  "In Transit": 4,
   Delivered: 5,
   Returned: 4,
   Cancelled: 1,
@@ -37,9 +39,10 @@ export const STATUS_PROGRESS = {
 // Drives the badge colour. The values are CSS class suffixes, not colours, so
 // the palette stays in the stylesheets.
 export const STATUS_TONE = {
-  "In-progress": "warning",
   "Under Verification": "info",
   "Verification Failed": "danger",
+  "In Transit": "warning",
+  "In-progress": "warning",
   Delivered: "success",
   Returned: "return",
   Cancelled: "danger",

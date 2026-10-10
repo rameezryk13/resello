@@ -78,7 +78,7 @@ const ContactIssuesList = ({
                     {isResolved ? <CheckCircle2 size={14} /> : <MessageSquare size={14} />} {issue.issueType}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
-                    #{issue.id}
+                    #{issue.id} {issue.title ? `— ${issue.title}` : ""}
                   </span>
                 </div>
 

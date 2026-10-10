@@ -57,8 +57,10 @@ const Footer = () => {
     <footer className="site-footer">
       <div className="container footer-grid">
         <div className="footer-brand-column">
-          <button type="button" className="footer-logo" onClick={() => navigate("/")}>
-            <span className="footer-logo-mark">R</span>
+          <button type="button" className="footer-logo" onClick={() => navigate("/")} aria-label="ReSello Home">
+            <span className="footer-logo-mark">
+              <img src="/images/resello_icon.png" alt="" className="footer-logo-icon" />
+            </span>
             <span>ReSello</span>
           </button>
           <p className="footer-copy">

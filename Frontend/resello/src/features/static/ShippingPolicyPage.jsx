@@ -298,8 +298,9 @@ const ShippingPolicyPage = () => {
               </div>
               <h2 className="return-portal-title">Return Defective Product</h2>
               <p className="return-portal-sub">
-                Select an order delivered in the last 7 days, attach video or photo proof of the
-                defect, and submit for instant pickup &amp; replacement.
+                Select an order delivered in the last 7 days. You must attach 1 video proof of the
+                defect, with the option to attach pictures (minimum 3 pictures if provided), and submit
+                for instant pickup &amp; replacement.
               </p>
             </div>
 

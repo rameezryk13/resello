@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { Star, Truck, ShieldCheck, Tag, Check } from "lucide-react";
+import { Star, Truck, ShieldCheck, Tag, Check, Trash2, X, ZoomIn } from "lucide-react";
 import RatingStars from "../RatingStars/RatingStars";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { del } from "@/api/client";
+import endpoints from "@/api/endpoints";
 import "./ReviewSection.css";
 
 const formatReviewDate = (value) => {
@@ -18,6 +22,7 @@ const formatReviewDate = (value) => {
 const DEFAULT_MENTIONS = ["price", "delivery", "quality", "value", "recommended"];
 
 const ReviewSection = ({
+  productId,
   reviewData,
   reviewSummary,
   visibleReviews = [],
@@ -25,8 +30,13 @@ const ReviewSection = ({
   onToggleSection,
   reviewsExpanded,
   onToggleReviews,
+  onReviewDeleted,
 }) => {
+  const { user } = useAuth();
+  const toast = useToast();
   const [selectedMention, setSelectedMention] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   // Category average ratings from summary or fallback realistic values
   const catRatings = reviewSummary?.categoryRatings || {
@@ -47,6 +57,20 @@ const ReviewSection = ({
           selectedMention === "all"
       )
     : visibleReviews;
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm("Are you sure you want to delete this review?")) return;
+    setDeletingId(reviewId);
+    try {
+      await del(endpoints.products.deleteReview(productId, reviewId));
+      toast.success("Review deleted successfully.");
+      if (onReviewDeleted) onReviewDeleted(reviewId);
+    } catch (err) {
+      toast.error(err?.message || "Failed to delete review.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <>
@@ -183,6 +207,13 @@ const ReviewSection = ({
                   const rQuality = review.ratings?.quality || review.rating || 5;
                   const rPrice = review.ratings?.price || review.rating || 5;
 
+                  const isAuthor = user && (
+                    String(review.userId) === String(user.id) ||
+                    String(review.userId) === String(user.email)
+                  );
+                  const isAdmin = user && (user.role === "admin" || user.isAdmin);
+                  const canDelete = isAuthor || isAdmin;
+
                   return (
                     <article className="pdp-review-card" key={review.reviewId}>
                       <div className="pdp-review-card-header">
@@ -192,7 +223,33 @@ const ReviewSection = ({
                             <Check size={12} /> Verified Purchase
                           </span>
                         </div>
-                        <time dateTime={review.date}>{formatReviewDate(review.date)}</time>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <time dateTime={review.date}>{formatReviewDate(review.date)}</time>
+                          {canDelete && (
+                            <button
+                              type="button"
+                              className="pdp-review-delete-btn"
+                              onClick={() => handleDeleteReview(review.reviewId)}
+                              disabled={deletingId === review.reviewId}
+                              title={isAdmin ? "Delete / Moderate Review (Admin)" : "Delete Your Review"}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                background: "#fef2f2",
+                                color: "#dc2626",
+                                border: "1px solid #fecaca",
+                                borderRadius: 6,
+                                padding: "2px 8px",
+                                fontSize: "11px",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <Trash2 size={12} /> {deletingId === review.reviewId ? "Deleting..." : "Delete"}
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Overall Star & Score */}
@@ -206,8 +263,8 @@ const ReviewSection = ({
 
                       {/* CATEGORY RATINGS BREAKDOWN PILLS */}
                       <div className="pdp-review-card-categories">
-                        <span className="pdp-review-cat-chip">
-                          Delivery: <strong>{rDelivery}★</strong>
+                        <span className="pdp-review-cat-chip" title="Courier Delivery Review (excluded from overall product rating)">
+                          Delivery: <strong>{rDelivery}★</strong> <small style={{ opacity: 0.75, fontSize: "10px" }}>(Courier)</small>
                         </span>
                         <span className="pdp-review-cat-chip">
                           Quality: <strong>{rQuality}★</strong>
@@ -231,18 +288,47 @@ const ReviewSection = ({
                         return (
                           <div className="pdp-review-card-photos-grid" style={{ marginTop: "12px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
                             {reviewPhotos.map((photo, pIdx) => (
-                              <img
+                              <div
                                 key={pIdx}
-                                src={photo}
-                                alt={`Customer review photo ${pIdx + 1}`}
+                                className="pdp-review-photo-wrapper"
+                                onClick={() => setLightboxImage(photo)}
+                                title="Click to view large photo"
                                 style={{
+                                  position: "relative",
+                                  cursor: "pointer",
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  border: "1.5px solid #e2e8f0",
                                   width: "90px",
                                   height: "90px",
-                                  borderRadius: "8px",
-                                  border: "1.5px solid #e2e8f0",
-                                  objectFit: "cover",
                                 }}
-                              />
+                              >
+                                <img
+                                  src={photo}
+                                  alt={`Customer review photo ${pIdx + 1}`}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    display: "block",
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    position: "absolute",
+                                    bottom: 4,
+                                    right: 4,
+                                    background: "rgba(0,0,0,0.6)",
+                                    color: "#fff",
+                                    borderRadius: "4px",
+                                    padding: "2px 4px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <ZoomIn size={12} />
+                                </span>
+                              </div>
                             ))}
                           </div>
                         );
@@ -257,6 +343,82 @@ const ReviewSection = ({
           </div>
         </section>
       ) : null}
+
+      {/* FULL-SIZE REVIEW PHOTO LIGHTBOX POPUP */}
+      {lightboxImage && (
+        <div
+          className="review-lightbox-backdrop"
+          onClick={() => setLightboxImage(null)}
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.8)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            className="review-lightbox-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              background: "#1e293b",
+              borderRadius: "12px",
+              padding: "12px",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <button
+              type="button"
+              className="review-lightbox-close"
+              onClick={() => setLightboxImage(null)}
+              aria-label="Close image popup"
+              style={{
+                position: "absolute",
+                top: "-14px",
+                right: "-14px",
+                background: "#ffffff",
+                color: "#0f172a",
+                border: "none",
+                borderRadius: "50%",
+                width: "34px",
+                height: "34px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+              }}
+            >
+              <X size={20} />
+            </button>
+            <img
+              src={lightboxImage}
+              alt="Customer review photo large"
+              style={{
+                maxWidth: "85vw",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                borderRadius: "8px",
+                display: "block",
+              }}
+            />
+            <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px", marginBottom: 0 }}>
+              Customer Review Photo
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 };

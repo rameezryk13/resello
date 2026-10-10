@@ -190,6 +190,8 @@ function calculateWallet() {
     balance: availableBalance,
     availableBalance,
     pendingProfit,
+    pendingCommission: pendingProfit,
+    clearedCommission: deliveredProfit,
     totalProfit,
     totalWithdrawn,
     pendingWithdrawal,
@@ -555,6 +557,60 @@ export async function handleMockRequest(endpoint, options = {}) {
 
   if (path === "/wallet/demo-date") {
     return { wallet: calculateWallet(), message: "Demo date updated" };
+  }
+
+  if (path === "/wallet/demo-release-commission" || path === "/wallet/release-commission") {
+    let orders = getOrders();
+    let releasedAmount = 0;
+    let releasedOrdersCount = 0;
+
+    const pendingOrders = orders.filter(
+      (o) => o.status !== "Delivered" && o.status !== "Cancelled" && o.status !== "Returned"
+    );
+
+    if (pendingOrders.length > 0) {
+      pendingOrders.forEach((o) => {
+        o.status = "Delivered";
+        o.deliveredAt = new Date().toISOString();
+        const profit = Number(o.profit) || 0;
+        releasedAmount += profit;
+        releasedOrdersCount++;
+      });
+      setOrders(orders);
+    } else {
+      const demoProfit = 300;
+      const demoOrder = {
+        orderId: `ORD-DEMO-${Date.now().toString().slice(-6)}`,
+        status: "Delivered",
+        deliveredAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        profit: demoProfit,
+        totalAmount: 1200,
+        cart: [{ quantity: 1, profit: demoProfit, product: { price: 1200, title: "Demo Item" } }],
+      };
+      orders.unshift(demoOrder);
+      setOrders(orders);
+      releasedAmount = demoProfit;
+      releasedOrdersCount = 1;
+    }
+
+    const notifs = getNotifications();
+    notifs.unshift({
+      id: `notif_${Date.now()}`,
+      type: "review",
+      title: "Demo Commission Released!",
+      message: `Pending commission of Rs. ${releasedAmount} has been cleared into your wallet!`,
+      time: "Just now",
+      unread: true,
+    });
+    setNotifications(notifs);
+
+    return {
+      wallet: calculateWallet(),
+      releasedAmount,
+      releasedOrdersCount,
+      message: `Released Rs. ${releasedAmount} pending commission.`,
+    };
   }
 
   // --- NOTIFICATIONS ---

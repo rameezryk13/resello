@@ -36,6 +36,13 @@ const formatDate = (value) =>
     timeStyle: "short",
   });
 
+const normalizeOrderStatus = (status) => {
+  if (status === "inprogress" || status === "In Progress") return "In-progress";
+  if (status === "intransit") return "In Transit";
+  if (status === "Return") return "Returned";
+  return status;
+};
+
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,8 +98,17 @@ const OrdersPage = () => {
   };
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
+
+  const statusCounts = orders.reduce((acc, order) => {
+    const norm = normalizeOrderStatus(order.status);
+    acc[norm] = (acc[norm] || 0) + 1;
+    return acc;
+  }, {});
+  const totalOrdersCount = orders.length;
+
   const filteredOrders = orders.filter((order) => {
-    if (activeStatus !== ALL_STATUSES && order.status !== activeStatus) {
+    const currentStatus = normalizeOrderStatus(order.status);
+    if (activeStatus !== ALL_STATUSES && currentStatus !== activeStatus) {
       return false;
     }
 
@@ -122,20 +138,53 @@ const OrdersPage = () => {
         <AccountHero title="My Orders" description="Track every order placed from your reseller account. Items from different suppliers ship as separate orders, each with its own total, profit, and shipping." />
 
         <section className="account-section">
+          {/* Top Metric Cards showing count of all instances (e.g. Total Orders, In-progress, Delivered, etc.) */}
+          <div className="orders-summary-bar">
+            <div
+              className={`orders-summary-card ${activeStatus === ALL_STATUSES ? "active" : ""}`}
+              onClick={() => setActiveStatus(ALL_STATUSES)}
+              role="button"
+              tabIndex={0}
+            >
+              <span className="summary-card-label">Total Orders</span>
+              <strong className="summary-card-count">{totalOrdersCount}</strong>
+            </div>
+            {ORDER_STATUSES.map((status) => {
+              const count = statusCounts[status] || 0;
+              return (
+                <div
+                  key={status}
+                  className={`orders-summary-card ${activeStatus === status ? "active" : ""}`}
+                  onClick={() => setActiveStatus(status)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className="summary-card-label">{status}</span>
+                  <strong className="summary-card-count">{count}</strong>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="orders-toolbar">
             <div className="orders-status-tabs" role="tablist" aria-label="Order status filters">
-              {STATUS_TABS.map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeStatus === status}
-                  className={`orders-status-tab ${activeStatus === status ? "active" : ""}`}
-                  onClick={() => setActiveStatus(status)}
-                >
-                  {status}
-                </button>
-              ))}
+              {STATUS_TABS.map((status) => {
+                const count = status === ALL_STATUSES ? totalOrdersCount : (statusCounts[status] || 0);
+                return (
+                  <button
+                    key={status}
+                    type="button"
+                    role="tab"
+                    aria-label={status}
+                    aria-selected={activeStatus === status}
+                    className={`orders-status-tab ${activeStatus === status ? "active" : ""}`}
+                    onClick={() => setActiveStatus(status)}
+                  >
+                    <span>{status}</span>
+                    <span className="tab-count-pill">({count})</span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="orders-search">
@@ -177,13 +226,15 @@ const OrdersPage = () => {
 
           {!loading && !error && filteredOrders.length > 0 ? (
             <div className="account-list">
-              {filteredOrders.map((order) => (
+              {filteredOrders.map((order) => {
+                const currentStatus = normalizeOrderStatus(order.status);
+                return (
                 <article key={order.orderId} className="account-card">
                   <div className="account-card-main">
                     <div className="account-card-title account-card-title-row">
                       <span>{order.orderId}</span>
-                      <span className={`order-status-badge status-${order.status.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
-                        {order.status}
+                      <span className={`order-status-badge status-${currentStatus.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
+                        {currentStatus}
                       </span>
                     </div>
                     {order.shopName ? (
@@ -216,7 +267,7 @@ const OrdersPage = () => {
                       ))}
                     </div>
 
-                    {order.status === PENALTY_STATUS ? (
+                    {currentStatus === PENALTY_STATUS ? (
                       <p className="order-penalty-note">
                         <TriangleAlert size={15} aria-hidden="true" />
                         {formatMoney(penalty)} return penalty charged to your wallet, and the
@@ -230,7 +281,7 @@ const OrdersPage = () => {
                     <span>Total paid</span>
                     <span>Profit {formatMoney(order.profit)}</span>
 
-                    {order.status === "Delivered" && (
+                    {currentStatus === "Delivered" && (
                       <button
                         type="button"
                         className="order-review-btn"
@@ -244,7 +295,7 @@ const OrdersPage = () => {
                     <label className="order-status-switcher">
                       <span>Demo: set status</span>
                       <select
-                        value={order.status}
+                        value={currentStatus}
                         disabled={updating === order.orderId}
                         onChange={(event) => changeStatus(order.orderId, event.target.value)}
                         aria-label={`Set status for order ${order.orderId}`}
@@ -258,7 +309,8 @@ const OrdersPage = () => {
                     </label>
                   </div>
                 </article>
-              ))}
+              );
+              })}
             </div>
           ) : null}
         </section>

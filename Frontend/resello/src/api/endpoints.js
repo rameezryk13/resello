@@ -13,6 +13,7 @@ export const endpoints = {
     logout: "/auth/logout",
     me: "/auth/me",
     meBank: "/auth/me/bank",
+    verifyAccount: "/auth/verify-account",
   },
 
   home: {
@@ -25,6 +26,7 @@ export const endpoints = {
     byId: (productId) => `/products/${enc(productId)}`,
     reviews: (productId) => `/products/${enc(productId)}/reviews`,
     addReview: (productId) => `/products/${enc(productId)}/reviews`,
+    deleteReview: (productId, reviewId) => `/products/${enc(productId)}/reviews/${enc(reviewId)}`,
     search: (query) => `/products/search?q=${enc(query)}`,
     subcategories: "/products/subcategories",
     filterBase: "/products/filter",
@@ -59,6 +61,7 @@ export const endpoints = {
     root: "/wallet",
     withdraw: "/wallet/withdraw",
     demoDate: "/wallet/demo-date",
+    releaseCommission: "/wallet/demo-release-commission",
     withdrawRequest: "/wallet/withdraw-request",
     approveRequest: (id) => `/wallet/withdraw-request/${enc(id)}/approve`,
     rejectRequest: (id) => `/wallet/withdraw-request/${enc(id)}/reject`,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import { useAuth } from "@/context/AuthContext";
 import useWallet from "@/features/wallet/useWallet";
 import { parsePrice } from "@/utils/currency";
 import {
@@ -28,6 +29,7 @@ const getItemProfitTotal = (item) => {
 };
 
 const useCheckout = () => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
@@ -43,6 +45,10 @@ const useCheckout = () => {
   const [checkoutStep, setCheckoutStep] = useState("address");
   const [orderPaymentType, setOrderPaymentType] = useState("cod");
   const [paymentMethod, setPaymentMethod] = useState("bank");
+
+  const isUnderVerification = Boolean(
+    user && (user.isUnderVerification || user.isVerified === false)
+  );
   const [paymentDetails, setPaymentDetails] = useState({
     bank: "",
     accountNumber: "",
@@ -120,8 +126,34 @@ const useCheckout = () => {
 
   const submitNewAddress = async () => {
     const { name, line1, area, town, city, phone } = newAddress;
-    if (!name || !line1 || !city || !phone) {
+    if (!name?.trim() || !line1?.trim() || !city?.trim() || !phone?.trim()) {
       setError("Please fill in all required address fields.");
+      return;
+    }
+
+    const nameRegex = /^[A-Za-z\s'-]+$/;
+    if (!nameRegex.test(name.trim())) {
+      setError("Name must contain letters only (numbers and symbols are not allowed).");
+      return;
+    }
+    if (name.trim().length < 2 || name.trim().length > 50) {
+      setError("Name must be between 2 and 50 characters.");
+      return;
+    }
+    if (line1.trim().length > 100) {
+      setError("Street Address exceeds maximum 100 characters.");
+      return;
+    }
+    if (area && area.trim().length > 50) {
+      setError("Area / Sector exceeds maximum 50 characters.");
+      return;
+    }
+    if (town && town.trim().length > 50) {
+      setError("Town exceeds maximum 50 characters.");
+      return;
+    }
+    if (city.trim().length > 35) {
+      setError("City exceeds maximum 35 characters.");
       return;
     }
 
@@ -130,10 +162,13 @@ const useCheckout = () => {
     setMessage(null);
 
     const combinedLine2 = [area, town].filter(Boolean).join(", ") || newAddress.line2 || "";
+    const cleanPhoneDigits = (newAddress.phone || "").replace("+92", "").replace(/\D/g, "");
+    const formattedPhone = cleanPhoneDigits ? `+92${cleanPhoneDigits}` : newAddress.phone;
 
     try {
       const data = await post(endpoints.addresses, {
         ...newAddress,
+        phone: formattedPhone,
         line2: combinedLine2,
       });
 
@@ -153,6 +188,11 @@ const useCheckout = () => {
   const placeOrder = async (addressIdOverride) => {
     const addressId = addressIdOverride || selectedAddressId;
     if (!addressId || cartItems.length === 0) return;
+
+    if (isUnderVerification) {
+      setError("Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order.");
+      return;
+    }
 
     // Both entry points — Buy Now and the payment step — come through here, so
     // one check covers them.
@@ -199,6 +239,11 @@ const useCheckout = () => {
   // Pay Now (advance) moves to the payment step first — nothing is ordered
   // until the payment details clear validation.
   const handlePrimaryAction = () => {
+    if (isUnderVerification) {
+      setError("Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order.");
+      return;
+    }
+
     if (wallet.deactivated) {
       const email = wallet.support?.email || "support@resello.pk";
       setError(
@@ -224,6 +269,11 @@ const useCheckout = () => {
   };
 
   const handlePaymentSubmit = async () => {
+    if (isUnderVerification) {
+      setError("Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order.");
+      return;
+    }
+
     if (wallet.deactivated) {
       const email = wallet.support?.email || "support@resello.pk";
       setError(
@@ -302,6 +352,7 @@ const useCheckout = () => {
     handlePaymentChange,
     handlePaymentSubmit,
     handlePrimaryAction,
+    isUnderVerification,
   };
 };
 

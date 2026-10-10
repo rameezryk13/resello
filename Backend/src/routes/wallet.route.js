@@ -12,6 +12,7 @@ const {
   approveWithdrawalRequest,
   rejectWithdrawalRequest,
   walletSummary,
+  releasePendingCommissions,
 } = require('../lib/wallet');
 
 const router = express.Router();
@@ -23,6 +24,26 @@ router.get('/wallet', requireAuth, (req, res) => {
 
   res.json({ wallet: summary });
 });
+
+const handleReleaseCommission = (req, res) => {
+  const bucket = userBucket(req.user.id);
+  try {
+    const result = releasePendingCommissions(bucket, summarizeOrder);
+    saveDb();
+    const summary = walletSummary(bucket, bucket.orders.map(summarizeOrder));
+    res.json({
+      wallet: summary,
+      releasedAmount: result.releasedAmount,
+      releasedOrdersCount: result.releasedOrdersCount,
+      message: `Released Rs. ${result.releasedAmount} pending commission (${result.releasedOrdersCount} order${result.releasedOrdersCount === 1 ? '' : 's'}).`,
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message || 'Could not release pending commission.' });
+  }
+};
+
+router.post('/wallet/demo-release-commission', requireAuth, handleReleaseCommission);
+router.post('/wallet/release-commission', requireAuth, handleReleaseCommission);
 
 router.post('/wallet/demo-date', requireAuth, (req, res) => {
   const bucket = userBucket(req.user.id);

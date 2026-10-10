@@ -50,6 +50,7 @@ const CheckoutPage = () => {
     handlePaymentChange,
     handlePaymentSubmit,
     handlePrimaryAction,
+    isUnderVerification,
   } = checkout;
 
   const activeStepIndex = STEP_INDEX[checkoutStep] ?? 0;
@@ -133,6 +134,7 @@ const CheckoutPage = () => {
               submitting={submitting}
               selectedAddressId={selectedAddressId}
               deactivated={wallet.deactivated}
+              isUnderVerification={isUnderVerification}
               wallet={wallet}
               onPrimaryAction={handlePrimaryAction}
             />

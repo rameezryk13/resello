@@ -1,4 +1,5 @@
-import { CalendarClock, RotateCcw } from "lucide-react";
+import { CalendarClock, RotateCcw, Zap } from "lucide-react";
+import { formatRupees } from "@/utils/currency";
 
 const getNextWeekdayDateStr = (dayOfWeek) => {
   const d = new Date();
@@ -8,12 +9,17 @@ const getNextWeekdayDateStr = (dayOfWeek) => {
   return d.toISOString().split("T")[0];
 };
 
-const WalletDemoBar = ({ wallet, onDateChange }) => {
+const WalletDemoBar = ({
+  wallet,
+  onDateChange,
+  onReleaseCommission,
+  releasingCommission = false,
+}) => {
   return (
     <section className="demo-controller-bar">
       <div className="demo-controller-info">
         <span className="demo-tag">
-          <CalendarClock size={14} /> Demo Date Control
+          <CalendarClock size={14} /> Demo Controls
         </span>
         <span className="demo-date-status">
           Current Date:{" "}
@@ -32,6 +38,22 @@ const WalletDemoBar = ({ wallet, onDateChange }) => {
       </div>
 
       <div className="demo-controller-actions">
+        {onReleaseCommission && (
+          <button
+            type="button"
+            className="demo-btn-preset demo-btn-release"
+            onClick={onReleaseCommission}
+            disabled={releasingCommission}
+            title="Demo: Release pending order commission into your wallet balance"
+          >
+            <Zap size={13} />
+            {releasingCommission
+              ? "Releasing…"
+              : wallet.pendingCommission > 0
+                ? `Release Pending Commission (${formatRupees(wallet.pendingCommission)})`
+                : "Release Demo Commission"}
+          </button>
+        )}
         <button
           type="button"
           className="demo-btn-preset"

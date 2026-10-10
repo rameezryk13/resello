@@ -83,14 +83,25 @@
 }
 
 .auth-brand-logo {
-  font-family: Raleway, sans-serif;
-  font-weight: 800;
-  font-size: var(--text-xl);
-  letter-spacing: -0.02em;
-  color: var(--color-white);
   text-decoration: none;
   margin-bottom: var(--space-lg);
   align-self: flex-start;
+  display: inline-block;
+  border-radius: 8px;
+}
+
+.auth-brand-logo-img {
+  height: 44px;
+  width: auto;
+  max-width: 170px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.auth-brand-logo:hover .auth-brand-logo-img {
+  transform: scale(1.03);
 }
 
 .auth-brand-title {

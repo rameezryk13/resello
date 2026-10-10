@@ -8,19 +8,27 @@
 // routes and the seed script agree on.
 
 const ORDER_STATUSES = [
-  'In-progress',
   'Under Verification',
   'Verification Failed',
+  'In-progress',
+  'In Transit',
   'Delivered',
   'Returned',
   'Cancelled',
 ];
 
-const DEFAULT_ORDER_STATUS = 'In-progress';
+const DEFAULT_ORDER_STATUS = 'Under Verification';
+
+const LEGACY_STATUS_MAP = {
+  'In Progress': 'In-progress',
+  'inprogress': 'In-progress',
+  'intransit': 'In Transit',
+  'Return': 'Returned',
+};
 
 // The old frontend derivation, kept for orders already sitting in db.json with
 // no status of their own. Without it every historic order would snap to
-// "In-progress" on first read, which reads as data loss to anyone who had the
+// "Under Verification" on first read, which reads as data loss to anyone who had the
 // app open before this change.
 function hashStatus(orderId) {
   const source = String(orderId || '');
@@ -33,12 +41,17 @@ function hashStatus(orderId) {
   return ORDER_STATUSES[total % ORDER_STATUSES.length];
 }
 
-const isValidStatus = (status) => ORDER_STATUSES.includes(status);
+const isValidStatus = (status) =>
+  ORDER_STATUSES.includes(status) || Boolean(LEGACY_STATUS_MAP[status]);
 
 // Every read of an order's status goes through here, so a stored status always
 // wins and an unstored one stays what it has always looked like.
-const resolveStatus = (order) =>
-  isValidStatus(order?.status) ? order.status : hashStatus(order?.orderId);
+const resolveStatus = (order) => {
+  const current = order?.status;
+  if (ORDER_STATUSES.includes(current)) return current;
+  if (LEGACY_STATUS_MAP[current]) return LEGACY_STATUS_MAP[current];
+  return hashStatus(order?.orderId);
+};
 
 module.exports = {
   ORDER_STATUSES,

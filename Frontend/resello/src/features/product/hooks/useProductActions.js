@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
+import { useAuth } from "@/context/AuthContext";
 import useAuthGate from "@/features/auth/useAuthGate";
 import useWallet from "@/features/wallet/useWallet";
 
@@ -30,6 +31,7 @@ const useProductActions = ({
 }) => {
   const navigate = useNavigate();
   const { isAuthenticated, blocked } = useAuthGate();
+  const { user } = useAuth();
   const { wallet } = useWallet();
   const [favorited, setFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
@@ -165,6 +167,20 @@ const useProductActions = ({
   };
 
   const handleBuyNow = async () => {
+    const isUnderVerification = Boolean(user && (user.isUnderVerification || user.isVerified === false));
+    if (isUnderVerification) {
+      setActionError(
+        "Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order."
+      );
+      if (typeof window !== "undefined") {
+        if (typeof window.scrollTo === "function") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        window.dispatchEvent(new CustomEvent("resello:blink-verification-banner"));
+      }
+      return;
+    }
+
     if (wallet?.deactivated) {
       const email = wallet.support?.email || "support@resello.pk";
       setActionError(

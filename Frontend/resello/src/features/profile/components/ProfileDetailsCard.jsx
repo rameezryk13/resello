@@ -1,5 +1,6 @@
 import {
   Building2,
+  Clock,
   Lock,
   Mail,
   MapPin,
@@ -150,9 +151,19 @@ const ProfileDetailsCard = ({
                 value={user?.email || ""}
                 disabled
               />
-              <span className="verified-chip" title="Email Verified">
-                <ShieldCheck size={14} /> Verified
-              </span>
+              {user?.isUnderVerification || user?.isVerified === false ? (
+                <span
+                  className="verified-chip under-verification"
+                  title="Under Admin Verification (approx. 24 hours)"
+                  style={{ background: "#fef2f2", color: "#dc2626", borderColor: "#fca5a5" }}
+                >
+                  <Clock size={14} /> Under Verification
+                </span>
+              ) : (
+                <span className="verified-chip" title="Account Verified">
+                  <ShieldCheck size={14} /> Verified
+                </span>
+              )}
             </div>
             <small className="field-hint">Email address cannot be changed.</small>
           </div>

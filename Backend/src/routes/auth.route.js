@@ -5,10 +5,11 @@ const {
   saveDb,
   userBucket,
   findUserByEmail,
+  findUserById,
   publicUser,
 } = require('../lib/store');
+const { requireAuth, userFromRequest } = require('../middleware/auth');
 const { seedAddressesFor } = require('../../defaultPagesData/addresses');
-const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -30,72 +31,84 @@ function startSession(user) {
 }
 
 router.post('/auth/signup', async (req, res) => {
-  const name = String(req.body?.name || '').trim();
-  const email = normalizeEmail(req.body?.email);
-  const phone = String(req.body?.phone || '').trim();
-  const password = String(req.body?.password || '');
+  try {
+    const name = String(req.body?.name || '').trim();
+    const email = normalizeEmail(req.body?.email);
+    const phone = String(req.body?.phone || '').trim();
+    const password = String(req.body?.password || '');
 
-  if (!name || !email || !phone || !password) {
-    return res.status(400).json({ message: 'Name, email, phone number and password are required.' });
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ message: 'Name, email, phone number and password are required.' });
+    }
+
+    const cleanPhone = phone.replace(/[\s()-]/g, '');
+    if (!/^(?:\+92|0092|0)3\d{9}$/.test(cleanPhone)) {
+      return res.status(400).json({ message: 'Use a valid Pakistani mobile number, like 0300 1234567.' });
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({ message: 'Enter a valid email address.' });
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return res
+        .status(400)
+        .json({ message: `Use at least ${MIN_PASSWORD_LENGTH} characters for your password.` });
+    }
+
+    if (findUserByEmail(email)) {
+      // 409, not 400: the request is well-formed, it conflicts with what exists.
+      return res
+        .status(409)
+        .json({ message: 'That email is already registered. Sign in instead.' });
+    }
+
+    const db = getDb();
+    const user = {
+      id: `u_${Date.now()}_${db.users.length + 1}`,
+      name,
+      email,
+      phone,
+      passwordHash: await hashPassword(password),
+      createdAt: new Date().toISOString(),
+      isVerified: false,
+      verificationStatus: 'under_verification',
+    };
+
+    db.users.push(user);
+    userBucket(user.id).addresses = seedAddressesFor(user.id);
+    saveDb();
+
+    res.status(201).json(startSession(user));
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ message: err?.message || 'Signup failed due to a server error.' });
   }
-
-  const cleanPhone = phone.replace(/[\s()-]/g, '');
-  if (!/^(?:\+92|0092|0)3\d{9}$/.test(cleanPhone)) {
-    return res.status(400).json({ message: 'Use a valid Pakistani mobile number, like 0300 1234567.' });
-  }
-
-  if (!EMAIL_PATTERN.test(email)) {
-    return res.status(400).json({ message: 'Enter a valid email address.' });
-  }
-
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return res
-      .status(400)
-      .json({ message: `Use at least ${MIN_PASSWORD_LENGTH} characters for your password.` });
-  }
-
-  if (findUserByEmail(email)) {
-    // 409, not 400: the request is well-formed, it conflicts with what exists.
-    return res
-      .status(409)
-      .json({ message: 'That email is already registered. Sign in instead.' });
-  }
-
-  const db = getDb();
-  const user = {
-    id: `u_${Date.now()}_${db.users.length + 1}`,
-    name,
-    email,
-    phone,
-    passwordHash: await hashPassword(password),
-    createdAt: new Date().toISOString(),
-  };
-
-  db.users.push(user);
-  userBucket(user.id).addresses = seedAddressesFor(user.id);
-  saveDb();
-
-  res.status(201).json(startSession(user));
 });
 
 router.post('/auth/login', async (req, res) => {
-  const email = normalizeEmail(req.body?.email);
-  const password = String(req.body?.password || '');
+  try {
+    const email = normalizeEmail(req.body?.email);
+    const password = String(req.body?.password || '');
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Enter your email and password.' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Enter your email and password.' });
+    }
+
+    const user = findUserByEmail(email);
+
+    // One message for both "no such account" and "wrong password", so this can't
+    // be used to enumerate which emails are registered.
+    const ok = user && (await verifyPassword(password, user.passwordHash));
+    if (!ok) {
+      return res.status(401).json({ message: 'Email or password is incorrect.' });
+    }
+
+    res.json(startSession(user));
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: err?.message || 'Login failed due to a server error.' });
   }
-
-  const user = findUserByEmail(email);
-
-  // One message for both "no such account" and "wrong password", so this can't
-  // be used to enumerate which emails are registered.
-  const ok = user && (await verifyPassword(password, user.passwordHash));
-  if (!ok) {
-    return res.status(401).json({ message: 'Email or password is incorrect.' });
-  }
-
-  res.json(startSession(user));
 });
 
 // Revoking the session server-side is the reason this app uses opaque tokens
@@ -174,12 +187,33 @@ router.put('/auth/me', requireAuth, (req, res) => {
   res.json({ user: publicUser(user), message: 'Profile updated successfully.' });
 });
 
-// Deletes user bank info
-router.delete('/auth/me/bank', requireAuth, (req, res) => {
-  const user = req.user;
-  user.bankInfo = null;
+// Admin verification of reseller account
+const handleVerifyAccount = (req, res) => {
+  const reqUser = userFromRequest(req);
+  const userId = req.params.userId || req.body?.userId;
+  const targetUser = userId
+    ? findUserById(userId)
+    : (req.body?.email ? findUserByEmail(req.body.email) : (reqUser || null));
+
+  if (!targetUser) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const isVerified = req.body?.isVerified !== undefined ? Boolean(req.body.isVerified) : true;
+  targetUser.isVerified = isVerified;
+  targetUser.verificationStatus = isVerified ? 'verified' : 'under_verification';
+  if (isVerified) {
+    targetUser.verifiedAt = new Date().toISOString();
+  }
+
   saveDb();
-  res.json({ user: publicUser(user), message: 'Bank info deleted successfully.' });
-});
+  res.json({
+    message: isVerified ? 'Reseller account verified successfully by admin.' : 'Reseller account marked as under verification.',
+    user: publicUser(targetUser),
+  });
+};
+
+router.put('/auth/verify-account', handleVerifyAccount);
+router.put('/auth/verify-account/:userId', handleVerifyAccount);
 
 module.exports = router;

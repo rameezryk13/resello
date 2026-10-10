@@ -247,7 +247,7 @@
      0 and 20px — no rhythm, and five product rows fused into one wall.
      One fluid token gives every page the same vertical cadence and lets
      it tighten on small screens without a media query. */
-  --section-gap:   clamp(2rem, 4vw, 3.5rem);
+  --section-gap:   clamp(1.25rem, 2.5vw, 1.75rem);
   --section-pad-y: clamp(1.5rem, 3vw, 2.5rem);
 
   /* ── Breakpoints ────────────────────────────────────────── NEW

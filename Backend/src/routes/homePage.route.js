@@ -3,7 +3,7 @@ const { products, shops, productReviews } = require('../../defaultPagesData/prod
 const visualCategories = require('../../defaultPagesData/categories');
 const heroPosters = require('../../defaultPagesData/poster');
 const row = require("../../defaultPagesData/row");
-const { userBucket, saveDb } = require('../lib/store');
+const { userBucket, saveDb, isAccountUnderVerification } = require('../lib/store');
 const { requireAuth } = require('../middleware/auth');
 const {
   ORDER_STATUSES,
@@ -346,6 +346,16 @@ router.post("/products/:productId/reviews", requireAuth, (req, res) => {
   }
 
   const { rating, comment, image, images, ratings } = req.body;
+  const trimmedComment = String(comment || "").trim();
+
+  if (!trimmedComment) {
+    return res.status(400).json({ message: "Review text is mandatory." });
+  }
+
+  if (trimmedComment.length > 1000) {
+    return res.status(400).json({ message: "Review text cannot exceed 1,000 characters." });
+  }
+
   const baseRating = Number(rating) || 5;
 
   const categoryRatingsInput = {
@@ -354,26 +364,28 @@ router.post("/products/:productId/reviews", requireAuth, (req, res) => {
     price: Math.max(1, Math.min(5, Number(ratings?.price || baseRating))),
   };
 
-  const computedAvg = Math.round(
-    ((categoryRatingsInput.delivery + categoryRatingsInput.quality + categoryRatingsInput.price) / 3) * 10
+  // Delivery review does not impact overall product rating (purely Product Quality & Price)
+  const productRatingAvg = Math.round(
+    ((categoryRatingsInput.quality + categoryRatingsInput.price) / 2) * 10
   ) / 10;
 
   if (!productReviews[productId]) {
     productReviews[productId] = [];
   }
 
-  const reviewImagesList = Array.isArray(images) && images.length > 0
+  const reviewImagesList = (Array.isArray(images) && images.length > 0
     ? images
     : image
       ? [image]
-      : [];
+      : []).slice(0, 5);
 
   const newReview = {
     reviewId: `rev_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+    userId: req.user?.id || req.user?.email || "anonymous",
     reviewerName: req.user?.name || "Verified Customer",
-    rating: computedAvg,
+    rating: productRatingAvg,
     ratings: categoryRatingsInput,
-    comment: String(comment || "").trim() || "Great quality product!",
+    comment: trimmedComment,
     images: reviewImagesList,
     image: reviewImagesList[0] || null,
     date: new Date().toISOString(),
@@ -390,6 +402,45 @@ router.post("/products/:productId/reviews", requireAuth, (req, res) => {
   res.status(201).json({
     message: "Review submitted successfully!",
     review: newReview,
+    product: { rating: product.rating, reviews: product.reviews },
+  });
+});
+
+router.delete("/products/:productId/reviews/:reviewId", requireAuth, (req, res) => {
+  const { productId, reviewId } = req.params;
+  const product = products.find((p) => p.productId === productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  const list = productReviews[productId] || [];
+  const reviewIndex = list.findIndex((r) => r.reviewId === reviewId);
+  if (reviewIndex === -1) {
+    return res.status(404).json({ message: "Review not found" });
+  }
+
+  const review = list[reviewIndex];
+  const isAuthor = review.userId && String(review.userId) === String(req.user?.id || req.user?.email);
+  const isAdmin = req.user?.role === "admin" || req.user?.isAdmin;
+
+  if (!isAuthor && !isAdmin) {
+    return res.status(403).json({ message: "You do not have permission to delete this review." });
+  }
+
+  list.splice(reviewIndex, 1);
+
+  if (list.length > 0) {
+    const allRatings = list.map((r) => Number(r.rating) || 5);
+    const avg = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length;
+    product.rating = Math.round(avg * 10) / 10;
+    product.reviews = list.length;
+  } else {
+    product.rating = 5.0;
+    product.reviews = 0;
+  }
+
+  res.json({
+    message: "Review deleted successfully.",
     product: { rating: product.rating, reviews: product.reviews },
   });
 });
@@ -636,7 +687,7 @@ router.get('/addresses', requireAuth, (req, res) => {
 });
 
 router.post('/addresses', requireAuth, (req, res) => {
-  const { name, line1, line2, city, phone, phone2 } = req.body;
+  const { name, line1, line2, area, town, city, phone, phone2 } = req.body;
 
   if (!name || !line1 || !city || !phone) {
     return res.status(400).json({ message: 'Please provide all required address fields' });
@@ -650,6 +701,8 @@ router.post('/addresses', requireAuth, (req, res) => {
     id: `${req.user.id}-address-${Date.now()}`,
     name,
     line1,
+    area: area || "",
+    town: town || "",
     line2: line2 || "",
     city,
     phone,
@@ -659,12 +712,42 @@ router.post('/addresses', requireAuth, (req, res) => {
   bucket.addresses.push(newAddress);
   saveDb();
 
-  res.status(201).json({ addresses: bucket.addresses });
+  res.status(201).json({ addresses: bucket.addresses, address: newAddress });
+});
+
+router.put('/addresses/:addressId', requireAuth, (req, res) => {
+  const { name, line1, line2, area, town, city, phone, phone2 } = req.body;
+  const bucket = userBucket(req.user.id);
+  const address = bucket.addresses.find((addr) => addr.id === req.params.addressId);
+
+  if (!address) {
+    return res.status(404).json({ message: 'Address not found' });
+  }
+
+  if (name) address.name = name;
+  if (line1) address.line1 = line1;
+  if (area !== undefined) address.area = area;
+  if (town !== undefined) address.town = town;
+  if (line2 !== undefined) address.line2 = line2;
+  if (city) address.city = city;
+  if (phone) address.phone = phone;
+  if (phone2 !== undefined) address.phone2 = phone2;
+
+  saveDb();
+  res.json({ addresses: bucket.addresses, address });
 });
 
 router.post('/orders', requireAuth, (req, res) => {
   const { addressId, cart: cartPayload, totalAmount, shippingCharge, paymentType } = req.body;
   const bucket = userBucket(req.user.id);
+
+  // Checked before anything else is validated: an account under verification cannot place orders
+  if (isAccountUnderVerification(req.user)) {
+    return res.status(403).json({
+      message: 'Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order.',
+      underVerification: true,
+    });
+  }
 
   // Checked before anything else is validated: a deactivated reseller can't
   // place an order however well-formed it is, and the frontend disables the
@@ -745,7 +828,10 @@ router.get('/orders', requireAuth, (req, res) => {
 // wired in, this is the only way to walk the commission and penalty rules, so
 // the frontend labels it as a demo control.
 router.put('/orders/:orderId/status', requireAuth, (req, res) => {
-  const { status } = req.body;
+  let { status } = req.body;
+  if (status === 'inprogress' || status === 'In Progress') status = 'In-progress';
+  if (status === 'intransit') status = 'In Transit';
+  if (status === 'Return') status = 'Returned';
 
   if (!isValidStatus(status)) {
     return res.status(400).json({
@@ -794,14 +880,22 @@ router.put('/orders/:orderId/status', requireAuth, (req, res) => {
 });
 
 router.post('/orders/:orderId/return', requireAuth, (req, res) => {
-  const { reason, description, mediaUrl, mediaType, productId, productName, mistakeType } = req.body || {};
+  const { reason, description, mediaUrl, mediaType, videoUrl, images, pictures, productId, productName, mistakeType } = req.body || {};
 
   if (!reason || !String(reason).trim()) {
     return res.status(400).json({ message: 'Please provide a return reason.' });
   }
 
-  if (!mediaUrl || !String(mediaUrl).trim()) {
-    return res.status(400).json({ message: 'Please provide a photo or video proof of the defective product.' });
+  const finalVideoUrl = String(videoUrl || (mediaType === 'video' ? mediaUrl : '') || mediaUrl || '').trim();
+  if (!finalVideoUrl) {
+    return res.status(400).json({ message: 'Please provide 1 video proof of the defective product (mandatory).' });
+  }
+
+  const rawPictures = Array.isArray(images) ? images : (Array.isArray(pictures) ? pictures : []);
+  const cleanPictures = rawPictures.map((pic) => String(pic || '').trim()).filter(Boolean);
+
+  if (cleanPictures.length > 0 && cleanPictures.length < 3) {
+    return res.status(400).json({ message: 'If you choose to provide pictures, a minimum of 3 pictures is required.' });
   }
 
   const bucket = userBucket(req.user.id);
@@ -822,8 +916,10 @@ router.post('/orders/:orderId/return', requireAuth, (req, res) => {
     id: `ret_${Date.now()}`,
     reason: String(reason).trim(),
     description: String(description || '').trim(),
-    mediaUrl: String(mediaUrl).trim(),
-    mediaType: mediaType || 'image',
+    mediaUrl: finalVideoUrl,
+    mediaType: 'video',
+    videoUrl: finalVideoUrl,
+    images: cleanPictures,
     productId: productId || null,
     productName: productName || null,
     mistakeType: derivedMistake,

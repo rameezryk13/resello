@@ -124,9 +124,31 @@ export function AuthProvider({ children }) {
     return data?.user;
   }, []);
 
+  const adminVerifyUser = useCallback(async (userId) => {
+    const targetId = userId || user?.id;
+    const data = await client.put(endpoints.auth.verifyAccount, {
+      userId: targetId,
+      isVerified: true,
+    });
+    if (data?.user) {
+      setUser(data.user);
+    }
+    return data?.user;
+  }, [user]);
+
   const value = useMemo(
-    () => ({ user, loading, isAuthenticated: Boolean(user), signup, login, logout, updateProfile, deleteBankInfo }),
-    [user, loading, signup, login, logout, updateProfile, deleteBankInfo]
+    () => ({
+      user,
+      loading,
+      isAuthenticated: Boolean(user),
+      signup,
+      login,
+      logout,
+      updateProfile,
+      deleteBankInfo,
+      adminVerifyUser,
+    }),
+    [user, loading, signup, login, logout, updateProfile, deleteBankInfo, adminVerifyUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

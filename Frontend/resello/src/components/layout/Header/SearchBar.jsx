@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, PackageSearch } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { get } from "@/api/client";
 import endpoints from "@/api/endpoints";
@@ -137,8 +137,12 @@ export default function SearchBar() {
             ) : error ? (
               <div className="searchbar-empty">{error}</div>
             ) : results.length === 0 ? (
-              <div className="searchbar-empty">
-                No products found for "{query}"
+              <div className="searchbar-empty searchbar-no-match">
+                <PackageSearch size={26} className="searchbar-empty-icon" />
+                <strong className="searchbar-empty-title">Product does not exist</strong>
+                <p className="searchbar-empty-subtitle">
+                  No product found for "<span>{query}</span>". Please check spelling or try other keywords.
+                </p>
               </div>
             ) : (
               <ul className="searchbar-dropdown-list">

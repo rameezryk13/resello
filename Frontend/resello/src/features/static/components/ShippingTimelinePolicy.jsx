@@ -66,11 +66,20 @@ const ShippingTimelinePolicy = () => {
             color: "#92400e",
           }}
         >
-          <strong>⚠️ Important Note for Resellers:</strong>
-          <p style={{ margin: "4px 0 0 0" }}>
-            Ensure your customer keeps the original packaging intact. Replacement requests are
-            processed immediately upon receipt verification.
-          </p>
+          <strong>⚠️ Defect Return &amp; Proof Requirements:</strong>
+          <ul style={{ margin: "6px 0 0 0", paddingLeft: 18, lineHeight: 1.6 }}>
+            <li>
+              <strong>Mandatory Video (1 Video):</strong> You must provide 1 video proof
+              demonstrating the defect, malfunction, or courier transit damage upon opening.
+            </li>
+            <li>
+              <strong>Optional Photos (Minimum 3 Pictures):</strong> Adding photos is optional, but if
+              you include pictures, a minimum of 3 clear photos (product defect, full item, and courier parcel label) is required.
+            </li>
+            <li>
+              Ensure the customer keeps the original packaging and accessories intact for courier pickup.
+            </li>
+          </ul>
         </div>
       </div>
     </div>

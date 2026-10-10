@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Bell, Heart, LayoutDashboard, Landmark, LogIn, LogOut, Menu, Package, ShoppingCart, Store, TrendingUp, Truck, User, Wallet, X } from "lucide-react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { AlertTriangle, Bell, CheckCircle, Heart, LayoutDashboard, Landmark, LogIn, LogOut, Menu, Package, ShoppingCart, Store, TrendingUp, Truck, User, Wallet, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import NotificationPanel from "./NotificationPanel";
@@ -7,7 +7,8 @@ import ReviewModal from "@/components/ui/ReviewModal/ReviewModal";
 import { SAMPLE_NOTIFICATIONS } from "@/constants/notifications";
 import useAuthGate from "@/features/auth/useAuthGate";
 import { useAuth } from "@/context/AuthContext";
-import { get, post } from "@/api/client";
+import { ToastContext } from "@/context/ToastContext";
+import { get, post, put } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import "./Header.css";
 
@@ -23,7 +24,8 @@ const CATEGORY_NAV_LINKS = [
 const Header = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, adminVerifyUser } = useAuth();
+  const toastContext = useContext(ToastContext);
   const { isAuthenticated, sendToLogin } = useAuthGate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -32,8 +34,32 @@ const Header = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewModalOrder, setReviewModalOrder] = useState(null);
   const [reviewModalProduct, setReviewModalProduct] = useState(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [blinkVerification, setBlinkVerification] = useState(false);
   const profileMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
+  const blinkTimerRef = useRef(null);
+  const verificationBannerRef = useRef(null);
+
+  const handleAdminVerifyDemo = async () => {
+    try {
+      setIsVerifying(true);
+      if (typeof adminVerifyUser === "function") {
+        await adminVerifyUser(user?.id);
+      } else {
+        await put(endpoints.auth.verifyAccount, { userId: user?.id, isVerified: true });
+      }
+      if (toastContext?.show) {
+        toastContext.show("Reseller account verified successfully by admin! Restrictions lifted.", "success");
+      }
+    } catch (err) {
+      if (toastContext?.show) {
+        toastContext.show(err?.message || "Failed to verify account", "error");
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -105,6 +131,37 @@ const Header = () => {
       window.removeEventListener("resello:favorites-updated", handleFavUpdate);
     };
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleBlinkNotice = () => {
+      if (blinkTimerRef.current) {
+        clearTimeout(blinkTimerRef.current);
+      }
+      setBlinkVerification(false);
+
+      if (verificationBannerRef.current) {
+        verificationBannerRef.current.classList.remove("is-blinking");
+        void verificationBannerRef.current.offsetWidth;
+        verificationBannerRef.current.classList.add("is-blinking");
+      }
+
+      setBlinkVerification(true);
+      blinkTimerRef.current = setTimeout(() => {
+        setBlinkVerification(false);
+        if (verificationBannerRef.current) {
+          verificationBannerRef.current.classList.remove("is-blinking");
+        }
+      }, 3000);
+    };
+
+    window.addEventListener("resello:blink-verification-banner", handleBlinkNotice);
+    return () => {
+      window.removeEventListener("resello:blink-verification-banner", handleBlinkNotice);
+      if (blinkTimerRef.current) {
+        clearTimeout(blinkTimerRef.current);
+      }
+    };
+  }, []);
 
   const unreadCount = notifications.filter((item) => item.unread).length;
 
@@ -229,6 +286,10 @@ const Header = () => {
       "/profit-summary", "/followed-shops",
     ].includes(pathname);
 
+  const isUnderVerification = Boolean(
+    isAuthenticated && user && (user.isUnderVerification || user.isVerified === false)
+  );
+
   return (
     <div className="site-header animate-fade-in">
       {/* Top info bar */}
@@ -244,7 +305,20 @@ const Header = () => {
       {/* Main top bar */}
       <div className="top-bar">
         <div className="container">
-          <div className="logo" onClick={() => navigate("/")}>ReSello</div>
+          <div
+            className="logo"
+            onClick={() => navigate("/")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && navigate("/")}
+            aria-label="ReSello Home"
+          >
+            <img
+              src="/images/resello_logo_navbar.png"
+              alt="ReSello"
+              className="site-logo-img"
+            />
+          </div>
           <SearchBar />
           <div className="nav-icons">
             <button
@@ -270,6 +344,15 @@ const Header = () => {
                 <span className="notif-badge" aria-hidden="true">{cartCount}</span>
               ) : null}
               <span className="icon-label">Cart</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => goToAccountArea("/my-orders")}
+              className="icon-btn header-badge-wrap"
+              aria-label="My Orders"
+            >
+              <Package size={18} />
+              <span className="icon-label">Orders</span>
             </button>
             {/* Signed out, Alerts and Account have nothing to show, so they
                 collapse into the one thing that does: sign in. */}
@@ -354,6 +437,12 @@ const Header = () => {
                   <span className="mobile-notif-count" aria-hidden="true">{cartCount}</span>
                 ) : null}
               </button>
+              <button
+                type="button"
+                onClick={() => goToAccountArea("/my-orders", () => setShowMobileMenu(false))}
+              >
+                <Package size={18} /> My Orders
+              </button>
               {isAuthenticated ? (
                 <>
                   <button type="button" onClick={openNotifications} aria-label={notificationsLabel}>
@@ -423,7 +512,7 @@ const Header = () => {
           <div className="container">
             <ul>
               {staticPages.map((p) => (
-                <li key={p.path}>
+                 <li key={p.path}>
                   <a
                     href="#"
                     className={pathname === p.path ? "active-static-link" : ""}
@@ -436,6 +525,38 @@ const Header = () => {
             </ul>
           </div>
         </nav>
+      )}
+
+      {/* Account Under Verification Notice Bar */}
+      {isUnderVerification && (
+        <aside
+          ref={verificationBannerRef}
+          id="header-verification-banner"
+          className={`header-verification-banner ${blinkVerification ? "is-blinking" : ""}`}
+          role="alert"
+          aria-label="Notice Bar"
+          aria-live="polite"
+        >
+          <div className="container header-verification-banner-content">
+            <div className="header-verification-banner-main">
+              <AlertTriangle size={18} className="verification-banner-icon" aria-hidden="true" />
+              <span className="verification-banner-text">
+                <strong>Your account is under verification.</strong> It takes up to 24 hours to be verified by admin. During this period, you cannot place an order.
+              </span>
+            </div>
+            <button
+              type="button"
+              className="header-demo-verify-btn"
+              onClick={handleAdminVerifyDemo}
+              disabled={isVerifying}
+              aria-label="Verify account by admin (Demo)"
+              title="Demo action: Instantly approve and verify this account as admin"
+            >
+              <CheckCircle size={15} aria-hidden="true" />
+              <span>{isVerifying ? "Verifying..." : "Verify as Admin (Demo)"}</span>
+            </button>
+          </div>
+        </aside>
       )}
 
       <NotificationPanel

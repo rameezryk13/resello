@@ -116,4 +116,34 @@ describe("WalletPage - Return Penalties vs Shipping & Return", () => {
     expect(screen.queryByText("Return to vendor penalty")).not.toBeInTheDocument();
     expect(screen.getByText("Shipping & return claim (Defective item)")).toBeInTheDocument();
   });
+
+  it("renders demo release pending commission button and releases commission when clicked", async () => {
+    const postSpy = vi.spyOn(client, "post").mockResolvedValue({
+      wallet: {
+        ...mockWallet,
+        balance: 650,
+        pendingCommission: 0,
+        clearedCommission: 850,
+      },
+      releasedAmount: 200,
+      releasedOrdersCount: 1,
+      message: "Released Rs. 200 pending commission (1 order).",
+    });
+
+    render(
+      <BrowserRouter>
+        <WalletPage />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Release Pending Commission/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Release Pending Commission/i }));
+
+    await waitFor(() => {
+      expect(postSpy).toHaveBeenCalledWith("/wallet/demo-release-commission");
+    });
+  });
 });

@@ -21,8 +21,12 @@ const LOGIN_WAITING = [
 
 const BrandPanel = ({ mode }) => (
   <aside className="auth-brand">
-    <Link to="/" className="auth-brand-logo">
-      ReSello
+    <Link to="/" className="auth-brand-logo" aria-label="ReSello Home">
+      <img
+        src="/images/resello_logo_navbar.png"
+        alt="ReSello"
+        className="auth-brand-logo-img"
+      />
     </Link>
 
     {mode === "signup" ? (

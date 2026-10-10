@@ -8,6 +8,8 @@ export const TEST_USER = {
   name: "Ayesha Malik",
   email: "ayesha@example.com",
   phone: "0300 1234567",
+  isVerified: true,
+  isUnderVerification: false,
 };
 
 export const signedInAuth = (overrides = {}) => ({
@@ -17,6 +19,7 @@ export const signedInAuth = (overrides = {}) => ({
   signup: vi.fn(),
   login: vi.fn(),
   logout: vi.fn().mockResolvedValue(undefined),
+  adminVerifyUser: vi.fn().mockResolvedValue(undefined),
   ...overrides,
 });
 
@@ -27,5 +30,6 @@ export const signedOutAuth = (overrides = {}) => ({
   signup: vi.fn(),
   login: vi.fn(),
   logout: vi.fn().mockResolvedValue(undefined),
+  adminVerifyUser: vi.fn().mockResolvedValue(undefined),
   ...overrides,
 });

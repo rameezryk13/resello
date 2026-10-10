@@ -256,6 +256,7 @@ const ProductDetailPage = () => {
         />
 
         <ReviewSection
+          productId={product?.productId}
           reviewData={reviewData}
           reviewSummary={reviewSummary}
           visibleReviews={visibleReviews}

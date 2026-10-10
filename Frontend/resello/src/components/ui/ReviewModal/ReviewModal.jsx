@@ -61,11 +61,19 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
     (item) => item?.product?.productId === selectedProductId
   )?.product || cartItems[0]?.product;
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
     const validFiles = files.filter((f) => {
+      const isAllowedType = ALLOWED_TYPES.includes(f.type.toLowerCase()) || 
+        /\.(jpe?g|png|webp)$/i.test(f.name);
+      if (!isAllowedType) {
+        toast.error(`"${f.name}" is not supported. Allowed formats: JPG, JPEG, PNG, WebP.`);
+        return false;
+      }
       if (f.size > 5 * 1024 * 1024) {
         toast.error(`"${f.name}" exceeds 5MB limit.`);
         return false;
@@ -73,7 +81,7 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
       return true;
     });
 
-    const remainingSlots = 6 - images.length;
+    const remainingSlots = 5 - images.length;
     const filesToRead = validFiles.slice(0, remainingSlots);
 
     filesToRead.forEach((file) => {
@@ -81,7 +89,7 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
       reader.onloadend = () => {
         if (reader.result) {
           setImages((prev) => {
-            if (prev.length >= 6) return prev;
+            if (prev.length >= 5) return prev;
             return [...prev, reader.result];
           });
         }
@@ -111,28 +119,35 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
       return;
     }
 
-    if (images.length < 3) {
-      toast.error("Please attach a minimum of 3 pictures of the product for your review.");
+    const trimmedComment = comment.trim();
+    if (!trimmedComment) {
+      toast.error("Review text is mandatory. Please add your feedback.");
+      return;
+    }
+
+    if (trimmedComment.length > 1000) {
+      toast.error("Review text cannot exceed 1,000 characters.");
       return;
     }
 
     const targetId = selectedProductId || activeProduct?.productId;
     setSubmitting(true);
 
+    // Delivery review does not impact product rating (computed purely from Quality and Price)
     const overallAvg = Math.round(
-      ((categoryRatings.delivery + categoryRatings.quality + categoryRatings.price) / 3) * 10
+      ((categoryRatings.quality + categoryRatings.price) / 2) * 10
     ) / 10;
 
     try {
       await post(endpoints.products.addReview(targetId), {
         rating: overallAvg,
         ratings: categoryRatings,
-        comment,
+        comment: trimmedComment,
         images,
-        image: images[0],
+        image: images[0] || null,
       });
 
-      toast.success("Thank you! Your category ratings and review have been submitted.");
+      toast.success("Thank you! Your review has been submitted successfully.");
       setComment("");
       setImages([]);
       setCategoryRatings({ delivery: 5, quality: 5, price: 5 });
@@ -146,7 +161,7 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
   };
 
   const overallAvgDisplay = (
-    (categoryRatings.delivery + categoryRatings.quality + categoryRatings.price) / 3
+    (categoryRatings.quality + categoryRatings.price) / 2
   ).toFixed(1);
 
   return (
@@ -267,22 +282,28 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
           </div>
 
           <div className="review-field-group">
-            <label htmlFor="review-comment">Add Review Details</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label htmlFor="review-comment">Review Description <span style={{ color: "#ef4444" }}>*</span></label>
+              <span style={{ fontSize: "12px", color: comment.length > 900 ? "#ea580c" : "var(--color-text-muted)", fontWeight: 600 }}>
+                {comment.length} / 1,000 characters
+              </span>
+            </div>
             <textarea
               id="review-comment"
-              rows={3}
+              rows={4}
+              maxLength={1000}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Tell us what you loved about delivery, product quality, or pricing..."
+              placeholder="Write your honest product feedback (required, up to 1,000 characters)..."
               required
             />
           </div>
 
           <div className="review-field-group">
             <div className="review-photos-label-row">
-              <label>Product Pictures (Minimum 3 required) *</label>
-              <span className={`review-photos-count ${images.length >= 3 ? "valid" : ""}`}>
-                {images.length}/3 photos added
+              <label>Product Pictures (Optional, max 5)</label>
+              <span className={`review-photos-count ${images.length > 0 ? "valid" : ""}`}>
+                {images.length} / 5 photos added
               </span>
             </div>
 
@@ -304,18 +325,18 @@ const ReviewModal = ({ open, order, product, onClose, onSubmitSuccess }) => {
               </div>
             )}
 
-            {images.length < 6 && (
+            {images.length < 5 && (
               <label className="review-upload-dropzone">
                 <Camera size={22} />
                 <span>
                   {images.length === 0
-                    ? "Click to Upload Product Photos (Min 3 required)"
-                    : `Add More Photos (${images.length}/6)`}
+                    ? "Click to Upload Product Photos (Optional)"
+                    : `Add More Photos (${images.length}/5)`}
                 </span>
-                <small>PNG, JPG or WEBP (Max 5MB each)</small>
+                <small>JPG, JPEG, PNG or WebP (Max 5MB each)</small>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                   multiple
                   onChange={handleImageChange}
                   className="review-file-input"

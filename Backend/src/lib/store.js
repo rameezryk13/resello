@@ -92,18 +92,33 @@ const findUserByEmail = (email) => {
 
 const findUserById = (userId) => db.users.find((user) => user.id === userId);
 
+const isAccountUnderVerification = (user) => {
+  if (!user) return false;
+  if (user.isVerified === true) return false;
+  if (user.isVerified === false || user.verificationStatus === 'under_verification') {
+    return true;
+  }
+  return false;
+};
+
 // What the frontend is allowed to see. Every response that includes a user goes
 // through here so a passwordHash can't leak by someone spreading the record.
-const publicUser = (user) => ({
-  id: user.id,
-  name: user.name,
-  email: user.email,
-  phone: user.phone || '',
-  shopName: user.shopName || '',
-  city: user.city || '',
-  bankInfo: user.bankInfo || null,
-  createdAt: user.createdAt,
-});
+const publicUser = (user) => {
+  const underVerification = isAccountUnderVerification(user);
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone || '',
+    shopName: user.shopName || '',
+    city: user.city || '',
+    bankInfo: user.bankInfo || null,
+    createdAt: user.createdAt,
+    isVerified: user.isVerified === true,
+    isUnderVerification: underVerification,
+    verificationStatus: underVerification ? 'under_verification' : 'verified',
+  };
+};
 
 module.exports = {
   getDb,
@@ -112,5 +127,6 @@ module.exports = {
   findUserByEmail,
   findUserById,
   publicUser,
+  isAccountUnderVerification,
   DB_PATH,
 };

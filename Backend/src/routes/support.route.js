@@ -76,16 +76,30 @@ router.get('/support/issues', (req, res) => {
 
 // POST /api/support/issues - Create a new support issue
 router.post('/support/issues', (req, res) => {
-  const { issueType, description, attachments } = req.body || {};
+  const { title, issueType, description, attachments } = req.body || {};
 
   if (!issueType) {
     return res.status(400).json({ message: 'Please select an issue type.' });
   }
 
-  const words = countWords(description);
-  if (words < 5) {
+  const trimmedTitle = (title || '').trim();
+  if (trimmedTitle.length < 5 || trimmedTitle.length > 20) {
     return res.status(400).json({ 
-      message: `Description must contain at least 5 words (currently ${words} word${words === 1 ? '' : 's'}).` 
+      message: 'Title must be between 5 and 20 characters (including spaces).' 
+    });
+  }
+
+  const trimmedDesc = (description || '').trim();
+  if (trimmedDesc.length < 20 || trimmedDesc.length > 1000) {
+    return res.status(400).json({ 
+      message: 'Description must be between 20 and 1,000 characters.' 
+    });
+  }
+
+  const pics = Array.isArray(attachments) ? attachments : [];
+  if (pics.length < 1 || pics.length > 3) {
+    return res.status(400).json({ 
+      message: 'Please attach at least 1 and at most 3 pictures.' 
     });
   }
 
@@ -97,9 +111,10 @@ router.post('/support/issues', (req, res) => {
     userId: user ? user.id : 'guest',
     userEmail: user ? user.email : 'guest@resello.pk',
     userName: user ? user.name : 'Guest User',
+    title: trimmedTitle,
     issueType,
-    description: description.trim(),
-    attachments: Array.isArray(attachments) ? attachments : [],
+    description: trimmedDesc,
+    attachments: pics,
     status: 'active',
     createdAt: new Date().toISOString(),
     adminReply: null,

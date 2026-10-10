@@ -68,16 +68,32 @@ describe("ContactPage render and interaction tests", () => {
   });
 
   it("submits a support request and displays it in active issues", async () => {
+    // Mock URL.createObjectURL for test environment
+    if (!window.URL.createObjectURL) {
+      window.URL.createObjectURL = () => "mock-image-url";
+    }
+
     render(
       <BrowserRouter>
         <ContactPage />
       </BrowserRouter>
     );
 
+    const titleInput = screen.getByPlaceholderText(/Broken watch screen/i);
+    fireEvent.change(titleInput, {
+      target: { value: "Late parcel check" },
+    });
+
     const textarea = screen.getByPlaceholderText(/Describe your issue clearly/i);
     fireEvent.change(textarea, {
       target: { value: "My order has not arrived yet for five whole days" },
     });
+
+    const file = new File(["dummy content"], "parcel_proof.png", { type: "image/png" });
+    const fileInput = document.getElementById("file-input-element");
+    if (fileInput) {
+      fireEvent.change(fileInput, { target: { files: [file] } });
+    }
 
     const submitBtn = screen.getByRole("button", { name: /Submit Support Request/i });
     await waitFor(() => {

@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import CheckoutPage from "./CheckoutPage";
 import * as client from "@/api/client";
 import endpoints from "@/api/endpoints";
+import { AuthContext } from "@/context/AuthContext";
+import { signedInAuth, TEST_USER } from "@/test/authFixtures";
 
 // Header pulls in SearchBar, its own network calls and now useAuth; none of
 // that is under test here. The specifier has to match the one CheckoutPage
@@ -297,6 +299,39 @@ describe("CheckoutPage deactivated account", () => {
   });
 });
 
+describe("CheckoutPage under verification account", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("disables the buy button and displays the verification notice", async () => {
+    const user = userEvent.setup();
+    mockLoad();
+    const post = vi.spyOn(client, "post").mockResolvedValue({ order: { orderId: "ORD-1" } });
+
+    render(
+      <AuthContext.Provider value={signedInAuth({ user: { ...TEST_USER, isVerified: false, isUnderVerification: true } })}>
+        <BrowserRouter>
+          <CheckoutPage />
+        </BrowserRouter>
+      </AuthContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading checkout/i)).not.toBeInTheDocument();
+    });
+
+    const button = screen.getByRole("button", { name: /Account under verification/i });
+    expect(button).toBeDisabled();
+
+    expect(screen.getByText("Account Under Verification")).toBeInTheDocument();
+    expect(screen.getByText(/takes up to 24 hours for admin verification/i)).toBeInTheDocument();
+
+    await user.click(button);
+    expect(post).not.toHaveBeenCalled();
+  });
+});
+
 describe("CheckoutPage payment validation", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -401,5 +436,80 @@ describe("CheckoutPage load failure", () => {
     );
 
     expect(await screen.findByText("Checkout service unavailable")).toBeInTheDocument();
+  });
+});
+
+describe("CheckoutPage new address preview and edit", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("previews the full address when clicking Save Address, allows editing, and saves on Confirm Address", async () => {
+    const user = userEvent.setup();
+    await renderCheckout();
+
+    // Open add address form
+    await user.click(screen.getByRole("button", { name: /Add new address/i }));
+
+    // Fill form
+    await user.type(screen.getByLabelText(/^Name\*/i), "Zainab Bibi");
+    await user.type(screen.getByLabelText(/Street Address \/ House No\.\*/i), "House 45, Street 12");
+    await user.type(screen.getByLabelText(/Area \/ Sector\*/i), "Sector F-10/2");
+    await user.type(screen.getByLabelText(/Town\*/i), "Blue Area");
+    await user.type(screen.getByLabelText(/^City\*/i), "Islamabad");
+    await user.clear(screen.getByLabelText(/^Phone Number/i));
+    await user.type(screen.getByLabelText(/^Phone Number/i), "121234567");
+
+    // Click "Save Address" on form -> transitions to Preview
+    await user.click(screen.getByRole("button", { name: /^Save Address$/i }));
+
+    // Verify preview is displayed with complete formatted address
+    expect(screen.getByText("Full Address Preview")).toBeInTheDocument();
+    expect(screen.getByText(/House 45, Street 12, Sector F-10\/2, Blue Area, Islamabad/i)).toBeInTheDocument();
+    expect(screen.getByText("Zainab Bibi")).toBeInTheDocument();
+
+    // Click "Edit Address" to make changes
+    await user.click(screen.getByRole("button", { name: /Edit Address/i }));
+
+    // Form inputs are visible again and editable
+    const nameInput = screen.getByLabelText(/^Name\*/i);
+    expect(nameInput).toHaveValue("Zainab Bibi");
+    await user.clear(nameInput);
+    await user.type(nameInput, "Zainab Khan");
+
+    // Click "Save Address" again to review updated preview
+    await user.click(screen.getByRole("button", { name: /^Save Address$/i }));
+    expect(screen.getByText("Zainab Khan")).toBeInTheDocument();
+
+    // Mock backend address save
+    const post = vi.spyOn(client, "post").mockResolvedValue({
+      addresses: [
+        ADDRESS,
+        {
+          id: "a2",
+          name: "Zainab Khan",
+          line1: "House 45, Street 12",
+          area: "Sector F-10/2",
+          town: "Blue Area",
+          city: "Islamabad",
+          phone: "+923121234567",
+        },
+      ],
+    });
+
+    // Click "Confirm Address" to finalize and save
+    await user.click(screen.getByRole("button", { name: /Confirm Address/i }));
+
+    await waitFor(() => {
+      expect(post).toHaveBeenCalledWith(
+        endpoints.addresses,
+        expect.objectContaining({
+          name: "Zainab Khan",
+          line1: "House 45, Street 12",
+          city: "Islamabad",
+          phone: "+923121234567",
+        })
+      );
+    });
   });
 });

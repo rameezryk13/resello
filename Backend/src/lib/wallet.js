@@ -477,6 +477,91 @@ function walletSummary(bucket, orders = []) {
   };
 }
 
+function releasePendingCommissions(bucket, summarizeOrderFn) {
+  ensureWallet(bucket);
+  const orders = bucket.orders || [];
+
+  const pendingOrders = orders.filter((order) => {
+    const status = resolveStatus(order);
+    return status !== CLEARING_STATUS && !DEAD_STATUSES.includes(status);
+  });
+
+  let releasedAmount = 0;
+  let releasedOrdersCount = 0;
+
+  if (pendingOrders.length > 0) {
+    pendingOrders.forEach((order) => {
+      order.status = CLEARING_STATUS;
+      if (!order.deliveredAt) {
+        order.deliveredAt = new Date().toISOString();
+      }
+      const summary = typeof summarizeOrderFn === 'function' ? summarizeOrderFn(order) : order;
+      const profit = toAmount(summary?.profit ?? order?.profit);
+      settleOrder(bucket, order, profit);
+      releasedAmount += profit;
+      releasedOrdersCount++;
+
+      bucket.notifications = bucket.notifications || [];
+      const exists = bucket.notifications.some(
+        (n) => n.orderId === order.orderId && n.type === 'review'
+      );
+      if (!exists && order.orderId) {
+        bucket.notifications.unshift({
+          id: `notif_review_${order.orderId}_${Date.now()}`,
+          type: 'review',
+          title: 'Order Delivered - Give a Review!',
+          message: `Order ${order.orderId} was delivered. Your commission of Rs. ${profit} has cleared into your wallet!`,
+          time: 'Just now',
+          unread: true,
+          orderId: order.orderId,
+          order: summary,
+        });
+      }
+    });
+  } else {
+    const demoProfit = 300;
+    const demoOrderId = `ORD-DEMO-${Date.now().toString().slice(-6)}`;
+    const demoOrder = {
+      orderId: demoOrderId,
+      status: CLEARING_STATUS,
+      deliveredAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      cart: [
+        {
+          quantity: 1,
+          profit: demoProfit,
+          product: { price: '1,200', title: 'Demo Reseller Product' },
+        },
+      ],
+      totalAmount: 1200,
+      profit: demoProfit,
+    };
+    bucket.orders = bucket.orders || [];
+    bucket.orders.unshift(demoOrder);
+    settleOrder(bucket, demoOrder, demoProfit);
+    releasedAmount = demoProfit;
+    releasedOrdersCount = 1;
+
+    bucket.notifications = bucket.notifications || [];
+    bucket.notifications.unshift({
+      id: `notif_demo_${Date.now()}`,
+      type: 'review',
+      title: 'Demo Commission Released!',
+      message: `Demo order ${demoOrderId} delivered. Rs. ${demoProfit} commission credited to wallet!`,
+      time: 'Just now',
+      unread: true,
+      orderId: demoOrderId,
+    });
+  }
+
+  recomputeBalance(bucket);
+
+  return {
+    releasedAmount: round2(releasedAmount),
+    releasedOrdersCount,
+  };
+}
+
 module.exports = {
   RETURN_PENALTY,
   DEACTIVATION_THRESHOLD,
@@ -502,4 +587,5 @@ module.exports = {
   approveWithdrawalRequest,
   rejectWithdrawalRequest,
   walletSummary,
+  releasePendingCommissions,
 };

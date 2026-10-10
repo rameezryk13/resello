@@ -102,8 +102,8 @@ const DEMO_ACCOUNTS = [
       { status: 'Delivered', daysAgo: 12, items: [[4, 1, 180]] },
       { status: 'Delivered', daysAgo: 6, items: [[7, 1, 220]], paymentType: 'advance' },
       { status: 'Under Verification', daysAgo: 3, items: [[9, 1, 120]] },
-      { status: 'In-progress', daysAgo: 2, items: [[12, 1, 150]] },
-      { status: 'In-progress', daysAgo: 1, items: [[15, 2, 200]] },
+      { status: 'In Transit', daysAgo: 2, items: [[12, 1, 150]] },
+      { status: 'In Transit', daysAgo: 1, items: [[15, 2, 200]] },
     ],
   },
   {
@@ -118,7 +118,7 @@ const DEMO_ACCOUNTS = [
       { status: 'Delivered', daysAgo: 21, items: [[2, 1, 100]] },
       { status: 'Returned', daysAgo: 14, items: [[5, 1, 90]], deliveredFirst: true },
       { status: 'Returned', daysAgo: 8, items: [[8, 1, 130]] },
-      { status: 'In-progress', daysAgo: 2, items: [[11, 1, 180]] },
+      { status: 'In Transit', daysAgo: 2, items: [[11, 1, 180]] },
     ],
   },
   {
@@ -137,7 +137,7 @@ const DEMO_ACCOUNTS = [
       { status: 'Returned', daysAgo: 15, items: [[16, 2, 95]] },
       { status: 'Returned', daysAgo: 9, items: [[19, 1, 140]] },
       { status: 'Returned', daysAgo: 4, items: [[22, 1, 65]] },
-      { status: 'In-progress', daysAgo: 1, items: [[25, 1, 210]] },
+      { status: 'In Transit', daysAgo: 1, items: [[25, 1, 210]] },
     ],
   },
 ];

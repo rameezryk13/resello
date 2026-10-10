@@ -11,6 +11,8 @@ const WalletBalanceBanner = ({
   setAmount,
   submitting,
   onWithdrawRequest,
+  onReleaseCommission,
+  releasingCommission = false,
 }) => {
   const { withdrawal } = wallet;
 
@@ -33,9 +35,20 @@ const WalletBalanceBanner = ({
       </div>
 
       <div className="wallet-banner-side">
-        <div className="wallet-banner-stat">
+        <div className="wallet-banner-stat wallet-banner-stat-pending">
           <span>Pending commission</span>
           <strong>{loading ? "—" : formatRupees(wallet.pendingCommission)}</strong>
+          {wallet.pendingCommission > 0 && onReleaseCommission && (
+            <button
+              type="button"
+              className="wallet-stat-release-btn"
+              onClick={onReleaseCommission}
+              disabled={releasingCommission}
+              title="Demo action: Release pending commission into wallet balance"
+            >
+              {releasingCommission ? "Releasing…" : "⚡ Demo: Release"}
+            </button>
+          )}
         </div>
         <div className="wallet-banner-stat">
           <span>Cleared</span>

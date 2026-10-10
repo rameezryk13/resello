@@ -53,6 +53,24 @@ const Row = ({ title, products, showViewAll = true, rowId }) => {
           {products.map((product) => (
             <Product key={product.productId} product={product} />
           ))}
+          {showViewAll && (
+            <div
+              className="row-see-all-card"
+              onClick={handleViewAll}
+              role="button"
+              tabIndex={0}
+              aria-label={`See all ${title || "products"}`}
+            >
+              <div className="see-all-card-inner">
+                <span className="see-all-arrow" aria-hidden="true">→</span>
+                <span className="see-all-title">See all</span>
+                <span className="see-all-subtitle">
+                  <span className="see-all-icon">✨</span>
+                  <span>{title || "Featured"}</span>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

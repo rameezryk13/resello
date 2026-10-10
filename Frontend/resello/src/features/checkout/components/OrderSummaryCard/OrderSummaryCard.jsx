@@ -20,6 +20,7 @@ const OrderSummaryCard = ({
   submitting,
   selectedAddressId,
   deactivated = false,
+  isUnderVerification = false,
   wallet,
   onPrimaryAction,
 }) => {
@@ -108,29 +109,41 @@ const OrderSummaryCard = ({
               <div
                 className="buy-now-btn-container"
                 onClick={() => {
-                  if (deactivated) {
+                  if (deactivated || isUnderVerification) {
                     onPrimaryAction?.();
                   }
                 }}
               >
                 <button
                   type="button"
-                  className={`buy-now-btn ${deactivated ? "disabled-deactivated" : ""}`}
+                  className={`buy-now-btn ${deactivated || isUnderVerification ? "disabled-deactivated" : ""}`}
                   onClick={onPrimaryAction}
                   disabled={
-                    submitting || deactivated || cartItems.length === 0 || !selectedAddressId
+                    submitting || deactivated || isUnderVerification || cartItems.length === 0 || !selectedAddressId
                   }
                 >
-                  {deactivated
-                    ? "Account deactivated"
-                    : submitting
-                      ? "Processing..."
-                      : orderPaymentType === "cod"
-                        ? "Buy Now"
-                        : "Pay Now"}
+                  {isUnderVerification
+                    ? "Account under verification"
+                    : deactivated
+                      ? "Account deactivated"
+                      : submitting
+                        ? "Processing..."
+                        : orderPaymentType === "cod"
+                          ? "Buy Now"
+                          : "Pay Now"}
                 </button>
               </div>
-              {deactivated ? (
+              {isUnderVerification ? (
+                <div className="account-disabled-badge-msg" role="status" style={{ borderColor: "#fca5a5", background: "#fef2f2" }}>
+                  <span className="account-disabled-badge-icon">⏳</span>
+                  <div className="account-disabled-badge-body">
+                    <strong style={{ color: "#b91c1c" }}>Account Under Verification</strong>
+                    <p className="account-disabled-badge-desc" style={{ color: "#dc2626" }}>
+                      Your account is under verification (takes up to 24 hours for admin verification). During this period, you cannot place an order.
+                    </p>
+                  </div>
+                </div>
+              ) : deactivated ? (
                 <div className="account-disabled-badge-msg" role="status">
                   <span className="account-disabled-badge-icon">⚠️</span>
                   <div className="account-disabled-badge-body">

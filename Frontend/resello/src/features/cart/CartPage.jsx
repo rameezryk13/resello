@@ -6,6 +6,7 @@ import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import EmptyState from "@/components/ui/EmptyState/EmptyState";
 import AccountAlert from "@/components/sections/AccountAlert";
+import { useAuth } from "@/context/AuthContext";
 import useWallet from "@/features/wallet/useWallet";
 import { formatRupees, parsePrice } from "@/utils/currency";
 import "./CartPage.css";
@@ -13,7 +14,9 @@ import "./CartPage.css";
 const formatMoney = (value) => formatRupees(value);
 
 const CartPage = () => {
+  const { user } = useAuth();
   const { wallet } = useWallet();
+  const isUnderVerification = Boolean(user && (user.isUnderVerification || user.isVerified === false));
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -293,13 +296,37 @@ const CartPage = () => {
                   <span>Total</span>
                   <span>{formatMoney(total)}</span>
                 </div>
+                {isUnderVerification && (
+                  <div
+                    className="cart-verification-notice"
+                    role="alert"
+                    style={{
+                      color: "#b91c1c",
+                      background: "#fef2f2",
+                      border: "1px solid #fca5a5",
+                      borderRadius: "6px",
+                      padding: "10px 12px",
+                      fontSize: "0.85rem",
+                      marginTop: "12px",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <strong>Account Under Verification:</strong> It takes up to 24 hours for admin verification. During this period, you cannot place an order.
+                  </div>
+                )}
                 <button
                   type="button"
-                  className="checkout-btn"
-                  onClick={() => navigate("/checkout")}
-                  disabled={cartItems.length === 0}
+                  className={`checkout-btn ${isUnderVerification ? "disabled-btn" : ""}`}
+                  onClick={() => {
+                    if (isUnderVerification) {
+                      setError("Your account is under verification. It takes up to 24 hours for admin verification. During this period, you cannot place an order.");
+                      return;
+                    }
+                    navigate("/checkout");
+                  }}
+                  disabled={cartItems.length === 0 || isUnderVerification}
                 >
-                  Go to Checkout
+                  {isUnderVerification ? "Account Under Verification" : "Go to Checkout"}
                 </button>
               </aside>
             </div>

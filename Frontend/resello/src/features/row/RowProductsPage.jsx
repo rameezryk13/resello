@@ -5,6 +5,7 @@ import endpoints from "@/api/endpoints";
 import Header from "@/components/layout/Header/Header.jsx";
 import Product from "@/components/catalog/Product/Product.jsx";
 import EmptyState from "@/components/ui/EmptyState/EmptyState";
+import CatalogLayout from "@/components/catalog/CatalogLayout/CatalogLayout.jsx";
 import "./RowProductsPage.css";
 
 const RowProductsPage = () => {
@@ -70,35 +71,25 @@ const RowProductsPage = () => {
   return (
     <div className="row-products-page animate-fade-in">
       <Header />
-      <div className="container row-products-content">
-        <div className="row-products-header">
-          <div>
-            <h1>{title || "Products"}</h1>
-            {!loading && !error ? (
-              <p className="row-products-count">
-                {products.length} {products.length === 1 ? "product" : "products"}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        {loading ? (
+      {loading ? (
+        <div className="container" style={{ padding: "60px 0" }}>
           <EmptyState variant="loading" title="Loading products..." />
-        ) : error ? (
+        </div>
+      ) : error ? (
+        <div className="container" style={{ padding: "60px 0" }}>
           <EmptyState variant="error" title="Could not load this section" description={error} />
-        ) : products.length === 0 ? (
-          <EmptyState
-            title="No products here yet"
-            description="No products available in this section."
-          />
-        ) : (
-          <div className="row-products-grid">
-            {products.map((product) => (
-              <Product key={product.productId} product={product} showCategory />
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <CatalogLayout
+          products={products}
+          pageTitle={title || "Products"}
+          badgeText={title || "Seller Deals"}
+          breadcrumbItems={[
+            { label: "Home", path: "/" },
+            { label: title || "Products" },
+          ]}
+        />
+      )}
     </div>
   );
 };

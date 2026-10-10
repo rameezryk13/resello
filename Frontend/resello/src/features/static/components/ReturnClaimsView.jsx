@@ -24,6 +24,72 @@ const formatDate = (value) => {
   });
 };
 
+const ReturnProofDisplay = ({ req, contextLabel = "Attached" }) => {
+  if (!req) return null;
+  const video = req.videoUrl || (req.mediaType === "video" ? req.mediaUrl : null);
+  const images =
+    Array.isArray(req.images) && req.images.length > 0
+      ? req.images
+      : req.mediaType !== "video" && req.mediaUrl
+      ? [req.mediaUrl]
+      : [];
+
+  if (!video && images.length === 0) return null;
+
+  return (
+    <div className="returned-proofs-container">
+      {/* Video Proof */}
+      {video && (
+        <div className="returned-media-attached-box">
+          <span className="returned-media-label">
+            <Video size={14} /> {contextLabel} Video Proof
+          </span>
+          {typeof video === "string" && video.startsWith("http") ? (
+            <a
+              href={video}
+              target="_blank"
+              rel="noreferrer"
+              className="returned-media-link"
+            >
+              <FileVideo size={16} /> Open Video Proof <ExternalLink size={12} />
+            </a>
+          ) : (
+            <video src={video} controls className="returned-preview-video" />
+          )}
+        </div>
+      )}
+
+      {/* Pictures Proof */}
+      {images.length > 0 && (
+        <div className="returned-media-attached-box">
+          <span className="returned-media-label">
+            <ImageIcon size={14} /> {contextLabel} Photos ({images.length}
+            {images.length >= 3 ? " • Requirement met" : ""})
+          </span>
+          <div className="returned-proof-photos-row">
+            {images.map((imgUrl, idx) => (
+              <a
+                key={idx}
+                href={imgUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="returned-proof-photo-link"
+                title={`Open Photo #${idx + 1}`}
+              >
+                <img
+                  src={imgUrl}
+                  alt={`Defect photo proof ${idx + 1}`}
+                  className="returned-proof-thumb"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ReturnClaimsView = ({
   historySectionFilter,
   setHistorySectionFilter,
@@ -148,47 +214,7 @@ const ReturnClaimsView = ({
                         </div>
 
                         {/* Media Proof Preview */}
-                        {req.mediaUrl && (
-                          <div className="returned-media-attached-box">
-                            <span className="returned-media-label">
-                              {req.mediaType === "video" ? (
-                                <>
-                                  <Video size={14} /> Attached Video Proof
-                                </>
-                              ) : (
-                                <>
-                                  <ImageIcon size={14} /> Attached Picture Proof
-                                </>
-                              )}
-                            </span>
-
-                            {req.mediaType === "video" ? (
-                              req.mediaUrl.startsWith("http") ? (
-                                <a
-                                  href={req.mediaUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="returned-media-link"
-                                >
-                                  <FileVideo size={16} /> Open Video Proof{" "}
-                                  <ExternalLink size={12} />
-                                </a>
-                              ) : (
-                                <video
-                                  src={req.mediaUrl}
-                                  controls
-                                  className="returned-preview-video"
-                                />
-                              )
-                            ) : (
-                              <img
-                                src={req.mediaUrl}
-                                alt="Defect proof"
-                                className="returned-proof-thumb"
-                              />
-                            )}
-                          </div>
-                        )}
+                        <ReturnProofDisplay req={req} contextLabel="Attached" />
 
                         {/* Admin Financial Settlement Strip */}
                         <div className="order-admin-clearance-strip pending">
@@ -407,47 +433,7 @@ const ReturnClaimsView = ({
                     </div>
 
                     {/* Media Proof Preview if attached */}
-                    {req?.mediaUrl && (
-                      <div className="returned-media-attached-box">
-                        <span className="returned-media-label">
-                          {req.mediaType === "video" ? (
-                            <>
-                              <Video size={14} /> Verified Defect Video
-                            </>
-                          ) : (
-                            <>
-                              <ImageIcon size={14} /> Verified Defect Photo
-                            </>
-                          )}
-                        </span>
-
-                        {req.mediaType === "video" ? (
-                          req.mediaUrl.startsWith("http") ? (
-                            <a
-                              href={req.mediaUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="returned-media-link"
-                            >
-                              <FileVideo size={16} /> View Attached Video Proof{" "}
-                              <ExternalLink size={12} />
-                            </a>
-                          ) : (
-                            <video
-                              src={req.mediaUrl}
-                              controls
-                              className="returned-preview-video"
-                            />
-                          )
-                        ) : (
-                          <img
-                            src={req.mediaUrl}
-                            alt="Defect proof"
-                            className="returned-proof-thumb"
-                          />
-                        )}
-                      </div>
-                    )}
+                    <ReturnProofDisplay req={req} contextLabel="Verified" />
 
                     {/* Admin Financial Settlement Strip */}
                     <div className="order-admin-clearance-strip cleared">
@@ -595,47 +581,7 @@ const ReturnClaimsView = ({
                     </div>
 
                     {/* Media Proof Preview if attached */}
-                    {req?.mediaUrl && (
-                      <div className="returned-media-attached-box">
-                        <span className="returned-media-label">
-                          {req.mediaType === "video" ? (
-                            <>
-                              <Video size={14} /> Submitted Video Proof
-                            </>
-                          ) : (
-                            <>
-                              <ImageIcon size={14} /> Submitted Picture Proof
-                            </>
-                          )}
-                        </span>
-
-                        {req.mediaType === "video" ? (
-                          req.mediaUrl.startsWith("http") ? (
-                            <a
-                              href={req.mediaUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="returned-media-link"
-                            >
-                              <FileVideo size={16} /> Open Video Proof{" "}
-                              <ExternalLink size={12} />
-                            </a>
-                          ) : (
-                            <video
-                              src={req.mediaUrl}
-                              controls
-                              className="returned-preview-video"
-                            />
-                          )
-                        ) : (
-                          <img
-                            src={req.mediaUrl}
-                            alt="Defect proof"
-                            className="returned-proof-thumb"
-                          />
-                        )}
-                      </div>
-                    )}
+                    <ReturnProofDisplay req={req} contextLabel="Submitted" />
 
                     {/* Admin Financial Settlement Strip */}
                     <div className="order-admin-clearance-strip rejected">
