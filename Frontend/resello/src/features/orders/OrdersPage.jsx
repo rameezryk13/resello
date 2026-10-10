@@ -138,33 +138,6 @@ const OrdersPage = () => {
         <AccountHero title="My Orders" description="Track every order placed from your reseller account. Items from different suppliers ship as separate orders, each with its own total, profit, and shipping." />
 
         <section className="account-section">
-          {/* Top Metric Cards showing count of all instances (e.g. Total Orders, In-progress, Delivered, etc.) */}
-          <div className="orders-summary-bar">
-            <div
-              className={`orders-summary-card ${activeStatus === ALL_STATUSES ? "active" : ""}`}
-              onClick={() => setActiveStatus(ALL_STATUSES)}
-              role="button"
-              tabIndex={0}
-            >
-              <span className="summary-card-label">Total Orders</span>
-              <strong className="summary-card-count">{totalOrdersCount}</strong>
-            </div>
-            {ORDER_STATUSES.map((status) => {
-              const count = statusCounts[status] || 0;
-              return (
-                <div
-                  key={status}
-                  className={`orders-summary-card ${activeStatus === status ? "active" : ""}`}
-                  onClick={() => setActiveStatus(status)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="summary-card-label">{status}</span>
-                  <strong className="summary-card-count">{count}</strong>
-                </div>
-              );
-            })}
-          </div>
 
           <div className="orders-toolbar">
             <div className="orders-status-tabs" role="tablist" aria-label="Order status filters">
