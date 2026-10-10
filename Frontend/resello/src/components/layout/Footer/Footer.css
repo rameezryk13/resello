@@ -173,6 +173,158 @@
   transform: translateX(3px);
 }
 
+.footer-link.highlight-gold {
+  color: #d97706 !important;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-link.highlight-gold:hover {
+  color: #b45309 !important;
+}
+
+.footer-inline-truck-icon {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.footer-link.highlight-red {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+.footer-link.highlight-red:hover {
+  color: #b91c1c !important;
+}
+
+/* Delivery card */
+.footer-delivery-card {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--color-white);
+  border: 1px solid rgba(255, 140, 0, 0.25);
+  border-radius: var(--radius-sm-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.footer-delivery-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+
+.footer-delivery-title strong {
+  color: var(--color-text-primary);
+}
+
+.footer-delivery-text {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Office & Developer Info */
+.footer-office-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-office-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.footer-developer-credit {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border-medium);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dev-credit-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.dev-credit-label strong {
+  color: var(--color-text-primary);
+}
+
+.dev-credit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.dev-credit-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Bottom Bar */
+.footer-bottom-bar {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.footer-bottom-copy p {
+  margin: 0;
+}
+
+.footer-bottom-dev {
+  margin-top: 4px !important;
+  font-size: 0.78rem;
+}
+
+.footer-bottom-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-bottom-nav button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.footer-bottom-nav button:hover {
+  color: var(--color-primary);
+}
+
 @media (max-width: 1200px) {
   .footer-grid {
     grid-template-columns: minmax(260px, 1.2fr) repeat(2, minmax(180px, 1fr));

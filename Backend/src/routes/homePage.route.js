@@ -737,6 +737,19 @@ router.put('/addresses/:addressId', requireAuth, (req, res) => {
   res.json({ addresses: bucket.addresses, address });
 });
 
+router.delete('/addresses/:addressId', requireAuth, (req, res) => {
+  const bucket = userBucket(req.user.id);
+  const index = bucket.addresses.findIndex((addr) => addr.id === req.params.addressId);
+
+  if (index === -1) {
+    return res.status(404).json({ message: 'Address not found' });
+  }
+
+  bucket.addresses.splice(index, 1);
+  saveDb();
+  res.json({ addresses: bucket.addresses, message: 'Address deleted successfully' });
+});
+
 router.post('/orders', requireAuth, (req, res) => {
   const { addressId, cart: cartPayload, totalAmount, shippingCharge, paymentType } = req.body;
   const bucket = userBucket(req.user.id);

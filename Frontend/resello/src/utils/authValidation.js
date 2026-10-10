@@ -10,6 +10,16 @@
 // like "ayesha@gmail", don't adjudicate RFC 5322.
 export const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value ?? "").trim());
 
+// Names must be between 2 and 50 characters, contain only letters (supports Unicode),
+// spaces, dots, hyphens, and apostrophes, and contain at least 2 actual letters.
+export const isValidName = (value) => {
+  const trimmed = String(value ?? "").trim();
+  if (trimmed.length < 2 || trimmed.length > 50) return false;
+  if (!/^[\p{L}\s.'-]+$/u.test(trimmed)) return false;
+  const letters = trimmed.match(/\p{L}/gu) || [];
+  return letters.length >= 2;
+};
+
 // Pakistani mobile numbers are 03XX XXXXXXX locally, +92 3XX XXXXXXX in
 // international form. Both reach the same handset, so both are accepted, along
 // with the spaces and dashes people naturally type.

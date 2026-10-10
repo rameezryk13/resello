@@ -43,6 +43,7 @@ const CheckoutPage = () => {
     newAddress,
     handleNewAddressChange,
     submitNewAddress,
+    deleteAddress,
     handleAddressSelect,
     paymentMethod,
     setPaymentMethod,
@@ -117,6 +118,7 @@ const CheckoutPage = () => {
               newAddress={newAddress}
               onNewAddressChange={handleNewAddressChange}
               onSubmitNewAddress={submitNewAddress}
+              onDeleteAddress={deleteAddress}
               submitting={submitting}
               orderPaymentType={orderPaymentType}
               setOrderPaymentType={setOrderPaymentType}

@@ -442,6 +442,8 @@ export async function handleMockRequest(endpoint, options = {}) {
         id: `addr_${Date.now()}`,
         name: body.name || "Default Address",
         line1: body.line1 || "",
+        area: body.area || "",
+        town: body.town || "",
         line2: body.line2 || "",
         city: body.city || "Islamabad",
         phone: body.phone || "+92 300 1234567",
@@ -449,9 +451,27 @@ export async function handleMockRequest(endpoint, options = {}) {
       };
       addrs.push(newAddr);
       setAddresses(addrs);
-      return { addresses: addrs };
+      return { addresses: addrs, address: newAddr };
     }
     return { addresses: addrs };
+  }
+
+  if (path.startsWith("/addresses/")) {
+    const addrId = decodeURIComponent(path.split("/")[2]);
+    let addrs = getAddresses();
+    if (method === "DELETE") {
+      addrs = addrs.filter((a) => a.id !== addrId);
+      setAddresses(addrs);
+      return { addresses: addrs, message: "Address deleted successfully" };
+    }
+    if (method === "PUT") {
+      const idx = addrs.findIndex((a) => a.id === addrId);
+      if (idx !== -1) {
+        addrs[idx] = { ...addrs[idx], ...body };
+        setAddresses(addrs);
+        return { addresses: addrs, address: addrs[idx] };
+      }
+    }
   }
 
   // --- ORDERS ---

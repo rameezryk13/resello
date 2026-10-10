@@ -6,6 +6,7 @@ import { useToast } from "@/context/ToastContext";
 import Header from "@/components/layout/Header/Header";
 import Row from "@/components/catalog/Row/Row";
 import AdBanner from "@/components/common/AdBanner/AdBanner";
+import ChinaBanner from "@/components/common/ChinaBanner/ChinaBanner";
 import MoreProducts from "./components/MoreProducts/MoreProducts";
 import Events from "./components/Events/Events";
 import ShopByCategory from "./components/ShopByCategory/ShopByCategory";
@@ -112,6 +113,8 @@ const Home = () => {
             {index === 1 && <AdBanner />}
           </Fragment>
         ))}
+
+        <ChinaBanner />
 
         <div ref={moreProductsRef}>
           <MoreProducts externalCategory={activeCategory} visualCategories={visualCategories} />

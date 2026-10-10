@@ -50,6 +50,7 @@ export const endpoints = {
   favorites: "/favorites",
   followedShops: "/followed-shops",
   addresses: "/addresses",
+  address: (id) => `/addresses/${enc(id)}`,
   orders: "/orders",
   // The demo status switcher on My Orders; stands in for a courier webhook.
   orderStatus: (orderId) => `/orders/${enc(orderId)}/status`,

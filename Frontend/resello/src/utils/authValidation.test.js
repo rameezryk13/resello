@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isValidEmail,
+  isValidName,
   isValidPakistanPhone,
   passwordStrength,
   MIN_PASSWORD_LENGTH,
@@ -39,6 +40,29 @@ describe("isValidEmail", () => {
     expect(isValidEmail("")).toBe(false);
     expect(isValidEmail(null)).toBe(false);
     expect(isValidEmail(undefined)).toBe(false);
+  });
+});
+
+describe("isValidName", () => {
+  it("accepts a normal first and last name", () => {
+    expect(isValidName("Muhammad Rameez")).toBe(true);
+  });
+
+  it("accepts names with apostrophes or hyphens", () => {
+    expect(isValidName("O'Connor-Smith")).toBe(true);
+    expect(isValidName("Dr. Ali Khan")).toBe(true);
+  });
+
+  it("rejects names with numbers or symbols", () => {
+    expect(isValidName("Rameez123")).toBe(false);
+    expect(isValidName("Ali@Khan")).toBe(false);
+    expect(isValidName("$$$")).toBe(false);
+  });
+
+  it("rejects single letter or empty input", () => {
+    expect(isValidName("")).toBe(false);
+    expect(isValidName("A")).toBe(false);
+    expect(isValidName("   ")).toBe(false);
   });
 });
 

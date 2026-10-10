@@ -41,6 +41,10 @@ router.post('/auth/signup', async (req, res) => {
       return res.status(400).json({ message: 'Name, email, phone number and password are required.' });
     }
 
+    if (name.length < 2 || !/^[\p{L}\s.'-]+$/u.test(name)) {
+      return res.status(400).json({ message: 'Please enter a valid full name (letters only, at least 2 characters).' });
+    }
+
     const cleanPhone = phone.replace(/[\s()-]/g, '');
     if (!/^(?:\+92|0092|0)3\d{9}$/.test(cleanPhone)) {
       return res.status(400).json({ message: 'Use a valid Pakistani mobile number, like 0300 1234567.' });

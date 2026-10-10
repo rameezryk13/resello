@@ -71,26 +71,25 @@
 }
 
 .searchbar-btn {
-  background: var(--color-primary);
+  background: #0f172a;
   border: none;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   min-width: 44px;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
-  transition: background 0.2s;
+  color: #ffffff;
+  transition: background 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
   font-size: clamp(0.8rem, 1.5vw, 0.9rem);
 }
 
 .searchbar-btn:hover {
-  background: var(--color-primary-dark);
-  /* flagged — reseller's --color-accent-hover-soft (#ea6c0a) has no
-     distinct vendor equivalent; primary-dark is the closest role */
+  background: #1e293b;
+  color: #fb923c;
 }
 
 /* Dropdown */

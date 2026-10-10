@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import {
   isValidEmail,
+  isValidName,
   isValidPakistanPhone,
   MIN_PASSWORD_LENGTH,
 } from "@/utils/authValidation";
@@ -60,7 +61,13 @@ const AuthPage = ({ mode }) => {
   const validate = () => {
     const next = {};
 
-    if (isSignup && !values.name.trim()) next.name = "Enter your name.";
+    if (isSignup) {
+      if (!values.name.trim()) {
+        next.name = "Enter your name.";
+      } else if (!isValidName(values.name)) {
+        next.name = "Please enter a valid full name (letters only, at least 2 characters).";
+      }
+    }
 
     if (!values.email.trim()) next.email = "Enter your email.";
     else if (!isValidEmail(values.email)) next.email = "Enter a valid email address.";

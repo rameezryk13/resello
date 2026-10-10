@@ -338,11 +338,9 @@
     margin-bottom: 14px;
   }
 
-  /* Lower floor keeps the 3-up density phones had before, while still
-     collapsing on its own below ~320px instead of overflowing. */
   .more-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(105px, 100%), 1fr));
-    gap: var(--space-2xs);
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
 
   .filter-bar {
@@ -420,8 +418,8 @@
   }
 
   .more-products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr));
-    gap: var(--space-3xs);
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
   }
 
   .filter-bar {

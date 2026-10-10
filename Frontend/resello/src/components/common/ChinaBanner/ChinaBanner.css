@@ -1,0 +1,150 @@
+.china-banner-wrapper {
+  margin: 36px 0 24px;
+  width: 100%;
+}
+
+.china-banner-card {
+  position: relative;
+  background: linear-gradient(108deg, #fef4e8 0%, #fee5c5 48%, #fbd5a5 100%);
+  border-radius: 24px;
+  border: 1px solid rgba(251, 146, 60, 0.28);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.06);
+  padding: 40px 48px;
+}
+
+.china-banner-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.china-banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.china-banner-left {
+  max-width: 580px;
+}
+
+.china-banner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #7c2d12;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.china-tag-icon {
+  color: #c2410c;
+}
+
+.china-banner-title {
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.18;
+  color: #291508;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+  font-family: inherit;
+}
+
+.china-banner-subtitle {
+  font-size: clamp(0.88rem, 1.4vw, 1.05rem);
+  color: #78533e;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 400;
+}
+
+.china-banner-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.china-cloud-graphics {
+  width: 170px;
+  height: 110px;
+  position: absolute;
+  top: -30px;
+  right: -10px;
+  pointer-events: none;
+}
+
+.china-cloud-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.china-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 9999px;
+  background: rgba(255, 237, 213, 0.75);
+  backdrop-filter: blur(4px);
+  border: 1.5px solid rgba(194, 65, 12, 0.22);
+  color: #431407;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.08);
+  white-space: nowrap;
+}
+
+.china-banner-btn:hover {
+  background: #ffffff;
+  border-color: #ea580c;
+  color: #c2410c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(194, 65, 12, 0.16);
+}
+
+@media (max-width: 900px) {
+  .china-banner-card {
+    padding: 30px 28px;
+  }
+}
+
+@media (max-width: 680px) {
+  .china-banner-card {
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+
+  .china-banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .china-banner-right {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .china-cloud-graphics {
+    display: none;
+  }
+
+  .china-banner-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

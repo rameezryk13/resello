@@ -1,4 +1,4 @@
-import { Heart, Instagram, Linkedin, Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
+import { Heart, Instagram, Linkedin, Mail, MapPin, Phone, ShoppingBag, Truck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "./Footer.css";
 
@@ -7,7 +7,7 @@ const Footer = () => {
 
   const footerGroups = [
     {
-      title: "Information",
+      title: "POLICIES & DETAILS",
       links: [
         { label: "About us", path: "/about" },
         { label: "How Resello Works", path: "/how-it-works" },
@@ -15,33 +15,37 @@ const Footer = () => {
         { label: "Reseller Program", path: "/reseller" },
         { label: "Terms & conditions", path: "/terms" },
         { label: "Privacy policy", path: "/privacy" },
+        { label: "Refund policy", path: "/shipping-policy", highlight: "red" },
       ],
     },
     {
-      title: "Customer care",
+      title: "CUSTOMER SUPPORT",
       links: [
-        { label: "Contact Support", path: "/contact" },
+        { label: "Track Your Order", path: "/track-order", highlight: "gold", hasTruck: true },
+        { label: "My Orders & Status", path: "/my-orders" },
+        { label: "Contact Support Helpline", path: "/contact" },
         { label: "FAQs & Help Center", path: "/faq" },
-        { label: "Shipping & Returns", path: "/shipping-policy" },
+        { label: "Shipping & Returns", path: "/shipping-policy", highlight: "red" },
       ],
     },
     {
-      title: "My account",
+      title: "MY ACCOUNT",
       links: [
         { label: "My favorites", path: "/favorites" },
         { label: "Shopping bag", path: "/cart" },
         { label: "Order history", path: "/my-orders" },
         { label: "Profit account", path: "/profit-account" },
+        { label: "Wallet & Payouts", path: "/wallet" },
       ],
     },
     {
-      title: "Popular categories",
+      title: "HELPLINE & OFFICE",
+      isOfficeColumn: true,
       links: [
         { label: "Electronics", path: "#" },
         { label: "Cosmetics", path: "#" },
         { label: "Women's Fashion", path: "#" },
         { label: "Men's Fashion", path: "#" },
-        { label: "Kids Clothing", path: "#" },
       ],
     },
   ];
@@ -64,14 +68,18 @@ const Footer = () => {
             <span>ReSello</span>
           </button>
           <p className="footer-copy">
-            ReSello is a reseller marketplace for fashion, beauty, electronics, home and everyday
-            essentials. Shop from trusted sellers with fast delivery and a simple return window.
+            Pakistan's premier wholesale and reseller marketplace for imported fashion, accessories,
+            electronics, home, and lifestyle essentials at guaranteed wholesale rates.
           </p>
 
-          <div className="footer-contact">
-            <h3>Contact</h3>
-            <p><Mail size={16} /> hello@resello.app</p>
-
+          <div className="footer-delivery-card">
+            <div className="footer-delivery-title">
+              <Truck size={17} className="footer-delivery-icon" />
+              <strong>Nationwide Express Delivery</strong>
+            </div>
+            <p className="footer-delivery-text">
+              TCS, Leopards Courier, &amp; Trax with live parcel tracking.
+            </p>
           </div>
 
           <div className="footer-socials" aria-label="Social links">
@@ -89,18 +97,55 @@ const Footer = () => {
         {footerGroups.map((group) => (
           <nav key={group.title} className="footer-link-column" aria-label={group.title}>
             <h3>{group.title}</h3>
-            {group.links.map((link) => (
-              <button
-                key={link.label}
-                type="button"
-                className="footer-link"
-                onClick={() => handleLinkClick(link)}
-              >
-                {link.label}
-              </button>
-            ))}
+            {group.isOfficeColumn ? (
+              <div className="footer-office-info">
+                <p className="footer-office-line"><MapPin size={15} /> Naseerabad, Peshawar Road, Rawalpindi, Pakistan</p>
+                <p className="footer-office-line"><Phone size={15} /> +92 341-5133443</p>
+                <p className="footer-office-line"><Mail size={15} /> sales@resello.pk</p>
+
+                <div className="footer-developer-credit">
+                  <span className="dev-credit-label">Website developed by <strong>Muhammad Rameez Khan</strong></span>
+                  <a href="https://wa.me/923005575390" target="_blank" rel="noopener noreferrer" className="dev-credit-link">
+                    <Phone size={13} /> Contact: 03005575390
+                  </a>
+                  <a href="mailto:rameezryk13@gmail.com" className="dev-credit-link">
+                    <Mail size={13} /> Email: rameezryk13@gmail.com
+                  </a>
+                </div>
+              </div>
+            ) : (
+              group.links.map((link) => (
+                <button
+                  key={link.label}
+                  type="button"
+                  className={`footer-link ${link.highlight ? `highlight-${link.highlight}` : ""}`}
+                  onClick={() => handleLinkClick(link)}
+                >
+                  {link.hasTruck && <Truck size={15} className="footer-inline-truck-icon" />}
+                  <span>{link.label}</span>
+                </button>
+              ))
+            )}
           </nav>
         ))}
+      </div>
+
+      <div className="footer-bottom-bar">
+        <div className="container footer-bottom-inner">
+          <div className="footer-bottom-copy">
+            <p>© 2026 ReSello. All rights reserved.</p>
+            <p className="footer-bottom-dev">
+              Website developed by <strong>Muhammad Rameez Khan</strong> • Contact: 03005575390 • Email: rameezryk13@gmail.com
+            </p>
+          </div>
+          <div className="footer-bottom-nav">
+            <button type="button" onClick={() => navigate("/terms")}>Terms of service</button>
+            <button type="button" onClick={() => navigate("/privacy")}>Privacy Policy</button>
+            <button type="button" className="footer-link highlight-red" onClick={() => navigate("/shipping-policy")}>
+              Refund policy
+            </button>
+          </div>
+        </div>
       </div>
     </footer>
   );

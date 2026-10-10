@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BadgeCheck, Check, CheckCircle, CreditCard, Home, MapPin, Pencil, Truck, WalletCards } from "lucide-react";
+import { BadgeCheck, Check, CheckCircle, CreditCard, Home, MapPin, Pencil, Trash2, Truck, WalletCards } from "lucide-react";
 import { formatRupees } from "@/utils/currency";
 import { ADVANCE_PAYMENT_BENEFITS, DELIVERY_PARTNER } from "../../constants";
 import PhoneInput from "@/components/ui/PhoneInput/PhoneInput.jsx";
@@ -18,6 +18,7 @@ const AddressStep = ({
   newAddress,
   onNewAddressChange,
   onSubmitNewAddress,
+  onDeleteAddress,
   submitting,
   orderPaymentType,
   setOrderPaymentType,
@@ -312,11 +313,18 @@ const AddressStep = ({
                 .join(", ");
 
               return (
-                <button
+                <div
                   key={address.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   className={`address-card ${isSelected ? "selected" : ""}`}
                   onClick={() => onAddressSelect(address.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onAddressSelect(address.id);
+                    }
+                  }}
                 >
                   <div className="address-card-indicator" aria-hidden="true">
                     {isSelected ? (
@@ -328,11 +336,29 @@ const AddressStep = ({
                   <div className="address-meta">
                     <div className="address-meta-top">
                       <strong className="address-card-name">{address.name}</strong>
-                      {isSelected && (
-                        <span className="selected-address-badge">
-                          <Check size={12} /> Selected
-                        </span>
-                      )}
+                      <div className="address-card-actions">
+                        {isSelected && (
+                          <span className="selected-address-badge">
+                            <Check size={12} /> Selected
+                          </span>
+                        )}
+                        {onDeleteAddress && (
+                          <button
+                            type="button"
+                            className="delete-address-btn"
+                            aria-label={`Delete address for ${address.name}`}
+                            title="Delete this address"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete address for "${address.name}"?`)) {
+                                onDeleteAddress(address.id);
+                              }
+                            }}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="address-full-line">
                       <Home size={15} className="address-inline-icon" />
@@ -343,7 +369,7 @@ const AddressStep = ({
                       {address.phone2 ? `, ${address.phone2}` : ""}
                     </span>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

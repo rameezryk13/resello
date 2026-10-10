@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get, post } from "@/api/client";
+import { del, get, post } from "@/api/client";
 import endpoints from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import useWallet from "@/features/wallet/useWallet";
@@ -185,6 +185,21 @@ const useCheckout = () => {
     }
   };
 
+  const deleteAddress = async (addressId) => {
+    if (!addressId) return;
+    try {
+      const data = await del(endpoints.address(addressId));
+      const updatedList = data.addresses || [];
+      setAddresses(updatedList);
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId(updatedList[0]?.id || "");
+      }
+      setMessage("Address deleted successfully.");
+    } catch (err) {
+      setError(err?.message || "Unable to delete address");
+    }
+  };
+
   const placeOrder = async (addressIdOverride) => {
     const addressId = addressIdOverride || selectedAddressId;
     if (!addressId || cartItems.length === 0) return;
@@ -344,6 +359,7 @@ const useCheckout = () => {
     newAddress,
     handleNewAddressChange,
     submitNewAddress,
+    deleteAddress,
     handleAddressSelect,
     // payment
     paymentMethod,

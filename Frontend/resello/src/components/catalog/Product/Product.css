@@ -26,14 +26,22 @@
   position: relative;
   width: 100%;
   height: 190px;
-  border: var(--border-width-thick) solid var(--color-primary);
-  /* flagged — original 3px has no border-width token
-     (thin/input/thick = 1/1.5/2px); using thick as closest, note
-     visual will be 1px thinner */
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm);
   overflow: hidden;
   margin-bottom: var(--space-xs);
   background-color: var(--color-bg);
+}
+
+.product-category {
+  display: block;
+  font-size: var(--text-2xs, 0.725rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .product-badge {
@@ -250,6 +258,7 @@
    the floor removed so the track can shrink them instead.
    This block was previously scoped to `min-width: 768px`, which is exactly
    where the problem did NOT occur. */
+.catalog-products-grid .product-card,
 .more-products-grid .product-card,
 .search-results-grid .product-card,
 .related-products-grid .product-card,
@@ -258,12 +267,13 @@
 .shop-products-grid .product-card,
 .favorites-grid .product-card,
 .favorite-select-card .product-card {
-  min-width: 0;
-  width: 100%;
-  max-width: none;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
   height: 100%;
 }
 
+.catalog-products-grid .product-img-container,
 .more-products-grid .product-img-container,
 .search-results-grid .product-img-container,
 .related-products-grid .product-img-container,
@@ -272,28 +282,28 @@
 .shop-products-grid .product-img-container,
 .favorites-grid .product-img-container,
 .favorite-select-card .product-img-container {
-  height: auto;
+  height: auto !important;
   aspect-ratio: 1 / 1;
 }
 
 @media (max-width: 1200px) {
   .product-card {
-      min-width: 140px;
-      width: min(240px, 100%);
-    }
+    min-width: 140px;
+    width: min(240px, 100%);
+  }
 }
 
-/* Single mobile block. This previously existed twice with the same
-   max-width: 768px query — the first copy was entirely overridden by the
-   second and never applied. Merged into one. */
+/* Single mobile block */
 @media (max-width: 767.98px) {
   .product-card {
-      min-width: 135px;
-      width: min(135px, 100%);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
+    min-width: 135px;
+    width: min(135px, 100%);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
 
+  /* When inside any mobile 2-column grid, expand card fully edge-to-edge like Markaz */
+  .catalog-products-grid .product-card,
   .more-products-grid .product-card,
   .search-results-grid .product-card,
   .related-products-grid .product-card,
@@ -302,68 +312,95 @@
   .shop-products-grid .product-card,
   .favorites-grid .product-card,
   .favorite-select-card .product-card {
-    min-width: 0;
-    width: 100%;
-    max-width: none;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100%;
+    padding: 6px 6px 10px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--color-border-light);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .catalog-products-grid .product-img-container,
+  .more-products-grid .product-img-container,
+  .search-results-grid .product-img-container,
+  .related-products-grid .product-img-container,
+  .row-products-grid .product-img-container,
+  .event-page-grid .product-img-container,
+  .shop-products-grid .product-img-container,
+  .favorites-grid .product-img-container,
+  .favorite-select-card .product-img-container {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 8px !important;
+    margin-bottom: 6px !important;
   }
 
   .product-img-container {
-      height: auto;
-      aspect-ratio: 1 / 1;
-      border-radius: var(--radius-xs) var(--radius-xs) 0 0;
-    }
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+  }
+
   .product-info {
-      padding: var(--space-2xs) var(--space-2xs);
-    }
+    padding: 2px 4px 0;
+  }
+
   .product-info h4 {
-      font-size: var(--text-xs);
-      line-height: 1.35;
-      min-height: 2.7em;
-      margin-bottom: var(--space-3xs);
-    }
+    font-size: var(--text-xs, 0.8rem);
+    line-height: 1.35;
+    min-height: 2.7em;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
   .product-rating {
-      margin-bottom: var(--space-3xs);
-    }
+    margin-bottom: 4px;
+  }
+
   .product-rating .stars {
-      font-size: var(--text-2xs);
-    }
+    font-size: var(--text-2xs);
+  }
+
   .product-rating .reviews {
-      font-size: var(--text-2xs);
-    }
+    font-size: var(--text-2xs);
+  }
+
   .price-wrapper {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: auto;
-    }
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
   .new-price {
-      font-size: var(--text-base);
-      font-weight: 700;
-      color: var(--color-primary);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   .old-price {
-      font-size: var(--text-2xs);
-      text-decoration: line-through;
-      white-space: nowrap;
-      flex-shrink: 0;
-      /* This block used to re-declare --color-text-faint here, which put the
-         2.54:1 failure straight back on every screen under 768px — i.e. on
-         exactly the devices that matter most. The base rule's colour is the
-         right one at every width, so this no longer sets colour at all. */
-    }
+    font-size: var(--text-2xs);
+    text-decoration: line-through;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 }
 
 @media (max-width: 480px) {
   .product-card {
-      min-width: 120px;
-      width: min(120px, 100%);
-      border-radius: var(--radius-xs);
-    }
+    min-width: 120px;
+    width: min(120px, 100%);
+    border-radius: var(--radius-xs);
+  }
 
+  .catalog-products-grid .product-card,
   .more-products-grid .product-card,
   .search-results-grid .product-card,
   .related-products-grid .product-card,
@@ -372,46 +409,68 @@
   .shop-products-grid .product-card,
   .favorites-grid .product-card,
   .favorite-select-card .product-card {
-    min-width: 0;
-    width: 100%;
-    max-width: none;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100%;
+    padding: 6px 6px 8px !important;
+  }
+
+  .catalog-products-grid .product-img-container,
+  .more-products-grid .product-img-container,
+  .search-results-grid .product-img-container,
+  .related-products-grid .product-img-container,
+  .row-products-grid .product-img-container,
+  .event-page-grid .product-img-container,
+  .shop-products-grid .product-img-container,
+  .favorites-grid .product-img-container,
+  .favorite-select-card .product-img-container {
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 8px !important;
   }
 
   .product-img-container {
-      height: auto;
-      aspect-ratio: 1 / 1;
-    }
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
   .product-info {
-      padding: var(--space-2xs);
-    }
+    padding: 2px 2px 0;
+  }
+
   .product-info h4 {
-      font-size: var(--text-xs);
-      line-height: 1.35;
-      min-height: 2.7em;
-    }
+    font-size: var(--text-xs, 0.775rem);
+    line-height: 1.35;
+    min-height: 2.7em;
+  }
+
   .product-rating .stars {
-      font-size: var(--text-2xs);
-    }
+    font-size: var(--text-2xs);
+  }
+
   .product-rating .reviews {
-      font-size: var(--text-2xs);
-    }
+    font-size: var(--text-2xs);
+  }
+
   .price-wrapper {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-top: auto;
-    }
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
   .new-price {
-      font-size: var(--text-sm);
-      font-weight: 700;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    font-size: var(--text-sm);
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   .old-price {
-      font-size: var(--text-2xs);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 }
